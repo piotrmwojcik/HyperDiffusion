@@ -48,12 +48,12 @@ def get_model(cfg):
     config_name="overfit_plane",
 )
 def main(cfg: DictConfig):
-    wandb.init(
-        project="hyperdiffusion_overfitting",
-        dir=cfg.wandb_dir,
-        config=dict(cfg),
-        mode="offline",
-    )
+    #wandb.init(
+    #    project="hyperdiffusion_overfitting",
+    #    dir=cfg.wandb_dir,
+    #    config=dict(cfg),
+    #    mode="offline",
+    #)
     first_state_dict = None
     if cfg.strategy == "same_init":
         first_state_dict = get_model(cfg).state_dict()
