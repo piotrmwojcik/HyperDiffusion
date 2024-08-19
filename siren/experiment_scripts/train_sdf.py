@@ -52,7 +52,7 @@ def main(cfg: DictConfig):
         project="hyperdiffusion_overfitting",
         dir=cfg.wandb_dir,
         config=dict(cfg),
-        mode="online",
+        mode="offline",
     )
     first_state_dict = None
     if cfg.strategy == "same_init":
