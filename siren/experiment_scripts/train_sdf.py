@@ -69,7 +69,6 @@ def main(cfg: DictConfig):
         for file in os.listdir(cfg.dataset_folder)
         if file not in ["train_split.lst", "test_split.lst", "val_split.lst"]
     ]
-    print(files)
     if multip_cfg.enabled:
         if multip_cfg.ignore_first:
             files = files[1:]  # Ignoring the first one
@@ -101,6 +100,10 @@ def main(cfg: DictConfig):
             if not (file in train_object_names):
                 print(f"File {file} not in train_split")
                 continue
+
+            print('!!!')
+            print(cfg.dataset_folder)
+            print(file)
 
             filename = file.split(".")[0]
             filename = f"{filename}_jitter_{j}"
