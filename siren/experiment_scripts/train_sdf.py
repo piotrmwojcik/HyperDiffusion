@@ -101,10 +101,6 @@ def main(cfg: DictConfig):
                 print(f"File {file} not in train_split")
                 continue
 
-            print('!!!')
-            print(cfg.dataset_folder)
-            print(file)
-
             filename = file.split(".")[0]
             filename = f"{filename}_jitter_{j}"
 
