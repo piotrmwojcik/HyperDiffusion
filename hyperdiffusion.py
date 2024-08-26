@@ -168,8 +168,6 @@ class HyperDiffusion(pl.LightningModule):
             self.logger,
             model_kwargs=None,
         )
-        print('!!!')
-        print(loss_terms["loss"].mean())
 
         loss_mse = loss_terms["loss"].mean()
         self.log("train_loss", loss_mse)
