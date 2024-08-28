@@ -1,12 +1,17 @@
 import os
 
+from pytorch_lightning.strategies import DDPStrategy
+
 from dataset import VoxelDataset, WeightDataset
 from hd_utils import Config, get_mlp
 from hyperdiffusion import HyperDiffusion
 
 # Using it to make pyrender work on clusters
-os.environ["PYOPENGL_PLATFORM"] = "egl"
+# os.environ["PYOPENGL_PLATFORM"] = "egl"
+
+
 import sys
+
 from datetime import datetime
 from os.path import join
 
@@ -33,6 +38,9 @@ sys.path.append("siren")
 )
 def main(cfg: DictConfig):
     Config.config = config = cfg
+
+    torch.set_float32_matmul_precision('medium')
+
     method = Config.get("method")
     mlp_kwargs = None
 
@@ -114,9 +122,9 @@ def main(cfg: DictConfig):
             assert len(train_idx.intersection(val_idx.intersection(test_idx))) == 0
             assert len(train_idx.union(val_idx.union(test_idx))) == total_size
             assert (
-                len(train_idx) == train_size
-                and len(val_idx) == val_size
-                and len(test_idx) == test_size
+                    len(train_idx) == train_size
+                    and len(val_idx) == val_size
+                    and len(test_idx) == test_size
             )
 
             np.savetxt(
@@ -253,7 +261,7 @@ def main(cfg: DictConfig):
         accelerator="gpu",
         devices=torch.cuda.device_count(),
         max_epochs=Config.get("epochs"),
-        strategy="ddp",
+        strategy=DDPStrategy(process_group_backend="gloo", find_unused_parameters=False),
         logger=wandb_logger,
         default_root_dir=checkpoint_path,
         callbacks=[
