@@ -50,7 +50,7 @@ transformer_config:
   params:
     n_embd: 2880
     n_layer: 12
-    n_head: 16
+    n_head: 8
     split_policy: layer_by_layer
     use_global_residual: False
     condition: 'no'
