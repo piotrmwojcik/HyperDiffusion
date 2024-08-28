@@ -27,7 +27,7 @@ batch_size: 32
 accumulate_grad_batches: 1
 val:
   num_points: 2048
-  num_samples: 60
+  num_samples: 30
 mlp_config:
   params:
     model_type: mlp_3d
