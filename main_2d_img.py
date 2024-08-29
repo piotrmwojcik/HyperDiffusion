@@ -133,14 +133,14 @@ def main(cfg: DictConfig):
         #         fmt="%s",
         #     )
 
-        val_object_names = np.genfromtxt(
-            os.path.join(dataset_path, "val_split.lst"), dtype="str"
-        )
-        val_object_names = set([str.split(".")[0] for str in val_object_names])
-        test_object_names = np.genfromtxt(
-            os.path.join(dataset_path, "test_split.lst"), dtype="str"
-        )
-        test_object_names = set([str.split(".")[0] for str in test_object_names])
+        # val_object_names = np.genfromtxt(
+        #     os.path.join(dataset_path, "val_split.lst"), dtype="str"
+        # )
+        # val_object_names = set([str.split(".")[0] for str in val_object_names])
+        # test_object_names = np.genfromtxt(
+        #     os.path.join(dataset_path, "test_split.lst"), dtype="str"
+        # )
+        # test_object_names = set([str.split(".")[0] for str in test_object_names])
         # assert len(train_object_names) == train_size, f"{len(train_object_names)} {train_size}"
 
         train_dt = WeightDataset(
