@@ -6,7 +6,6 @@ from hd_utils import Config
 from omegaconf import DictConfig
 import matplotlib.pyplot as plt
 import numpy as np
-
 def get_mgrid(sidelen, dim=2):
     tensors = tuple(dim * [torch.linspace(-1, 1, steps=sidelen)])
     mgrid = torch.stack(torch.meshgrid(*tensors), dim=-1)
@@ -15,7 +14,7 @@ def get_mgrid(sidelen, dim=2):
 
 
 if __name__ == '__main__':
-    weights_path = '/Users/kacpermarzol/PycharmProjects/hyperdiffusionproject/HyperDiffusion/data/02691156/11441_383ddba4ee9845b6b34dcbe295284658_000031/checkpoints/model_final.pth'
+    weights_path = '/Users/kacpermarzol/PycharmProjects/hyperdiffusionproject/HyperDiffusion/mlp_weights/srn_cars_inr_wgth100/11613_e5b03e7b088d43c09367a6ecbb0d496e_000043.pth'
     config_path = '/Users/kacpermarzol/PycharmProjects/hyperdiffusionproject/HyperDiffusion/configs/' \
                   'diffusion_configs/train_car.yaml'
 
@@ -31,24 +30,14 @@ if __name__ == '__main__':
     for weight in weights_dict:
         weights.append(weights_dict[weight].flatten().cpu())
     weights = torch.hstack(weights)
-
+    print(weights.shape)
     siren = generate_mlp_from_weights(weights, mlp_kwargs)
 
-    state_dict = siren.state_dict()
-    layers = []
-    layer_names = []
-    for l in state_dict:
-        shape = state_dict[l].shape
-        layers.append(np.prod(shape))
-        layer_names.append(l)
 
-    print('layers: ', layers, '\nlayer_names: ', layer_names)
-
-
-    # model_input = get_mgrid(128, 2).unsqueeze(0)
-    # model_input = {'coords': model_input}
-    # result = siren(model_input)
-    # img = result['model_out']
-    # fig, axes = plt.subplots(1, 1, figsize=(9, 9))
-    # axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
-    # plt.savefig("testtt")
+    model_input = get_mgrid(128, 2).unsqueeze(0)
+    model_input = {'coords': model_input}
+    result = siren(model_input)
+    img = result['model_out']
+    fig, axes = plt.subplots(1, 1, figsize=(9, 9))
+    axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
+    plt.savefig("testtt")

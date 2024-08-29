@@ -139,7 +139,6 @@ class SingleBVPNet(MetaModule): ## SIREN 2D
             params = OrderedDict(self.named_parameters())
 
         # Enables us to compute gradients w.r.t. coordinates
-        print("!!!!" , model_input)
         coords_org = model_input['coords'].clone().detach().requires_grad_(True)
         coords = coords_org
 
