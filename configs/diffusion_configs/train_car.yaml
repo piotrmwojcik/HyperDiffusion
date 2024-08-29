@@ -18,7 +18,7 @@ scheduler: True
 scheduler_step: 200
 best_model_save_path:
 mode: train
-mlps_folder_train: ./mlp_weights/srn_cars_inr_wgth100
+mlps_folder_train: ./mlp_weights/3d_128_car_multires_4_manifoldplus_slower_no_clipgrad
 model_resume_path:
 sampling: ddim
 val_fid_calculation_period: 30
@@ -30,14 +30,17 @@ val:
   num_samples: 60
 mlp_config:
   params:
-    model_type: SingleBVPNet
-    type: sine
-    mode: mlp
-    out_features: 3
-    in_features: 2
-    hidden_features: 128
-    sidelength: 128
+    model_type: mlp_3d
+    out_size: 1
+    hidden_neurons:
+      - 128
+      - 128
+      - 128
     output_type: occ
+    out_act: sigmoid
+    multires: 4
+    use_leaky_relu: False
+    move: False
 diff_config:
   params:
     model_mean_type: START_X

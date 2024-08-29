@@ -16,7 +16,7 @@ def get_mgrid(sidelen, dim=2):
 if __name__ == '__main__':
     weights_path = '/Users/kacpermarzol/PycharmProjects/hyperdiffusionproject/HyperDiffusion/mlp_weights/srn_cars_inr_wgth100/11613_e5b03e7b088d43c09367a6ecbb0d496e_000043.pth'
     config_path = '/Users/kacpermarzol/PycharmProjects/hyperdiffusionproject/HyperDiffusion/configs/' \
-                  'diffusion_configs/train_car.yaml'
+                  'diffusion_configs/train_car_2d_img.yaml'
 
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
