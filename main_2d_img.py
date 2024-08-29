@@ -81,57 +81,57 @@ def main(cfg: DictConfig):
 
     if method == "hyper_3d":
         mlps_folder_all = mlps_folder_train
-        all_object_names = np.array(
-            [obj for obj in os.listdir(dataset_path) if ".lst" not in obj]
-        )
-        total_size = len(all_object_names)
-        val_size = int(total_size * 0.05)
-        test_size = int(total_size * 0.15)
-        train_size = total_size - val_size - test_size
-        if not os.path.exists(os.path.join(dataset_path, "train_split.lst")):
-            train_idx = np.random.choice(
-                total_size, train_size + val_size, replace=False
-            )
-            test_idx = set(range(total_size)).difference(train_idx)
-            val_idx = set(np.random.choice(train_idx, val_size, replace=False))
-            train_idx = set(train_idx).difference(val_idx)
-            print(
-                "Generating new partition",
-                len(train_idx),
-                train_size,
-                len(val_idx),
-                val_size,
-                len(test_idx),
-                test_size,
-            )
-
-            # Sanity checking the train, val and test splits
-            assert len(train_idx.intersection(val_idx.intersection(test_idx))) == 0
-            assert len(train_idx.union(val_idx.union(test_idx))) == total_size
-            assert (
-                len(train_idx) == train_size
-                and len(val_idx) == val_size
-                and len(test_idx) == test_size
-            )
-
-            np.savetxt(
-                os.path.join(dataset_path, "train_split.lst"),
-                all_object_names[list(train_idx)],
-                delimiter=" ",
-                fmt="%s",
-            )
-            np.savetxt(
-                os.path.join(dataset_path, "val_split.lst"),
-                all_object_names[list(val_idx)],
-                delimiter=" ",
-                fmt="%s",
-            )
-            np.savetxt(
-                os.path.join(dataset_path, "test_split.lst"),
-                all_object_names[list(test_idx)],
-                delimiter=" ",
-                fmt="%s",
-            )
+        # all_object_names = np.array(
+        #     [obj for obj in os.listdir(dataset_path) if ".lst" not in obj]
+        # )
+        # total_size = len(all_object_names)
+        # val_size = int(total_size * 0.05)
+        # test_size = int(total_size * 0.15)
+        # train_size = total_size - val_size - test_size
+        # if not os.path.exists(os.path.join(dataset_path, "train_split.lst")):
+        #     train_idx = np.random.choice(
+        #         total_size, train_size + val_size, replace=False
+        #     )
+        #     test_idx = set(range(total_size)).difference(train_idx)
+        #     val_idx = set(np.random.choice(train_idx, val_size, replace=False))
+        #     train_idx = set(train_idx).difference(val_idx)
+        #     print(
+        #         "Generating new partition",
+        #         len(train_idx),
+        #         train_size,
+        #         len(val_idx),
+        #         val_size,
+        #         len(test_idx),
+        #         test_size,
+        #     )
+        #
+        #     # Sanity checking the train, val and test splits
+        #     assert len(train_idx.intersection(val_idx.intersection(test_idx))) == 0
+        #     assert len(train_idx.union(val_idx.union(test_idx))) == total_size
+        #     assert (
+        #         len(train_idx) == train_size
+        #         and len(val_idx) == val_size
+        #         and len(test_idx) == test_size
+        #     )
+        #
+        #     np.savetxt(
+        #         os.path.join(dataset_path, "train_split.lst"),
+        #         all_object_names[list(train_idx)],
+        #         delimiter=" ",
+        #         fmt="%s",
+        #     )
+        #     np.savetxt(
+        #         os.path.join(dataset_path, "val_split.lst"),
+        #         all_object_names[list(val_idx)],
+        #         delimiter=" ",
+        #         fmt="%s",
+        #     )
+        #     np.savetxt(
+        #         os.path.join(dataset_path, "test_split.lst"),
+        #         all_object_names[list(test_idx)],
+        #         delimiter=" ",
+        #         fmt="%s",
+        #     )
 
         val_object_names = np.genfromtxt(
             os.path.join(dataset_path, "val_split.lst"), dtype="str"
@@ -245,7 +245,7 @@ def main(cfg: DictConfig):
             #best_acc_checkpoint,
             #best_mmd_checkpoint,
             #last_model_saver,
-            #lr_monitor,
+            lr_monitor,
         ],
         check_val_every_n_epoch=Config.get("val_fid_calculation_period"),
         num_sanity_val_steps=0,
