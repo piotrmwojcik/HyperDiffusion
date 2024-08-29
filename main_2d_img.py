@@ -210,12 +210,12 @@ def main(cfg: DictConfig):
         model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, cfg
     )
 
-    # # Specify where to save checkpoints
-    # checkpoint_path = join(
-    #     config["tensorboard_log_dir"],
-    #     "lightning_checkpoints",
-    #     f"{str(datetime.now()).replace(':', '-') + '-' + wandb.run.name + '-' + wandb.run.id}",
-    # )
+    # Specify where to save checkpoints
+    checkpoint_path = join(
+        config["tensorboard_log_dir"],
+        "lightning_checkpoints",
+        f"{str(datetime.now()).replace(':', '-') + '-' + wandb.run.name + '-' + wandb.run.id}",
+    )
     # best_acc_checkpoint = ModelCheckpoint(
     #     save_top_k=1,
     #     monitor="val/1-NN-CD-acc",
