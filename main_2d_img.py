@@ -78,12 +78,7 @@ def main(cfg: DictConfig):
         ).float()
 
     dataset_path = os.path.join(Config.config["dataset_dir"], Config.config["dataset"])
-    train_object_names = np.genfromtxt(
-        os.path.join(dataset_path, "train_split.lst"), dtype="str"
-    )
-    if not cfg.mlp_config.params.move:
-        train_object_names = set([str.split(".")[0] for str in train_object_names])
-    # Check if dataset folder already has train,test,val split; create otherwise.
+
     if method == "hyper_3d":
         mlps_folder_all = mlps_folder_train
         all_object_names = np.array(
@@ -154,7 +149,7 @@ def main(cfg: DictConfig):
             model.dims,
             mlp_kwargs,
             cfg,
-            train_object_names,
+            None,
         )
         train_dl = DataLoader(
             train_dt,
@@ -169,7 +164,7 @@ def main(cfg: DictConfig):
             model.dims,
             mlp_kwargs,
             cfg,
-            val_object_names,
+            None,
         )
         test_dt = WeightDataset(
             mlps_folder_train,
@@ -177,7 +172,7 @@ def main(cfg: DictConfig):
             model.dims,
             mlp_kwargs,
             cfg,
-            test_object_names,
+            None,
         )
 
     # These two dl's are just placeholders, during val and test evaluation we are looking at test_split.lst,
