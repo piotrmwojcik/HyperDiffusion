@@ -5,10 +5,11 @@ import pyrender
 import torch
 import trimesh
 
-from mlp_models import MLP, MLP3D
+from mlp_models import MLP, MLP3D, SingleBVPNet
 from Pointnet_Pointnet2_pytorch.log.classification.pointnet2_ssg_wo_normals import \
     pointnet2_cls_ssg
 from torchmetrics_fid import FrechetInceptionDistance
+
 
 # Using edited 2D-FID code of torch_metrics
 fid = FrechetInceptionDistance(reset_real_features=True)
@@ -69,6 +70,8 @@ def get_mlp(mlp_kwargs):
     if "model_type" in mlp_kwargs:
         if mlp_kwargs.model_type == "mlp_3d":
             mlp = MLP3D(**mlp_kwargs)
+        elif mlp_kwargs.model_type == "SingleBVPNet":
+            mlp = SingleBVPNet(**mlp_kwargs)
     else:
         mlp = MLP(**mlp_kwargs)
     return mlp
