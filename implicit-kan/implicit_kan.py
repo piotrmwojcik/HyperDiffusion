@@ -25,7 +25,7 @@ set_random_seed(1)
 
 device = 'cuda'
 
-img = ToTensor()(Image.open('./inputs/eye.jpeg').resize((h, w)))[None].to(device) * 2 - 1.
+img = ToTensor()(Image.open('implicit-kan/inputs/eye.jpeg').resize((h, w)))[None].to(device) * 2 - 1.
 
 grid = get_grid(img.shape[2], img.shape[3], b=1).to(device)
 
