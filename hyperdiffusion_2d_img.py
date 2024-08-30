@@ -144,6 +144,8 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         model_input = {'coords': model_input}
         result = siren(model_input)
         img = result['model_out'][0].view(128, 128, 3)
+        print('!!!')
+        print(img.shape)
         images = wandb.Image(img, caption="")
         wandb.log({"examples": images})
         #self.logger.log_image("val", img)
