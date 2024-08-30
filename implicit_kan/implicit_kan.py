@@ -17,7 +17,6 @@ from implicit_kan.ChebyKANLayer import ChebyKANLayer
 from implicit_kan.KANLayer import FastKANLayer, KANLinear
 from implicit_kan.utils import get_grid, set_random_seed
 from implicit_kan.modules import GaussianFourierFeatureTransform
-from mlp_models import MLP3D, SingleBVPNet, MLP
 
 h = 128
 w = 128
@@ -215,19 +214,15 @@ kwargs = {
     'pos_enc': 'gff'
 }
 
-def get_mlp(mlp_kwargs):
+def test_get_mlp(mlp_kwargs):
     if "model_type" in mlp_kwargs:
-        if mlp_kwargs.model_type == "mlp_3d":
-            mlp = MLP3D(**mlp_kwargs)
-        elif mlp_kwargs.model_type == "SingleBVPNet":
-            mlp = SingleBVPNet(**mlp_kwargs)
-        elif mlp_kwargs.model_type == "kan":
+        if mlp_kwargs.model_type == "kan":
             mlp = ImplicitEKAN(**mlp_kwargs)
     else:
-        mlp = MLP(**mlp_kwargs)
+        pass
     return mlp
 
-test_kan = get_mlp(**kwargs)
+test_kan = test_get_mlp(**kwargs)
 
 # kan_7_reg_imgs = []
 # kan_7_reg_loss = []
