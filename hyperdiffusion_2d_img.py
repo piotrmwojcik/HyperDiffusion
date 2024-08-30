@@ -143,7 +143,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         model_input = get_mgrid(128, 2).unsqueeze(0)
         model_input = {'coords': model_input}
         result = siren(model_input)
-        img = result['model_out'][0].view(128, 128, 3)
+        img = result['model_out'][0].view(1, 128, 128, 3)
         img = torch.clamp(img, min=0.0, max=1.0)
         img = (img * 255).byte()
         print('!!!')
