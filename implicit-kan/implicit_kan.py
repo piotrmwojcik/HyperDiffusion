@@ -1,3 +1,5 @@
+import os
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -16,8 +18,8 @@ from implicit_kan.KANLayer import FastKANLayer, KANLinear
 from implicit_kan.utils import get_grid, set_random_seed
 from implicit_kan.modules import GaussianFourierFeatureTransform
 
-h = 256
-w = 256
+h = 128
+w = 128
 
 num_steps = 3000
 
@@ -38,7 +40,7 @@ class ImplicitKAN(nn.Module):
         if pos_enc == 'gff':
             self.pe = GaussianFourierFeatureTransform(mapping_dim=128)
         elif pos_enc == 'kan':
-            self.pe =  FastKANLayer(2, 128)
+            self.pe = FastKANLayer(2, 128)
         self.kan1 = FastKANLayer(256, 32)
         self.kan2 = FastKANLayer(32, 16)
         self.kan3 = FastKANLayer(16, 3)
@@ -203,7 +205,8 @@ kan_gff_loss = [l.item() for l in kan_gff_loss]
 kan_gff_imgs = [im.cpu().data.numpy() for im in kan_gff_imgs]
 
 print(f"trained in {time() - start} to {loss.item()}")
-
+torch.save(kan_model_7.state_dict(),
+           os.path.join('./kans_wghts', 'model_final.pth'))
 
 # kan_7_reg_imgs = []
 # kan_7_reg_loss = []
