@@ -250,13 +250,13 @@ for weight in state_dict:
 weights = torch.hstack(weights)
 
 test_kan = generate_mlp_from_weights_test(weights, kwargs).cuda()
-out = (test_kan(grid)[0] + 1.) / 2.
+out = est_kan(grid)[0]
 out_ref = (kan_model_7(grid)[0] + 1.) / 2
 print(out.shape)
 from torchvision import transforms
 transform_to_pil = transforms.ToPILImage()
-image = transform_to_pil(F.tanh(out))
-image_ref = transform_to_pil(F.tanh(out_ref))
+image = transform_to_pil((F.tanh(out)  + 1.) / 2.)
+image_ref = transform_to_pil((F.tanh(out_ref)  + 1.)/ 2.)
 
 # Save the image as a PNG file
 image.save(os.path.join('./kans_wghts', 'out.png'))
