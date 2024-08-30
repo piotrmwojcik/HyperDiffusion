@@ -59,7 +59,7 @@ class ImplicitKAN(nn.Module):
 
 
 class ImplicitEKAN(nn.Module):
-    def __init__(self, pos_enc='gff', grid_size=5):
+    def __init__(self, pos_enc='gff', grid_size=5, **kwargs):
         super(ImplicitEKAN, self).__init__()
         self.pos_enc = pos_enc
         assert pos_enc in ['gff', 'kan']
