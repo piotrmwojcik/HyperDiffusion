@@ -225,7 +225,7 @@ def test_get_mlp(mlp_kwargs):
     return mlp
 
 def generate_mlp_from_weights_test(weights, mlp_kwargs):
-    mlp = test_get_mlp(mlp_kwargs)
+    mlp = ImplicitEKAN(pos_enc='gff', grid_size=7)
     state_dict = mlp.state_dict()
     weight_names = list(state_dict.keys())
     for layer in weight_names:
