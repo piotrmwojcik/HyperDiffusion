@@ -233,6 +233,7 @@ def generate_mlp_from_weights_test(weights, mlp_kwargs):
         w = w.view(*val.shape)
         state_dict[layer] = w
         weights = weights[num_params:]
+        print(weights[num_params:])
     assert len(weights) == 0, f"len(weights) = {len(weights)}"
     dupa = mlp.load_state_dict(state_dict)
     print(dupa)
