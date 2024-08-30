@@ -831,7 +831,7 @@ class GaussianDiffusion:
                 result_target = siren_target(model_input)['model_out'][0]
                 result_output = siren_output(model_input)['model_out'][0]
                 mse2 = F.mse_loss(result_output, result_target)
-                mse1[i] *= mse2
+                mse1[i] += mse2
             terms["mse"] = mse1
 
             if "vb" in terms:
