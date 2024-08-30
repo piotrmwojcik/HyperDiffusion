@@ -6,7 +6,7 @@ import os
 import sys
 from pathlib import Path
 
-from mlp_models import MLP3D
+from mlp_models import MLP3D, SingleBVPNet
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(
@@ -27,6 +27,12 @@ class SDFDecoder(torch.nn.Module):
                 self.model = MLP3D(**cfg.mlp_config)
             else:
                 self.model = MLP3D(**cfg)
+        elif model_type == "SingleBVPNet":
+            if "mlp_config" in cfg:
+                self.model = SingleBVPNet(**cfg.mlp_config)
+            else:
+                pass
+
 
         if checkpoint_path is not None:
             self.model.load_state_dict(torch.load(checkpoint_path))
