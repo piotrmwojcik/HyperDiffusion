@@ -80,6 +80,9 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         if "hyper" in self.method and self.trainer.global_step == 0:
             curr_weights = Config.get("curr_weights")
             img = input_data[0].flatten()[:curr_weights]
+            print('!!!!')
+            print(input_data[0].flatten().shape)
+            print(curr_weights)
             print(img.shape)
             mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
             sdf_decoder = SDFDecoder(
