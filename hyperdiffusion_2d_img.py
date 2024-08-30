@@ -21,7 +21,7 @@ from siren.experiment_scripts.test_sdf import SDFDecoder
 
 class HyperDiffusion_2d_img(pl.LightningModule):
     def __init__(
-        self, model, train_dt, test_dt, mlp_kwargs, image_shape, method, cfg
+        self, model, train_dt, val_dt, test_dt, mlp_kwargs, image_shape, method, cfg
     ):
         super().__init__()
         self.model = model
