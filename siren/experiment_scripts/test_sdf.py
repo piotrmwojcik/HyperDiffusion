@@ -30,7 +30,6 @@ class SDFDecoder(torch.nn.Module):
         elif model_type == "SingleBVPNet":
             self.model = SingleBVPNet(**cfg)
 
-
         if checkpoint_path is not None:
             self.model.load_state_dict(torch.load(checkpoint_path))
         self.model.cuda()
