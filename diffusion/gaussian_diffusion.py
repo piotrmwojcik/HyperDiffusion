@@ -826,7 +826,8 @@ class GaussianDiffusion:
             result_target = siren_target(model_input)['model_out'][0]
             result_output = siren_output(model_input)['model_out'][0]
             mse1 = mean_flat((target - model_output) ** 2)
-            mse1[0] += (result_target - result_output) ** 2
+            mse2 = (result_target - result_output) ** 2
+            print(mse2.shape)
             terms["mse"] = mse1
 
             if "vb" in terms:
