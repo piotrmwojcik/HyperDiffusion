@@ -18,8 +18,8 @@ from implicit_kan.KANLayer import FastKANLayer, KANLinear
 from implicit_kan.utils import get_grid, set_random_seed
 from implicit_kan.modules import GaussianFourierFeatureTransform
 
-h = 512
-w = 512
+h = 256
+w = 256
 
 num_steps = 3000
 
