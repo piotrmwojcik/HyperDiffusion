@@ -216,7 +216,7 @@ kwargs = {
 
 def test_get_mlp(mlp_kwargs):
     if "model_type" in mlp_kwargs:
-        if mlp_kwargs.model_type == "kan":
+        if mlp_kwargs['model_type'] == "kan":
             mlp = ImplicitEKAN(**mlp_kwargs)
     else:
         pass
