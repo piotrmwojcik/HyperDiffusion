@@ -148,7 +148,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         #print(img.shape)
         #images = wandb.Image(img, caption="")
         #wandb.log({"examples": images})
-        self.logger.log_image("val", img)
+        self.logger.log_image("val", [img])
         #metric_fn = (
         #    self.calc_metrics_4d
         #    if self.cfg.mlp_config.params.move
