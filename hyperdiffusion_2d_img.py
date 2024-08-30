@@ -143,11 +143,8 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         model_input = get_mgrid(128, 2).unsqueeze(0)
         model_input = {'coords': model_input}
         result = siren(model_input)
-        img = result['model_out']
-        print('!!!')
-        print(img.shape)
-        print(img)
-        self.logger.log_image("val", [img])
+        img = result['model_out'][0].view(128, 128, 3)
+        self.logger.log_image("val", img)
         #metric_fn = (
         #    self.calc_metrics_4d
         #    if self.cfg.mlp_config.params.move
