@@ -189,24 +189,24 @@ for l in state_dict:
 print(layers)
 
 
-kan_gff_imgs = []
-kan_gff_loss = []
-start = time()
-for step_idx in tqdm(range(num_steps)):
-    optim_kan_7.zero_grad()
-    out = kan_model_7(grid)
-    loss = ((F.tanh(out) - img) ** 2).mean()
-    loss.backward()
-    optim_kan_7.step()
-    kan_gff_loss.append(loss)
-    kan_gff_imgs.append(out)
-
-kan_gff_loss = [l.item() for l in kan_gff_loss]
-kan_gff_imgs = [im.cpu().data.numpy() for im in kan_gff_imgs]
-
-print(f"trained in {time() - start} to {loss.item()}")
-torch.save(kan_model_7.state_dict(),
-           os.path.join('./kans_wghts', 'model_final.pth'))
+# kan_gff_imgs = []
+# kan_gff_loss = []
+# start = time()
+# for step_idx in tqdm(range(num_steps)):
+#     optim_kan_7.zero_grad()
+#     out = kan_model_7(grid)
+#     loss = ((F.tanh(out) - img) ** 2).mean()
+#     loss.backward()
+#     optim_kan_7.step()
+#     kan_gff_loss.append(loss)
+#     kan_gff_imgs.append(out)
+#
+# kan_gff_loss = [l.item() for l in kan_gff_loss]
+# kan_gff_imgs = [im.cpu().data.numpy() for im in kan_gff_imgs]
+#
+# print(f"trained in {time() - start} to {loss.item()}")
+# torch.save(kan_model_7.state_dict(),
+#            os.path.join('./kans_wghts', 'model_final.pth'))
 
 kwargs = {
     'model_type': 'kan',
@@ -234,7 +234,8 @@ def generate_mlp_from_weights_test(weights, mlp_kwargs):
         state_dict[layer] = w
         weights = weights[num_params:]
     assert len(weights) == 0, f"len(weights) = {len(weights)}"
-    mlp.load_state_dict(state_dict)
+    dupa = mlp.load_state_dict(state_dict)
+    print(dupa)
     return mlp
 
 #test_kan = test_get_mlp(kwargs)
