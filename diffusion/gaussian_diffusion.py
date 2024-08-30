@@ -820,7 +820,7 @@ class GaussianDiffusion:
                 ModelMeanType.EPSILON: noise,
             }[self.model_mean_type]
             assert model_output.shape == target.shape == x_start.shape
-            mse1 = mean_flat((target - model_output) ** 2)
+            mse1 = torch.zeros(x_t.shape[0])
 
             import torch.nn.functional as F
             for i in range(target.shape[0]):
