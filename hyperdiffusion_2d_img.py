@@ -85,13 +85,25 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             print(curr_weights)
             print(img.shape)
             mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
-            sdf_decoder = SDFDecoder(
-                self.mlp_kwargs.model_type,
-                None,
-                "nerf" if self.mlp_kwargs.model_type == "nerf" else "mlp",
-                self.mlp_kwargs,
-            )
-            sdf_decoder.model = mlp.cuda()
+            model_input = get_mgrid(128, 2).unsqueeze(0)
+            model_input = {'coords': model_input}
+            result = mlp(model_input)
+            img = result['model_out'][0].view(1, 128, 128, 3)
+            img = torch.clamp(img, min=0.0, max=1.0)
+            img = (img * 255).byte().permute(0, 3, 1, 2)
+            # print(img)
+            # print('!!!')
+            # print(img.shape)
+            # images = wandb.Image(img, caption="")
+            # wandb.log({"examples": images})
+            self.logger.log_image("train", [img])
+            #sdf_decoder = SDFDecoder(
+            #    self.mlp_kwargs.model_type,
+            #    None,
+            #    "nerf" if self.mlp_kwargs.model_type == "nerf" else "mlp",
+            #    self.mlp_kwargs,
+            #)
+            #sdf_decoder.model = mlp.cuda()
             # if not self.mlp_kwargs.move:
             #     sdf_meshing.create_mesh(
             #         sdf_decoder,
