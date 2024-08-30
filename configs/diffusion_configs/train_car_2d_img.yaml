@@ -21,7 +21,7 @@ mode: train
 mlps_folder_train: /data/pwojcik/srn_cars_inr_wgth
 model_resume_path:
 sampling: ddim
-val_fid_calculation_period: 30
+val_fid_calculation_period: 3
 lr: 0.0002
 batch_size: 32
 accumulate_grad_batches: 1
