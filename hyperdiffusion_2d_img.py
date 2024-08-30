@@ -96,7 +96,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             # print(img.shape)
             # images = wandb.Image(img, caption="")
             # wandb.log({"examples": images})
-            self.logger.log_image("train", [img])
+            #self.logger.log_image("train", [img])
             #sdf_decoder = SDFDecoder(
             #    self.mlp_kwargs.model_type,
             #    None,
@@ -153,6 +153,15 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             self.model, (16, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = x_0s / self.cfg.normalization_factor
+
+        print(x_0s.shape)
+        print(
+            "Sampled weights[0].stats",
+            x_0s.min().item(),
+            x_0s.max().item(),
+            x_0s.mean().item(),
+            x_0s.std().item(),
+        )
 
         weights = x_0s[0].view(-1)
         print(weights)
