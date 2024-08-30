@@ -146,35 +146,46 @@ optim_kan_7 = optim.AdamW(kan_model_7.parameters(), lr=1e-3, weight_decay=1e-4)
 optim_kan_7_reg = optim.AdamW(kan_model_7_reg.parameters(), lr=1e-3, weight_decay=1e-4)
 optim_mlp = optim.AdamW(mlp.parameters(), lr=1e-3, weight_decay=1e-4)
 
-kan_loss = []
-ekan_gff_imgs = []
-start = time()
-for step_idx in tqdm(range(num_steps)):
-    optim_kan.zero_grad()
-    out = kan_model(grid)
-    loss = ((F.tanh(out) - img) ** 2).mean()
-    loss.backward()
-    optim_kan.step()
-    kan_loss.append(((F.tanh(out) - img) ** 2).mean())
-    ekan_gff_imgs.append(out)
-kan_loss = [l.item() for l in kan_loss]
-ekan_gff_imgs = [im.cpu().data.numpy() for im in ekan_gff_imgs]
-print(f"trained in {time() - start} to {kan_loss[-1]}")
+# kan_loss = []
+# ekan_gff_imgs = []
+# start = time()
+# for step_idx in tqdm(range(num_steps)):
+#     optim_kan.zero_grad()
+#     out = kan_model(grid)
+#     loss = ((F.tanh(out) - img) ** 2).mean()
+#     loss.backward()
+#     optim_kan.step()
+#     kan_loss.append(((F.tanh(out) - img) ** 2).mean())
+#     ekan_gff_imgs.append(out)
+# kan_loss = [l.item() for l in kan_loss]
+# ekan_gff_imgs = [im.cpu().data.numpy() for im in ekan_gff_imgs]
+# print(f"trained in {time() - start} to {kan_loss[-1]}")
+#
+# kan_loss_reg = []
+# ekan_gff_imgs_reg = []
+# start = time()
+# for step_idx in tqdm(range(num_steps)):
+#     optim_kan_6.zero_grad()
+#     out = kan_model_6(grid)
+#     loss = ((F.tanh(out) - img) ** 2).mean()
+#     loss.backward()
+#     optim_kan_6.step()
+#     kan_loss_reg.append(((F.tanh(out) - img) ** 2).mean())
+#     ekan_gff_imgs_reg.append(out)
+# kan_loss_reg = [l.item() for l in kan_loss_reg]
+# ekan_gff_imgs_reg = [im.cpu().data.numpy() for im in ekan_gff_imgs_reg]
+# print(f"trained in {time() - start} to {kan_loss_reg[-1]}")
 
-kan_loss_reg = []
-ekan_gff_imgs_reg = []
-start = time()
-for step_idx in tqdm(range(num_steps)):
-    optim_kan_6.zero_grad()
-    out = kan_model_6(grid)
-    loss = ((F.tanh(out) - img) ** 2).mean()
-    loss.backward()
-    optim_kan_6.step()
-    kan_loss_reg.append(((F.tanh(out) - img) ** 2).mean())
-    ekan_gff_imgs_reg.append(out)
-kan_loss_reg = [l.item() for l in kan_loss_reg]
-ekan_gff_imgs_reg = [im.cpu().data.numpy() for im in ekan_gff_imgs_reg]
-print(f"trained in {time() - start} to {kan_loss_reg[-1]}")
+
+state_dict = kan_model_7.state_dict()
+layers = []
+layer_names = []
+for l in state_dict:
+    shape = state_dict[l].shape
+    layers.append(np.prod(shape))
+    layer_names.append(l)
+print(layers)
+
 
 kan_gff_imgs = []
 kan_gff_loss = []
@@ -193,38 +204,39 @@ kan_gff_imgs = [im.cpu().data.numpy() for im in kan_gff_imgs]
 
 print(f"trained in {time() - start} to {loss.item()}")
 
-kan_7_reg_imgs = []
-kan_7_reg_loss = []
-start = time()
-for step_idx in tqdm(range(num_steps)):
-    optim_kan_7_reg.zero_grad()
-    out = kan_model_7_reg(grid)
-    loss = ((F.tanh(out) - img) ** 2).mean() + kan_model_7_reg.regularization_loss()
-    loss.backward()
-    optim_kan_7_reg.step()
-    kan_7_reg_loss.append(((F.tanh(out) - img) ** 2).mean())
-    kan_7_reg_imgs.append(out)
 
-kan_7_reg_loss = [l.item() for l in kan_7_reg_loss]
-kan_7_reg_imgs = [im.cpu().data.numpy() for im in kan_7_reg_imgs]
+# kan_7_reg_imgs = []
+# kan_7_reg_loss = []
+# start = time()
+# for step_idx in tqdm(range(num_steps)):
+#     optim_kan_7_reg.zero_grad()
+#     out = kan_model_7_reg(grid)
+#     loss = ((F.tanh(out) - img) ** 2).mean() + kan_model_7_reg.regularization_loss()
+#     loss.backward()
+#     optim_kan_7_reg.step()
+#     kan_7_reg_loss.append(((F.tanh(out) - img) ** 2).mean())
+#     kan_7_reg_imgs.append(out)
+#
+# kan_7_reg_loss = [l.item() for l in kan_7_reg_loss]
+# kan_7_reg_imgs = [im.cpu().data.numpy() for im in kan_7_reg_imgs]
+#
+# print(f"trained in {time() - start} to {loss.item()}")
 
-print(f"trained in {time() - start} to {loss.item()}")
-
-
-mlp_imgs = []
-mlp_loss = []
-start = time()
-for step_idx in tqdm(range(num_steps)):
-    mlp.zero_grad()
-    out = mlp(grid)
-    loss = ((F.tanh(out) - img) ** 2).mean()
-    loss.backward()
-    optim_mlp.step()
-    mlp_loss.append(loss)
-    mlp_imgs.append(out)
-
-mlp_loss = [l.item() for l in mlp_loss]
-mlp_imgs = [im.cpu().data.numpy() for im in mlp_imgs]
-
-print(f"trained in {time() - start} to {loss.item()}")
+#
+# mlp_imgs = []
+# mlp_loss = []
+# start = time()
+# for step_idx in tqdm(range(num_steps)):
+#     mlp.zero_grad()
+#     out = mlp(grid)
+#     loss = ((F.tanh(out) - img) ** 2).mean()
+#     loss.backward()
+#     optim_mlp.step()
+#     mlp_loss.append(loss)
+#     mlp_imgs.append(out)
+#
+# mlp_loss = [l.item() for l in mlp_loss]
+# mlp_imgs = [im.cpu().data.numpy() for im in mlp_imgs]
+#
+# print(f"trained in {time() - start} to {loss.item()}")
 
