@@ -246,10 +246,10 @@ state_dict = torch.load(state_dict_path)
 
 weights = []
 shapes = []
-for weight in state_dict:
-    shapes.append(np.prod(state_dict[weight].shape))
-    weights.append(state_dict[weight].flatten().cpu())
-weights = torch.hstack(weights)
+#for weight in state_dict:
+#    shapes.append(np.prod(state_dict[weight].shape))
+#    weights.append(state_dict[weight].flatten().cpu())
+#weights = torch.hstack(weights)
 
 #test_kan = generate_mlp_from_weights_test(weights, kwargs).cuda()
 test_kan = ImplicitEKAN(pos_enc='gff', grid_size=7).cuda()
