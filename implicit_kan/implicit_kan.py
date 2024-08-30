@@ -18,8 +18,8 @@ from implicit_kan.KANLayer import FastKANLayer, KANLinear
 from implicit_kan.utils import get_grid, set_random_seed
 from implicit_kan.modules import GaussianFourierFeatureTransform
 
-h = 256
-w = 256
+h = 128
+w = 128
 
 num_steps = 3000
 
@@ -250,8 +250,8 @@ for weight in state_dict:
 weights = torch.hstack(weights)
 
 test_kan = generate_mlp_from_weights_test(weights, kwargs).cuda()
-out = test_kan(grid)[0]
-out_ref = kan_model_7(grid)[0]
+out = test_kan(grid)[0].permute(2, 0, 1)
+out_ref = kan_model_7(grid)[0].permute(2, 0, 1)
 print(out.shape)
 from torchvision import transforms
 transform_to_pil = transforms.ToPILImage()
