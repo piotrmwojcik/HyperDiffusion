@@ -147,6 +147,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         img = result['model_out'][0].view(128, 128, 3)
         img = torch.clamp(img, min=0.0, max=1.0)
         img = (img * 255).byte()
+        print(img)
         #print(img)
         #print('!!!')
         #print(img.shape)
