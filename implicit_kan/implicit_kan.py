@@ -189,24 +189,24 @@ for l in state_dict:
 print(layers)
 
 
-kan_gff_imgs = []
-kan_gff_loss = []
-start = time()
-for step_idx in tqdm(range(num_steps)):
-    optim_kan_7.zero_grad()
-    out = kan_model_7(grid)
-    loss = ((F.tanh(out) - img) ** 2).mean()
-    loss.backward()
-    optim_kan_7.step()
-    kan_gff_loss.append(loss)
-    kan_gff_imgs.append(out)
-
-kan_gff_loss = [l.item() for l in kan_gff_loss]
-kan_gff_imgs = [im.cpu().data.numpy() for im in kan_gff_imgs]
-
-print(f"trained in {time() - start} to {loss.item()}")
-torch.save(kan_model_7.state_dict(),
-           os.path.join('./kans_wghts', 'model_final.pth'))
+# kan_gff_imgs = []
+# kan_gff_loss = []
+# start = time()
+# for step_idx in tqdm(range(num_steps)):
+#     optim_kan_7.zero_grad()
+#     out = kan_model_7(grid)
+#     loss = ((F.tanh(out) - img) ** 2).mean()
+#     loss.backward()
+#     optim_kan_7.step()
+#     kan_gff_loss.append(loss)
+#     kan_gff_imgs.append(out)
+#
+# kan_gff_loss = [l.item() for l in kan_gff_loss]
+# kan_gff_imgs = [im.cpu().data.numpy() for im in kan_gff_imgs]
+#
+# print(f"trained in {time() - start} to {loss.item()}")
+# torch.save(kan_model_7.state_dict(),
+#            os.path.join('./kans_wghts', 'model_final.pth'))
 
 kwargs = {
     'model_type': 'kan',
@@ -250,13 +250,13 @@ for weight in state_dict:
 weights = torch.hstack(weights)
 
 test_kan = generate_mlp_from_weights_test(weights, kwargs).cuda()
-out = test_kan(grid)[0].permute(2, 0, 1)
-out_ref = kan_model_7(grid)[0].permute(2, 0, 1)
+out = test_kan(grid)[0]
+out_ref = kan_model_7(grid)[0]
 print(out.shape)
 from torchvision import transforms
 transform_to_pil = transforms.ToPILImage()
-image = transform_to_pil(out)
-image_ref = transform_to_pil(out_ref)
+image = transform_to_pil(F.tanh(out))
+image_ref = transform_to_pil(F.tanh(out_ref))
 
 # Save the image as a PNG file
 image.save(os.path.join('./kans_wghts', 'out.png'))
