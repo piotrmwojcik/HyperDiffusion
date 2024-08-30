@@ -13,6 +13,7 @@ from time import time
 import cv2
 from tqdm.auto import tqdm
 
+from hd_utils import get_mlp
 from implicit_kan.ChebyKANLayer import ChebyKANLayer
 from implicit_kan.KANLayer import FastKANLayer, KANLinear
 from implicit_kan.utils import get_grid, set_random_seed
@@ -207,6 +208,13 @@ kan_gff_imgs = [im.cpu().data.numpy() for im in kan_gff_imgs]
 print(f"trained in {time() - start} to {loss.item()}")
 torch.save(kan_model_7.state_dict(),
            os.path.join('./kans_wghts', 'model_final.pth'))
+
+kwargs = {
+    'model_type': 'kan',
+    'grid_size': 7,
+    'pos_enc': 'gff'
+}
+test_kan = get_mlp(**kwargs)
 
 # kan_7_reg_imgs = []
 # kan_7_reg_loss = []
