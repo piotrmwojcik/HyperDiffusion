@@ -826,7 +826,9 @@ class GaussianDiffusion:
             result_target = siren_target(model_input)['model_out'][0]
             result_output = siren_output(model_input)['model_out'][0]
             #mlp = MLP(**mlp_kwargs)
-            terms["mse"] = mean_flat((target - model_output) ** 2) + (result_target - result_output) ** 2
+            print('!!!')
+            print(mean_flat((target - model_output) ** 2).shape)
+            terms["mse"] = mean_flat((target - model_output) ** 2) + mean_flat((result_target - result_output) ** 2)
 
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
