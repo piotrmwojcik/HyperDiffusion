@@ -15,7 +15,7 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes)
 from siren import sdf_meshing
-from siren.dataio import anime_read
+from siren.dataio import anime_read, get_mgrid
 from siren.experiment_scripts.test_sdf import SDFDecoder
 
 
@@ -135,6 +135,16 @@ class HyperDiffusion_2d_img(pl.LightningModule):
 
     def validation_step(self, val_batch, batch_idx):
         print('validation')
+        weights = val_batch[0].view(-1)
+        print(weights)
+        print(weights.shape)
+        siren = generate_mlp_from_weights(weights, self.mlp_kwargs)
+
+        model_input = get_mgrid(128, 2).unsqueeze(0)
+        model_input = {'coords': model_input}
+        result = siren(model_input)
+        img = result['model_out']
+        self.logger.log_image("val", [img])
         #metric_fn = (
         #    self.calc_metrics_4d
         #    if self.cfg.mlp_config.params.move
