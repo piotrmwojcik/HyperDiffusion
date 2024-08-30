@@ -209,9 +209,11 @@ torch.save(kan_model_7.state_dict(),
            os.path.join('./kans_wghts', 'model_final.pth'))
 
 kwargs = {
-    'model_type': 'kan',
-    'grid_size': 7,
-    'pos_enc': 'gff'
+    'params': {
+        'model_type': 'kan',
+        'grid_size': 7,
+        'pos_enc': 'gff'
+    }
 }
 
 def test_get_mlp(mlp_kwargs):
