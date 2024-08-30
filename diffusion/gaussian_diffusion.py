@@ -15,6 +15,7 @@ import torch as th
 from hd_utils import generate_mlp_from_weights
 from simple_test import get_mgrid
 from .losses import discretized_gaussian_log_likelihood, normal_kl
+from .misc import module_requires_grad
 from .nn import mean_flat
 
 
@@ -828,10 +829,12 @@ class GaussianDiffusion:
                 siren_output = generate_mlp_from_weights(model_output[i], mlp_kwargs).cuda()
                 model_input = get_mgrid(128, 2).unsqueeze(0).cuda()
                 model_input = {'coords': model_input}
-                result_target = siren_target(model_input)['model_out'][0]
-                result_output = siren_output(model_input)['model_out'][0]
-                mse2 = F.mse_loss(result_output, result_target)
-                mse1[i] += mse2
+                with module_requires_grad(siren_target, False):
+                    result_target = siren_target(model_input)['model_out'][0]
+                    with module_requires_grad(siren_output, False):
+                        result_output = siren_output(model_input)['model_out'][0]
+                        mse2 = F.mse_loss(result_output, result_target)
+                        mse1[i] += mse2
             terms["mse"] = mse1
 
             if "vb" in terms:
