@@ -151,7 +151,7 @@ def main(cfg: DictConfig):
             model.dims,
             mlp_kwargs,
             cfg,
-            None,
+            #None,
         )
         train_dl = DataLoader(
             train_dt,
@@ -166,7 +166,7 @@ def main(cfg: DictConfig):
             model.dims,
             mlp_kwargs,
             cfg,
-            None,
+            #None,
         )
         test_dt = WeightDataset(
             mlps_folder_train,
@@ -174,7 +174,7 @@ def main(cfg: DictConfig):
             model.dims,
             mlp_kwargs,
             cfg,
-            None,
+            #None,
         )
 
     # These two dl's are just placeholders, during val and test evaluation we are looking at test_split.lst,
