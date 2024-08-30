@@ -222,7 +222,37 @@ def test_get_mlp(mlp_kwargs):
         pass
     return mlp
 
-test_kan = test_get_mlp(kwargs)
+def generate_mlp_from_weights_test(weights, mlp_kwargs):
+    mlp = test_get_mlp(mlp_kwargs)
+    state_dict = mlp.state_dict()
+    weight_names = list(state_dict.keys())
+    for layer in weight_names:
+        val = state_dict[layer]
+        num_params = np.product(list(val.shape))
+        w = weights[:num_params]
+        w = w.view(*val.shape)
+        state_dict[layer] = w
+        weights = weights[num_params:]
+    assert len(weights) == 0, f"len(weights) = {len(weights)}"
+    mlp.load_state_dict(state_dict)
+    return mlp
+
+#test_kan = test_get_mlp(kwargs)
+
+state_dict_path = os.path.join('./kans_wghts', 'model_final.pth')
+state_dict = torch.load(state_dict_path)
+
+weights = []
+shapes = []
+for weight in state_dict:
+    shapes.append(np.prod(state_dict[weight].shape))
+    weights.append(state_dict[weight].flatten().cpu())
+weights = torch.hstack(weights)
+
+test_kan = generate_mlp_from_weights_test(weights, kwargs)
+out = kan_model_7(grid)
+print(out.shape)
+
 
 # kan_7_reg_imgs = []
 # kan_7_reg_loss = []
