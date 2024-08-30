@@ -250,7 +250,7 @@ for weight in state_dict:
 weights = torch.hstack(weights)
 
 test_kan = generate_mlp_from_weights_test(weights, kwargs).cuda()
-out = est_kan(grid)[0]
+out = test_kan(grid)[0]
 out_ref = (kan_model_7(grid)[0] + 1.) / 2
 print(out.shape)
 from torchvision import transforms
