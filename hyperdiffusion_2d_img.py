@@ -134,8 +134,12 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         return loss
 
     def validation_step(self, val_batch, batch_idx):
-        print('validation')
-        weights = val_batch[0].view(-1)
+        x_0s = self.diff.ddim_sample_loop(
+            self.model, (16, *self.image_size[1:]), clip_denoised=False
+        )
+        x_0s = x_0s / self.cfg.normalization_factor
+
+        weights = x_0s[0].view(-1)
         print(weights)
         print(weights.shape)
         siren = generate_mlp_from_weights(weights, self.mlp_kwargs)
