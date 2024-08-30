@@ -252,7 +252,7 @@ for weight in state_dict:
 weights = torch.hstack(weights)
 
 #test_kan = generate_mlp_from_weights_test(weights, kwargs).cuda()
-test_kan = ImplicitEKAN(pos_enc='gff', grid_size=7)
+test_kan = ImplicitEKAN(pos_enc='gff', grid_size=7).cuda()
 test_kan.load_state_dict(state_dict)
 out = test_kan(grid)[0]
 #out_ref = kan_model_7(grid)[0]
