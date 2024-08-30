@@ -236,8 +236,7 @@ def generate_mlp_from_weights_test(weights, mlp_kwargs):
         state_dict[layer] = w
         weights = weights[num_params:]
     assert len(weights) == 0, f"len(weights) = {len(weights)}"
-    dupa = mlp.load_state_dict(state_dict)
-    print(dupa)
+    mlp.load_state_dict(state_dict)
     return mlp
 
 #test_kan = test_get_mlp(kwargs)
@@ -252,7 +251,9 @@ for weight in state_dict:
     weights.append(state_dict[weight].flatten().cpu())
 weights = torch.hstack(weights)
 
-test_kan = generate_mlp_from_weights_test(weights, kwargs).cuda()
+#test_kan = generate_mlp_from_weights_test(weights, kwargs).cuda()
+test_kan = ImplicitEKAN(pos_enc='gff', grid_size=7)
+test_kan.load_state_dict(state_dict)
 out = test_kan(grid)[0]
 #out_ref = kan_model_7(grid)[0]
 print(out.shape)
