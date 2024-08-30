@@ -12,6 +12,8 @@ import numpy as np
 import torch
 import torch as th
 
+from hd_utils import generate_mlp_from_weights
+from simple_test import get_mgrid
 from .losses import discretized_gaussian_log_likelihood, normal_kl
 from .nn import mean_flat
 
@@ -817,8 +819,14 @@ class GaussianDiffusion:
                 ModelMeanType.EPSILON: noise,
             }[self.model_mean_type]
             assert model_output.shape == target.shape == x_start.shape
-            # mlp = MLP(**mlp_kwargs)
-            terms["mse"] = mean_flat((target - model_output) ** 2)
+            siren_target = generate_mlp_from_weights(target[0], mlp_kwargs).cuda()
+            siren_output = generate_mlp_from_weights(model_output[0], mlp_kwargs).cuda()
+            model_input = get_mgrid(128, 2).unsqueeze(0).cuda()
+            model_input = {'coords': model_input}
+            result_target = siren_target(model_input)
+            result_output = siren_output(model_input)
+            #mlp = MLP(**mlp_kwargs)
+            terms["mse"] = mean_flat((target - model_output) ** 2) + (result_target - result_output) ** 2
 
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
