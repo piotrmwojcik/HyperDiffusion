@@ -89,13 +89,13 @@ class HyperDiffusion_2d_img(pl.LightningModule):
                 self.mlp_kwargs,
             )
             sdf_decoder.model = mlp.cuda()
-            if not self.mlp_kwargs.move:
-                sdf_meshing.create_mesh(
-                    sdf_decoder,
-                    "meshes/first_mesh",
-                    N=128,
-                    level=0.5 if self.mlp_kwargs.output_type == "occ" else 0,
-                )
+            # if not self.mlp_kwargs.move:
+            #     sdf_meshing.create_mesh(
+            #         sdf_decoder,
+            #         "meshes/first_mesh",
+            #         N=128,
+            #         level=0.5 if self.mlp_kwargs.output_type == "occ" else 0,
+            #     )
 
             print("Input images shape:", input_data.shape)
 
