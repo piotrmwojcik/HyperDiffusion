@@ -5,6 +5,8 @@ from hd_utils import Config, get_mlp
 from hyperdiffusion import HyperDiffusion
 
 # Using it to make pyrender work on clusters
+from hyperdiffusion_2d_img import HyperDiffusion_2d_img
+
 os.environ["PYOPENGL_PLATFORM"] = "egl"
 import sys
 from datetime import datetime
@@ -201,7 +203,7 @@ def main(cfg: DictConfig):
     model_resume_path = Config.get("model_resume_path")
 
     # Initialize HyperDiffusion
-    diffuser = HyperDiffusion(
+    diffuser = HyperDiffusion_2d_img(
         model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, cfg
     )
 
