@@ -218,6 +218,8 @@ def test_get_mlp(mlp_kwargs):
     if "model_type" in mlp_kwargs:
         if mlp_kwargs['model_type'] == "kan":
             mlp = ImplicitEKAN(**mlp_kwargs)
+            print('!!!')
+            print(**mlp_kwargs)
     else:
         pass
     return mlp
@@ -227,7 +229,6 @@ def generate_mlp_from_weights_test(weights, mlp_kwargs):
     state_dict = mlp.state_dict()
     weight_names = list(state_dict.keys())
     for layer in weight_names:
-        print(layer)
         val = state_dict[layer]
         num_params = np.product(list(val.shape))
         w = weights[:num_params]
@@ -253,16 +254,16 @@ weights = torch.hstack(weights)
 
 test_kan = generate_mlp_from_weights_test(weights, kwargs).cuda()
 out = test_kan(grid)[0]
-out_ref = kan_model_7(grid)[0]
+#out_ref = kan_model_7(grid)[0]
 print(out.shape)
 from torchvision import transforms
 transform_to_pil = transforms.ToPILImage()
 image = transform_to_pil((F.tanh(out)  + 1.) / 2.)
-image_ref = transform_to_pil((F.tanh(out_ref)  + 1.)/ 2.)
+#image_ref = transform_to_pil((F.tanh(out_ref)  + 1.)/ 2.)
 
 # Save the image as a PNG file
 image.save(os.path.join('./kans_wghts', 'out.png'))
-image_ref.save(os.path.join('./kans_wghts', 'out_ref.png'))
+#image_ref.save(os.path.join('./kans_wghts', 'out_ref.png'))
 
 # kan_7_reg_imgs = []
 # kan_7_reg_loss = []
