@@ -251,13 +251,16 @@ weights = torch.hstack(weights)
 
 test_kan = generate_mlp_from_weights_test(weights, kwargs).cuda()
 out = test_kan(grid)[0]
+out_ref = kan_model_7(grid)[0]
 print(out.shape)
 from torchvision import transforms
 transform_to_pil = transforms.ToPILImage()
 image = transform_to_pil(out)
+image_ref = transform_to_pil(out_ref)
 
 # Save the image as a PNG file
 image.save(os.path.join('./kans_wghts', 'out.png'))
+image_ref.save(os.path.join('./kans_wghts', 'out_ref.png'))
 
 # kan_7_reg_imgs = []
 # kan_7_reg_loss = []
