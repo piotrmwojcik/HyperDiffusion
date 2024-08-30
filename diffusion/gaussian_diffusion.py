@@ -819,16 +819,20 @@ class GaussianDiffusion:
                 ModelMeanType.EPSILON: noise,
             }[self.model_mean_type]
             assert model_output.shape == target.shape == x_start.shape
-            siren_target = generate_mlp_from_weights(target[0], mlp_kwargs).cuda()
-            siren_output = generate_mlp_from_weights(model_output[0], mlp_kwargs).cuda()
-            model_input = get_mgrid(128, 2).unsqueeze(0).cuda()
-            model_input = {'coords': model_input}
-            result_target = siren_target(model_input)['model_out'][0]
-            result_output = siren_output(model_input)['model_out'][0]
             mse1 = mean_flat((target - model_output) ** 2)
+
             import torch.nn.functional as F
-            mse2 = F.mse_loss(result_output, result_target)
-            terms["mse"] = mse1[0] + mse2
+            for i in range(target.shape[0]):
+
+                siren_target = generate_mlp_from_weights(target[i], mlp_kwargs).cuda()
+                siren_output = generate_mlp_from_weights(model_output[i], mlp_kwargs).cuda()
+                model_input = get_mgrid(128, 2).unsqueeze(0).cuda()
+                model_input = {'coords': model_input}
+                result_target = siren_target(model_input)['model_out'][0]
+                result_output = siren_output(model_input)['model_out'][0]
+                mse2 = F.mse_loss(result_output, result_target)
+                mse1[i] *= mse2
+            terms["mse"] = mse1
 
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
