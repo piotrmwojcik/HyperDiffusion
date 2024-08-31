@@ -646,7 +646,6 @@ class GaussianDiffusion:
         device=None,
         progress=False,
         eta=0.0,
-        modulation=None
     ):
         """
         Generate samples from the model using DDIM.
@@ -667,7 +666,7 @@ class GaussianDiffusion:
             eta=eta,
         ):
             final = sample
-        return final["sample"] * torch.sigmoid(modulation)
+        return final["sample"]
 
     def ddim_sample_loop_progressive(
         self,
@@ -755,7 +754,7 @@ class GaussianDiffusion:
         return {"output": output, "pred_xstart": out["pred_xstart"]}
 
     def training_losses(
-        self, model, x_start, t, mlp_kwargs, wandb_logger, model_kwargs=None, noise=None, modulation=None
+        self, model, x_start, t, mlp_kwargs, wandb_logger, model_kwargs=None, noise=None
     ):
         """
         Compute training losses for a single timestep.
@@ -822,7 +821,6 @@ class GaussianDiffusion:
             }[self.model_mean_type]
             assert model_output.shape == target.shape == x_start.shape
             # mlp = MLP(**mlp_kwargs)
-            model_output =  model_output * torch.sigmoid(modulation)
             terms["mse"] = mean_flat((target - model_output) ** 2)
 
             if "vb" in terms:

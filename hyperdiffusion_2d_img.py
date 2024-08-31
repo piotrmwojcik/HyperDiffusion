@@ -29,7 +29,6 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         self.method = method
         self.mlp_kwargs = mlp_kwargs
         self.train_dt = train_dt
-        self.modulation = torch.nn.Parameter(torch.randn(50307), requires_grad=True)
         self.test_dt = test_dt
         self.ae_model = None
         self.sample_count = min(
@@ -140,7 +139,6 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             t,
             self.mlp_kwargs,
             self.logger,
-            modulation = self.modulation,
             model_kwargs=None,
         )
 
@@ -152,7 +150,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
 
     def validation_step(self, val_batch, batch_idx):
         x_0s = self.diff.ddim_sample_loop(
-            self.model, (16, *self.image_size[1:]), clip_denoised=False, modulation=self.modulation,
+            self.model, (16, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = x_0s / self.cfg.normalization_factor
 
@@ -175,9 +173,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         model_input = {'coords': model_input}
         result = siren(model_input)
         img = result['model_out'][0].view(1, 128, 128, 3)
-        img_min = img.min()
-        img_max = img.max()
-        img = (img - img_min) / (img_max - img_min)
+        img = torch.clamp(img, min=0.0, max=1.0)
         img = (img * 255).byte().permute(0, 3, 1, 2)
         #print(img)
         #print('!!!')
