@@ -107,8 +107,8 @@ if __name__ == '__main__':
         #         fmt="%s",
         #     )
 
-        train_object_names = np.genfromtxt(
-            os.path.join(dataset_path, "train_split.lst"), dtype="str")
+        #train_object_names = np.genfromtxt(
+        #    os.path.join(dataset_path, "train_split.lst"), dtype="str")
 
         train_dt = WeightDataset(
             mlps_folder_train,
