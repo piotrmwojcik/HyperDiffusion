@@ -86,8 +86,6 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             result = mlp(model_input)
             img = result['model_out'][0].view(1, 128, 128, 3)
             img = (img * 255).byte().permute(0, 3, 1, 2)
-            print(img)
-            print('!!!')
             # print(img.shape)
             # images = wandb.Image(img, caption="")
             # wandb.log({"examples": images})
