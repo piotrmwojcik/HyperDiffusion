@@ -156,7 +156,6 @@ class GaussianDiffusion:
 
         # calculations for diffusion q(x_t | x_{t-1}) and others
         self.sqrt_alphas_cumprod = np.sqrt(self.alphas_cumprod)
-        self.modulation = torch.nn.Parameter(torch.randn(50307), requires_grad=True).cuda()
         self.sqrt_one_minus_alphas_cumprod = np.sqrt(1.0 - self.alphas_cumprod)
         self.log_one_minus_alphas_cumprod = np.log(1.0 - self.alphas_cumprod)
         self.sqrt_recip_alphas_cumprod = np.sqrt(1.0 / self.alphas_cumprod)
@@ -647,6 +646,7 @@ class GaussianDiffusion:
         device=None,
         progress=False,
         eta=0.0,
+        modulation=None
     ):
         """
         Generate samples from the model using DDIM.
@@ -667,7 +667,7 @@ class GaussianDiffusion:
             eta=eta,
         ):
             final = sample
-        return final["sample"] * torch.sigmoid(self.modulation)
+        return final["sample"] * torch.sigmoid(modulation)
 
     def ddim_sample_loop_progressive(
         self,
@@ -755,7 +755,7 @@ class GaussianDiffusion:
         return {"output": output, "pred_xstart": out["pred_xstart"]}
 
     def training_losses(
-        self, model, x_start, t, mlp_kwargs, wandb_logger, model_kwargs=None, noise=None
+        self, model, x_start, t, mlp_kwargs, wandb_logger, model_kwargs=None, noise=None, modulation=None
     ):
         """
         Compute training losses for a single timestep.
@@ -822,7 +822,7 @@ class GaussianDiffusion:
             }[self.model_mean_type]
             assert model_output.shape == target.shape == x_start.shape
             # mlp = MLP(**mlp_kwargs)
-            model_output =  model_output * torch.sigmoid(self.modulation)
+            model_output =  model_output * torch.sigmoid(modulation)
             terms["mse"] = mean_flat((target - model_output) ** 2)
 
             if "vb" in terms:
