@@ -77,7 +77,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         input_data = train_batch[0]
 
         # At the first step output first element in the dataset as a sanit check
-        if "hyper" in self.method and self.trainer.global_step == 0:
+        if "hyper" in self.method and self.trainer.global_step % 50 == 0:
             curr_weights = Config.get("curr_weights")
             img = input_data[0].flatten()[:curr_weights]
             mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
@@ -88,6 +88,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             img_min = img.min().item()
             img_max = img.max().item()
             print(img_min, img_max)
+
             img = (img * 255).byte().permute(0, 3, 1, 2)
             # print(img.shape)
             # images = wandb.Image(img, caption="")
