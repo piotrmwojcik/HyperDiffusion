@@ -149,7 +149,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         x_0s = self.diff.ddim_sample_loop(
             self.model, (16, *self.image_size[1:]), clip_denoised=False
         )
-        x_0s = x_0s.atanh() / self.cfg.normalization_factor
+        x_0s = (x_0s / self.cfg.normalization_factor).clip(-1.0, 1.0).atanh()
 
         print(x_0s.shape)
         print(
