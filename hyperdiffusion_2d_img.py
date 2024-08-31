@@ -160,7 +160,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             x_0s.std().item(),
         )
 
-        weights = x_0s[0].view(-1)
+        weights = x_0s[2].view(-1)
         print(weights)
         print(weights.shape)
         siren = generate_mlp_from_weights(weights, self.mlp_kwargs)
@@ -170,6 +170,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         model_input = {'coords': model_input}
         result = siren(model_input)
         img = result['model_out'][0].view(1, 128, 128, 3)
+        print(img)
         img_min = img.min()
         img_max = img.max()
         img = (img - img_min) / (img_max - img_min)
