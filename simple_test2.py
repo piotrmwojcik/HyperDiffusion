@@ -20,9 +20,9 @@ def get_mgrid(sidelen, dim=2):
     mgrid = mgrid.reshape(-1, dim)
     return mgrid
 
+
 if __name__ == '__main__':
-    config_path = '/Users/kacpermarzol/PycharmProjects/hyperdiffusionproject/HyperDiffusion/configs/' \
-                  'diffusion_configs/train_car_2d_img.yaml'
+    config_path = 'configs/diffusion_configs/train_car_2d_relu.yaml'
 
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
