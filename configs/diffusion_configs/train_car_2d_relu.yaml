@@ -1,0 +1,53 @@
+method: hyper_3d
+calculate_metric_on_test: True
+dedup: False
+test_sample_mult: 1.1
+filter_bad: True
+filter_bad_path: ./data/car_problematic_shapes.txt
+disable_wandb: False
+dataset_dir: ./data
+dataset: 02958343
+tensorboard_log_dir: .
+augment: False
+augment_amount: 0
+jitter_augment: False
+normalization_factor: 1.0
+timesteps: 500
+epochs: 6000
+scheduler: True
+scheduler_step: 200
+best_model_save_path:
+mode: train
+mlps_folder_train: /data/pwojcik/mlp_weigths_relu
+model_resume_path:
+sampling: ddim
+val_fid_calculation_period: 1
+lr: 0.0002
+batch_size: 32
+accumulate_grad_batches: 1
+val:
+  num_points: 2048
+  num_samples: 60
+mlp_config:
+  params:
+    model_type: SingleBVPNet
+    type: relu
+    mode: mlp
+    out_features: 3
+    in_features: 2
+    hidden_features: 128
+    sidelength: 128
+    output_type: occ
+diff_config:
+  params:
+    model_mean_type: START_X
+    model_var_type: FIXED_LARGE
+    loss_type: MSE
+transformer_config:
+  params:
+    n_embd: 1440
+    n_layer: 12
+    n_head: 16
+    split_policy: layer_by_layer
+    use_global_residual: False
+    condition: 'no'
