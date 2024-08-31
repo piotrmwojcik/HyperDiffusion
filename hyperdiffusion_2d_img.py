@@ -88,7 +88,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             img_min = img.min().item()
             img_max = img.max().item()
             print(img_min, img_max)
-
+            img = (img+1) / 2
             img = (img * 255).byte().permute(0, 3, 1, 2)
             # print(img.shape)
             # images = wandb.Image(img, caption="")
