@@ -164,7 +164,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         print(weights)
         print(weights.shape)
         siren = generate_mlp_from_weights(weights, self.mlp_kwargs)
-        print(self.mlp_kwargs.model_type)
+        #print(self.mlp_kwargs.model_type)
 
         model_input = get_mgrid(128, 2).unsqueeze(0)
         model_input = {'coords': model_input}
