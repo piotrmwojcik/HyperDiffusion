@@ -156,6 +156,7 @@ class GaussianDiffusion:
 
         # calculations for diffusion q(x_t | x_{t-1}) and others
         self.sqrt_alphas_cumprod = np.sqrt(self.alphas_cumprod)
+        self.modulation = torch.nn.Parameter(torch.randn(50307))
         self.sqrt_one_minus_alphas_cumprod = np.sqrt(1.0 - self.alphas_cumprod)
         self.log_one_minus_alphas_cumprod = np.log(1.0 - self.alphas_cumprod)
         self.sqrt_recip_alphas_cumprod = np.sqrt(1.0 / self.alphas_cumprod)
@@ -666,7 +667,7 @@ class GaussianDiffusion:
             eta=eta,
         ):
             final = sample
-        return final["sample"]
+        return final["sample"] * torch.sigmoid(self.modulation)
 
     def ddim_sample_loop_progressive(
         self,
@@ -821,6 +822,7 @@ class GaussianDiffusion:
             }[self.model_mean_type]
             assert model_output.shape == target.shape == x_start.shape
             # mlp = MLP(**mlp_kwargs)
+            model_output =  model_output * torch.sigmoid(self.modulation)
             terms["mse"] = mean_flat((target - model_output) ** 2)
 
             if "vb" in terms:
