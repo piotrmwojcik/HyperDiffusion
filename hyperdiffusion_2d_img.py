@@ -89,7 +89,9 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             model_input = {'coords': model_input}
             result = mlp(model_input)
             img = result['model_out'][0].view(1, 128, 128, 3)
-            img = torch.clamp(img, min=0.0, max=1.0)
+            img_min = img.min()
+            img_max = img.max()
+            img = (img - img_min) / (img_max - img_min)
             img = (img * 255).byte().permute(0, 3, 1, 2)
             # print(img)
             # print('!!!')
