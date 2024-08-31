@@ -11,7 +11,7 @@ tensorboard_log_dir: .
 augment: False
 augment_amount: 0
 jitter_augment: False
-normalization_factor: 2.5
+normalization_factor: 3.0
 timesteps: 500
 epochs: 6000
 scheduler: True
@@ -22,7 +22,7 @@ mlps_folder_train: /data/pwojcik/srn_cars_inr_wgth
 model_resume_path:
 sampling: ddim
 val_fid_calculation_period: 1
-lr: 0.0006
+lr: 0.0002
 batch_size: 32
 accumulate_grad_batches: 1
 val:
