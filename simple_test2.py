@@ -14,6 +14,7 @@ import os
 from transformer import Transformer
 from torch.utils.data import DataLoader, random_split
 
+
 def get_mgrid(sidelen, dim=2):
     tensors = tuple(dim * [torch.linspace(-1, 1, steps=sidelen)])
     mgrid = torch.stack(torch.meshgrid(*tensors), dim=-1)
@@ -50,6 +51,8 @@ if __name__ == '__main__':
     print("wandb", wandb.run.name, wandb.run.id)
 
     mlps_folder_train = Config.get("mlps_folder_train")
+
+    print('!!!!')
 
     if "hyper" in method:
         mlp = get_mlp(mlp_kwargs)
