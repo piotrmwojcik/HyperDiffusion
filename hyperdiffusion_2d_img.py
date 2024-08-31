@@ -95,7 +95,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             # print(img.shape)
             # images = wandb.Image(img, caption="")
             # wandb.log({"examples": images})
-            #self.logger.log_image("train", [img])
+            self.logger.log_image("train", [img])
             #sdf_decoder = SDFDecoder(
             #    self.mlp_kwargs.model_type,
             #    None,
