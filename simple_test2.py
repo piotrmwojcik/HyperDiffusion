@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
             weights = weights[0].view(-1)
             noise = torch.randn_like(weights) * 0.01
-            weights = weights + noise
+            #weights = weights + noise
             print(weights)
             print(weights.shape)
             siren = generate_mlp_from_weights(weights, mlp_kwargs)
