@@ -141,7 +141,7 @@ if __name__ == '__main__':
         mean = torch.mean(pca_result, dim=0)  # Shape: (400,)
         std = torch.std(pca_result, dim=0)  # Shape: (400,)
 
-        for i in range(50):
+        for j in range(50):
             # Draw new coefficients from a normal distribution with the computed mean and std
             coefficients = torch.normal(mean, std)  # Shape: (400,)
 
@@ -168,7 +168,7 @@ if __name__ == '__main__':
             fig, axes = plt.subplots(1, 1, figsize=(9, 9))
             axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
             #os.makedirs("test", exist_ok=True)
-            plt.savefig(f"test_siren/dupa_{i}.png")
+            plt.savefig(f"test_siren/dupa_{j}.png")
 
 
         siren = generate_mlp_from_weights(all_weights[5], mlp_kwargs)
