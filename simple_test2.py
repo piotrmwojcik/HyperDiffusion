@@ -143,6 +143,7 @@ if __name__ == '__main__':
             img_min = img.min()
             img_max = img.max()
             img = (img - img_min) / (img_max - img_min)
+            print(img)
             img = (img * 255).byte().permute(0, 3, 1, 2)
             plt.savefig(f"test_relu/img_{i}.png")
 
