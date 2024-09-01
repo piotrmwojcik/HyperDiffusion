@@ -836,7 +836,7 @@ class GaussianDiffusion:
             #             mse1[i] = mse2
             # #print(0.0001 * mse1)
             # Define the sizes of each segment
-            segments = [256, 128, 16384, 128, 16384, 128, 16384, 128, 384, 3, 257]
+            segments = [256, 128, 16384, 128, 16384, 128, 16384, 128, 384, 3]
             squared_diff = (target - model_output) ** 2
 
             splits = torch.split(squared_diff, segments, dim=1)
