@@ -23,7 +23,7 @@ def get_mgrid(sidelen, dim=2):
 
 
 if __name__ == '__main__':
-    config_path = 'configs/diffusion_configs/train_car_2d_relu.yaml'
+    config_path = 'configs/diffusion_configs/train_car_2d_img.yaml'
 
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
@@ -133,7 +133,7 @@ if __name__ == '__main__':
             all_weights.append(weights)
         all_weights = torch.cat(all_weights, dim=0)
         from sklearn.decomposition import PCA
-        pca = PCA(n_components=300)  # You can choose the number of components
+        pca = PCA(n_components=10000)  # You can choose the number of components
         pca_result = torch.tensor(pca.fit_transform(all_weights))
         basis = torch.tensor(pca.components_)
         #print(ca_result.shape)
