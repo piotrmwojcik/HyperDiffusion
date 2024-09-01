@@ -41,7 +41,7 @@ mlp_config:
 diff_config:
   params:
     model_mean_type: START_X
-    model_var_type: FIXED_LARGE
+    model_var_type: FIXED_SMALL
     loss_type: MSE
 transformer_config:
   params:
