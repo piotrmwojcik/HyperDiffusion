@@ -127,23 +127,30 @@ if __name__ == '__main__':
             pin_memory=True,
         )
 
+        all_weights = []
         for i, weights in enumerate(train_dl):
 
-            weights = weights[0].view(-1)
-            noise = torch.randn_like(weights) * 0.01
-            weights = weights + noise
-            print(weights)
-            print(weights.shape)
-            siren = generate_mlp_from_weights(weights, mlp_kwargs)
-
-            model_input = get_mgrid(128, 2).unsqueeze(0)
-            model_input = {'coords': model_input}
-            result = siren(model_input)
-            img = result['model_out']
-            fig, axes = plt.subplots(1, 1, figsize=(9, 9))
-            axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
-            os.makedirs("test", exist_ok=True)
-            plt.savefig(f"test_siren/img_{i}.png")
+            weights = weights[0].view(-1).unsqueeze(0)
+            all_weights.append(weights)
+        all_weights = torch.cat(all_weights, dim=0)
+        from sklearn.decomposition import PCA
+        pca = PCA(n_components=100)  # You can choose the number of components
+        pca_result = pca.fit_transform(all_weights)
+        print(pca_result.shape)
+            # noise = torch.randn_like(weights) * 0.01
+            # weights = weights + noise
+            # print(weights)
+            # print(weights.shape)
+            # siren = generate_mlp_from_weights(weights, mlp_kwargs)
+            #
+            # model_input = get_mgrid(128, 2).unsqueeze(0)
+            # model_input = {'coords': model_input}
+            # result = siren(model_input)
+            # img = result['model_out']
+            # fig, axes = plt.subplots(1, 1, figsize=(9, 9))
+            # axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
+            # os.makedirs("test", exist_ok=True)
+            # plt.savefig(f"test_siren/img_{i}.png")
 
 
 
