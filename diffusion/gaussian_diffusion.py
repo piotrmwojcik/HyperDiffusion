@@ -836,15 +836,16 @@ class GaussianDiffusion:
             #             mse1[i] = mse2
             # #print(0.0001 * mse1)
             # Define the sizes of each segment
-            segments = [256, 128, 16384, 128, 16384, 128, 16384, 128, 384, 3]
-            squared_diff = (target - model_output) ** 2
+            # segments = [256, 128, 16384, 128, 16384, 128, 16384, 128, 384, 3]
+            # squared_diff = (target - model_output) ** 2
+            #
+            # splits = torch.split(squared_diff, segments, dim=1)
+            # mse_loss_parts = [mean_flat(part) for part in splits]
+            # stacked_tensors = torch.stack(mse_loss_parts, dim=0)  # Shape will be [num_tensors, 32]
+            # mean_tensor = torch.mean(stacked_tensors, dim=0)
+            # terms["mse"] = mean_tensor
 
-            splits = torch.split(squared_diff, segments, dim=1)
-            mse_loss_parts = [mean_flat(part) for part in splits]
-            stacked_tensors = torch.stack(mse_loss_parts, dim=0)  # Shape will be [num_tensors, 32]
-            mean_tensor = torch.mean(stacked_tensors, dim=0)
-            terms["mse"] = mean_tensor
-
+            terms["mse"] = mean_flat((target - model_output) ** 2)
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
             else:
