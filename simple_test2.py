@@ -141,33 +141,34 @@ if __name__ == '__main__':
         mean = torch.mean(pca_result, dim=0)  # Shape: (400,)
         std = torch.std(pca_result, dim=0)  # Shape: (400,)
 
-        # Draw new coefficients from a normal distribution with the computed mean and std
-        coefficients = torch.normal(mean, std)  # Shape: (400,)
+        for i in range(50):
+            # Draw new coefficients from a normal distribution with the computed mean and std
+            coefficients = torch.normal(mean, std)  # Shape: (400,)
 
-        # coefficients will have the same shape as one PCA component vector (400,)
-        print("Mean:", mean)
-        print("Standard Deviation:", std)
-        print("Random Coefficients:", coefficients)
+            # coefficients will have the same shape as one PCA component vector (400,)
+            print("Mean:", mean)
+            print("Standard Deviation:", std)
+            print("Random Coefficients:", coefficients)
 
-        dupa = torch.zeros(50307)
+            dupa = torch.zeros(50307)
 
-        print(pca_result.shape)
-        print(basis.shape)
-        for i in range(coefficients.shape[0]):
-            dupa = dupa + basis[i]*coefficients[i]
+            print(pca_result.shape)
+            print(basis.shape)
+            for i in range(coefficients.shape[0]):
+                dupa = dupa + basis[i]*coefficients[i]
 
-       # print(weights)
-        #print(weights.shape)
-        siren = generate_mlp_from_weights(dupa, mlp_kwargs)
+           # print(weights)
+            #print(weights.shape)
+            siren = generate_mlp_from_weights(dupa, mlp_kwargs)
 
-        model_input = get_mgrid(128, 2).unsqueeze(0)
-        model_input = {'coords': model_input}
-        result = siren(model_input)
-        img = result['model_out']
-        fig, axes = plt.subplots(1, 1, figsize=(9, 9))
-        axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
-        #os.makedirs("test", exist_ok=True)
-        plt.savefig(f"test_siren/dupa.png")
+            model_input = get_mgrid(128, 2).unsqueeze(0)
+            model_input = {'coords': model_input}
+            result = siren(model_input)
+            img = result['model_out']
+            fig, axes = plt.subplots(1, 1, figsize=(9, 9))
+            axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
+            #os.makedirs("test", exist_ok=True)
+            plt.savefig(f"test_siren/dupa_{i}.png")
 
 
         siren = generate_mlp_from_weights(all_weights[5], mlp_kwargs)
