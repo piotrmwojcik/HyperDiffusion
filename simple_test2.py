@@ -138,13 +138,11 @@ if __name__ == '__main__':
         basis = torch.tensor(pca.components_)
         #print(ca_result.shape)
 
-
-
         mean = torch.mean(pca_result, dim=0)  # Shape: (400,)
         std = torch.std(pca_result, dim=0)  # Shape: (400,)
 
         # Draw new coefficients from a normal distribution with the computed mean and std
-        coefficients = torch.normal(mean, std)  # Shape: (400,)
+        coefficients = 0.7*pca_result[5] + 0.3*pca_result[10]#torch.normal(mean, std)  # Shape: (400,)
 
         # coefficients will have the same shape as one PCA component vector (400,)
         print("Mean:", mean)
@@ -172,7 +170,7 @@ if __name__ == '__main__':
         plt.savefig(f"test_siren/dupa.png")
 
 
-        siren = generate_mlp_from_weights(all_weights[0], mlp_kwargs)
+        siren = generate_mlp_from_weights(all_weights[5], mlp_kwargs)
 
         model_input = get_mgrid(128, 2).unsqueeze(0)
         model_input = {'coords': model_input}
