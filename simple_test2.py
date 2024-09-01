@@ -139,12 +139,10 @@ if __name__ == '__main__':
             model_input = get_mgrid(128, 2).unsqueeze(0)
             model_input = {'coords': model_input}
             result = siren(model_input)
-            img = result['model_out'][0].view(1, 128, 128, 3)
-            img_min = img.min()
-            img_max = img.max()
-            img = (img - img_min) / (img_max - img_min)
-            print(img)
-            img = (img * 255).byte().permute(0, 3, 1, 2)
+            img = result['model_out']
+            fig, axes = plt.subplots(1, 1, figsize=(9, 9))
+            axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
+            os.makedirs("test", exist_ok=True)
             plt.savefig(f"test_relu/img_{i}.png")
 
 
