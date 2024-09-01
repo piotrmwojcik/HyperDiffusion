@@ -135,13 +135,14 @@ if __name__ == '__main__':
         all_weights = torch.cat(all_weights, dim=0)
         from sklearn.decomposition import PCA
         pca = PCA(n_components=100)  # You can choose the number of components
-        pca_result = torch.tensor(pca.fit_transform(all_weights))
+        pca_result = pca.fit_transform(all_weights)
+        basis = torch.tensor(pca.components_)
         #print(ca_result.shape)
 
         dupa = torch.zeros(50307)
 
-        for i in range(all_weights.shape[0]):
-            dupa = dupa + pca_result[0, i]*all_weights[0, i]
+        for i in range(basis.shape[0]):
+            dupa = dupa + basis[i]*pca_result[0, i]
 
        # print(weights)
         #print(weights.shape)
