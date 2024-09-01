@@ -22,7 +22,7 @@ mlps_folder_train: /data/pwojcik/mlp_weigths_relu
 model_resume_path:
 sampling: ddim
 val_fid_calculation_period: 1
-lr: 0.0001
+lr: 0.0002
 batch_size: 32
 accumulate_grad_batches: 2
 val:
