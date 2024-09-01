@@ -23,7 +23,7 @@ def get_mgrid(sidelen, dim=2):
 
 
 if __name__ == '__main__':
-    config_path = 'configs/diffusion_configs/train_car_2d_relu.yaml'
+    config_path = 'configs/diffusion_configs/train_car_2d_img.yaml'
 
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
             weights = weights[0].view(-1)
             noise = torch.randn_like(weights) * 0.01
-            weights = weights + noise
+            #weights = weights + noise
             print(weights)
             print(weights.shape)
             siren = generate_mlp_from_weights(weights, mlp_kwargs)
@@ -143,7 +143,7 @@ if __name__ == '__main__':
             fig, axes = plt.subplots(1, 1, figsize=(9, 9))
             axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
             os.makedirs("test", exist_ok=True)
-            plt.savefig(f"test_relu/img_{i}.png")
+            plt.savefig(f"test_siren/img_{i}.png")
 
 
 
