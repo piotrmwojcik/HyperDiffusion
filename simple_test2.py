@@ -23,7 +23,7 @@ def get_mgrid(sidelen, dim=2):
 
 
 if __name__ == '__main__':
-    config_path = 'configs/diffusion_configs/train_car_2d_img.yaml'
+    config_path = 'configs/diffusion_configs/train_car_2d_relu.yaml'
 
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
@@ -133,17 +133,30 @@ if __name__ == '__main__':
             all_weights.append(weights)
         all_weights = torch.cat(all_weights, dim=0)
         from sklearn.decomposition import PCA
-        pca = PCA(n_components=1000)  # You can choose the number of components
+        pca = PCA(n_components=400)  # You can choose the number of components
         pca_result = pca.fit_transform(all_weights)
         basis = torch.tensor(pca.components_)
         #print(ca_result.shape)
+
+
+
+        mean = torch.mean(pca_result, dim=0)  # Shape: (400,)
+        std = torch.std(pca_result, dim=0)  # Shape: (400,)
+
+        # Draw new coefficients from a normal distribution with the computed mean and std
+        coefficients = torch.normal(mean, std)  # Shape: (400,)
+
+        # coefficients will have the same shape as one PCA component vector (400,)
+        print("Mean:", mean)
+        print("Standard Deviation:", std)
+        print("Random Coefficients:", coefficients)
 
         dupa = torch.zeros(50307)
 
         print(pca_result.shape)
         print(basis.shape)
-        for i in range(basis.shape[0]):
-            dupa = dupa + basis[i]*pca_result[0, i]
+        for i in range(coefficients.shape[0]):
+            dupa = dupa + basis[i]*coefficients[i]
 
        # print(weights)
         #print(weights.shape)
