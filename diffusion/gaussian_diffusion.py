@@ -833,7 +833,7 @@ class GaussianDiffusion:
                     result_target = siren_target(model_input)['model_out'][0]
                     with module_requires_grad(siren_output, False):
                         result_output = siren_output(model_input)['model_out'][0]
-                        mse2 = F.mse_loss(result_output, result_target, reduction=None) / result_output.shape[0]
+                        mse2 = F.mse_loss(result_output, result_target, reduction='none') / result_output.shape[0]
                         mse1[i] += mse2
             terms["mse"] = mse1
 
