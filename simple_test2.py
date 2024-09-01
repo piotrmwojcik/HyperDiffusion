@@ -23,7 +23,7 @@ def get_mgrid(sidelen, dim=2):
 
 
 if __name__ == '__main__':
-    config_path = 'configs/diffusion_configs/train_car_2d_relu.yaml'
+    config_path = 'configs/diffusion_configs/train_car_2d_img.yaml'
 
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
@@ -129,7 +129,6 @@ if __name__ == '__main__':
 
         all_weights = []
         for i, weights in enumerate(train_dl):
-
             weights = weights[0].view(-1).unsqueeze(0)
             all_weights.append(weights)
         all_weights = torch.cat(all_weights, dim=0)
