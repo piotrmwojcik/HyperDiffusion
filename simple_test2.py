@@ -135,13 +135,13 @@ if __name__ == '__main__':
         all_weights = torch.cat(all_weights, dim=0)
         from sklearn.decomposition import PCA
         pca = PCA(n_components=100)  # You can choose the number of components
-        pca_result = torch.tensor(ppca.fit_transform(all_weights))
+        pca_result = torch.tensor(pca.fit_transform(all_weights))
         #print(ca_result.shape)
 
         dupa = torch.zeros(50307)
 
         for i in range(all_weights.shape[0]):
-            dupa = dupa + pca_result[i]*all_weights[i]
+            dupa = dupa + pca_result[0, i]*all_weights[0, i]
 
        # print(weights)
         #print(weights.shape)
@@ -155,6 +155,18 @@ if __name__ == '__main__':
         axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
         os.makedirs("test", exist_ok=True)
         plt.savefig(f"test_siren/dupa.png")
+
+
+        siren = generate_mlp_from_weights(all_weights[0], mlp_kwargs)
+
+        model_input = get_mgrid(128, 2).unsqueeze(0)
+        model_input = {'coords': model_input}
+        result = siren(model_input)
+        img = result['model_out']
+        fig, axes = plt.subplots(1, 1, figsize=(9, 9))
+        axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
+        os.makedirs("test", exist_ok=True)
+        plt.savefig(f"test_siren/dupa_ref.png")
 
 
 
