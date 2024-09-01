@@ -134,7 +134,7 @@ if __name__ == '__main__':
         all_weights = torch.cat(all_weights, dim=0)
         from sklearn.decomposition import PCA
         pca = PCA(n_components=400)  # You can choose the number of components
-        pca_result = pca.fit_transform(all_weights)
+        pca_result = torch.tensor(pca.fit_transform(all_weights))
         basis = torch.tensor(pca.components_)
         #print(ca_result.shape)
 
