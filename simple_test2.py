@@ -141,6 +141,8 @@ if __name__ == '__main__':
 
         dupa = torch.zeros(50307)
 
+        print(pca_result.shape)
+        print(basis.shape)
         for i in range(basis.shape[0]):
             dupa = dupa + basis[i]*pca_result[0, i]
 
