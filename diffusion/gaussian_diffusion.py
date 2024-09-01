@@ -824,7 +824,6 @@ class GaussianDiffusion:
 
             import torch.nn.functional as F
             for i in range(target.shape[0]):
-
                 siren_target = generate_mlp_from_weights(target[i], mlp_kwargs).cuda()
                 siren_output = generate_mlp_from_weights(model_output[i], mlp_kwargs).cuda()
                 model_input = get_mgrid(128, 2).unsqueeze(0).cuda()
@@ -835,6 +834,7 @@ class GaussianDiffusion:
                         result_output = siren_output(model_input)['model_out'][0]
                         mse2 = F.mse_loss(result_output, result_target)
                         mse1[i] += mse2
+            terms["mse"] = mse1
 
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
