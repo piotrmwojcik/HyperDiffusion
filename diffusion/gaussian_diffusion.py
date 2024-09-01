@@ -835,7 +835,7 @@ class GaussianDiffusion:
                         mse2 = F.mse_loss(result_output, result_target, reduction='mean')
                         mse1[i] = mse2
             print(0.0001 * mse1)
-            terms["mse"] = 0.00001 * mse1 + mean_flat((target - model_output) ** 2)
+            terms["mse"] = 0.0001 * mse1 + mean_flat((target - model_output) ** 2)
 
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
