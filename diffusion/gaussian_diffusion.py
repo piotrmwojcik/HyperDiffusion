@@ -822,20 +822,26 @@ class GaussianDiffusion:
             assert model_output.shape == target.shape == x_start.shape
             mse1 = torch.zeros(x_t.shape[0]).cuda()
 
-            import torch.nn.functional as F
-            for i in range(target.shape[0]):
-                siren_target = generate_mlp_from_weights(target[i], mlp_kwargs).cuda()
-                siren_output = generate_mlp_from_weights(model_output[i], mlp_kwargs).cuda()
-                model_input = get_mgrid(128, 2).unsqueeze(0).cuda()
-                model_input = {'coords': model_input}
-                with module_requires_grad(siren_target, False):
-                    result_target = siren_target(model_input)['model_out'][0]
-                    with module_requires_grad(siren_output, False):
-                        result_output = siren_output(model_input)['model_out'][0]
-                        mse2 = F.mse_loss(result_output, result_target, reduction='mean')
-                        mse1[i] = mse2
-            #print(0.0001 * mse1)
-            terms["mse"] = 0.01 * mse1 + mean_flat((target - model_output) ** 2)
+            # import torch.nn.functional as F
+            # for i in range(target.shape[0]):
+            #     siren_target = generate_mlp_from_weights(target[i], mlp_kwargs).cuda()
+            #     siren_output = generate_mlp_from_weights(model_output[i], mlp_kwargs).cuda()
+            #     model_input = get_mgrid(128, 2).unsqueeze(0).cuda()
+            #     model_input = {'coords': model_input}
+            #     with module_requires_grad(siren_target, False):
+            #         result_target = siren_target(model_input)['model_out'][0]
+            #         with module_requires_grad(siren_output, False):
+            #             result_output = siren_output(model_input)['model_out'][0]
+            #             mse2 = F.mse_loss(result_output, result_target, reduction='mean')
+            #             mse1[i] = mse2
+            # #print(0.0001 * mse1)
+            # Define the sizes of each segment
+            segments = [256, 128, 16384, 128, 16384, 128, 16384, 128, 384, 3, 257]
+            squared_diff = (target - model_output) ** 2
+
+            splits = torch.split(squared_diff, segments, dim=1)
+            mse_loss_parts = [mean_flat(part) for part in splits]
+            terms["mse"] = torch.mean(torch.tensor(mse_loss_parts))
 
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
