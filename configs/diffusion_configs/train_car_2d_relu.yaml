@@ -24,7 +24,7 @@ sampling: ddim
 val_fid_calculation_period: 1
 lr: 0.0002
 batch_size: 32
-accumulate_grad_batches: 10
+accumulate_grad_batches: 2
 val:
   num_points: 2048
   num_samples: 60
@@ -45,7 +45,7 @@ diff_config:
     loss_type: MSE
 transformer_config:
   params:
-    n_embd: 1024
+    n_embd: 1920
     n_layer: 12
     n_head: 16
     split_policy: layer_by_layer
