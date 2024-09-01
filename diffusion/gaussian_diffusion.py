@@ -841,9 +841,9 @@ class GaussianDiffusion:
 
             splits = torch.split(squared_diff, segments, dim=1)
             mse_loss_parts = [mean_flat(part) for part in splits]
-            for ms in mse_loss_parts:
-                print(ms.shape)
-            terms["mse"] = torch.cat(mse_loss_parts, dim=0)
+            stacked_tensors = torch.stack(mse_loss_parts, dim=0)  # Shape will be [num_tensors, 32]
+            mean_tensor = torch.mean(stacked_tensors, dim=0)
+            terms["mse"] = torch.cat(mean_tensor, dim=0)
 
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
