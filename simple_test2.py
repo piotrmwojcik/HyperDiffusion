@@ -134,7 +134,7 @@ if __name__ == '__main__':
             all_weights.append(weights)
         all_weights = torch.cat(all_weights, dim=0)
         from sklearn.decomposition import PCA
-        pca = PCA(n_components=100)  # You can choose the number of components
+        pca = PCA(n_components=300)  # You can choose the number of components
         pca_result = pca.fit_transform(all_weights)
         basis = torch.tensor(pca.components_)
         #print(ca_result.shape)
@@ -156,7 +156,7 @@ if __name__ == '__main__':
         img = result['model_out']
         fig, axes = plt.subplots(1, 1, figsize=(9, 9))
         axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
-        os.makedirs("test", exist_ok=True)
+        #os.makedirs("test", exist_ok=True)
         plt.savefig(f"test_siren/dupa.png")
 
 
