@@ -160,6 +160,8 @@ if __name__ == '__main__':
 
            # print(weights)
             #print(weights.shape)
+            print('!!!')
+            print(dupa.shape)
             siren = generate_mlp_from_weights(dupa, mlp_kwargs)
 
             model_input = get_mgrid(128, 2).unsqueeze(0)
