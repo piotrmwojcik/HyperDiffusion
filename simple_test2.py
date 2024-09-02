@@ -155,8 +155,8 @@ if __name__ == '__main__':
             weights = weights + basis[i] * coefficients[i]
         print(weights.shape)
 
-        model = generate_mlp_from_weights(weights, mlp_kwargs)
-        model_input = get_mgrid(128, 3).unsqueeze(0)
+        model = generate_mlp_from_weights(weights, mlp_kwargs).cuda()
+        model_input = get_mgrid(128, 3).unsqueeze(0).cuda()
 
         model_input = {'coords': model_input}
 
@@ -169,7 +169,7 @@ if __name__ == '__main__':
             None,
             "nerf" if mlp_kwargs.model_type == "nerf" else "mlp",
             mlp_kwargs,
-        )
+        ).cuda()
         sdf_decoder.model = model.eval()
 
         os.makedirs("meshes", exist_ok=True)
