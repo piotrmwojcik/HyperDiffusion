@@ -149,7 +149,7 @@ if __name__ == '__main__':
             'pca_result': pca_result,
             'all_weights': all_weights[:500],
             'basis': basis
-        }, 'pca_data_7000.pth')
+        }, 'pca_data_full.pth')
 
         print(pca_result.shape)
 
