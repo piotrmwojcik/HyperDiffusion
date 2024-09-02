@@ -143,7 +143,7 @@ if __name__ == '__main__':
 
         for j in range(50):
             # Draw new coefficients from a normal distribution with the computed mean and std
-            coefficients = torch.normal(mean, 0.2*std)  # Shape: (400,)
+            coefficients = torch.normal(mean, std)  # Shape: (400,)
 
             # coefficients will have the same shape as one PCA component vector (400,)
             print("Mean:", mean)
