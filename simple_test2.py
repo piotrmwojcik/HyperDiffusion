@@ -150,7 +150,8 @@ if __name__ == '__main__':
         torch.save({
             'pca_result': pca_result,
             'all_weights': all_weights[:500],
-            'basis': basis
+            'basis': basis,
+            'pca_mean': pca.mean_,
         }, 'pca_data_full.pth')
 
         print(pca_result.shape)
