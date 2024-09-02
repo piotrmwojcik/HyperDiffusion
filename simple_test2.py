@@ -12,6 +12,7 @@ from pytorch_lightning.loggers import WandbLogger
 import wandb
 import os
 
+from siren.experiment_scripts.test_sdf import SDFDecoder
 from siren.sdf_meshing import create_mesh
 from transformer import Transformer
 from torch.utils.data import DataLoader, random_split
@@ -178,33 +179,32 @@ if __name__ == '__main__':
         meshes = []
         level = 0  # ????
 
-        with torch.no_grad():
-            effective_file_name = (
-                f"{folder_name}/plane_test"
-                if folder_name is not None
-                else None
-            )
+        effective_file_name = (
+            f"{folder_name}/plane_test"
+            if folder_name is not None
+            else None
+        )
 
-            v, f, sdf = create_mesh(
-                sdf_decoder,
-                effective_file_name,
-                N=res,
-                level=level
-                if mlp_kwargs.output_type in ["occ", "logits"]
-                else 0,
-            )
-            if (
-                    "occ" in mlp_kwargs.output_type
-                    or "logits" in mlp_kwargs.output_type
-            ):
-                tmp = copy.deepcopy(f[:, 1])
-                f[:, 1] = f[:, 2]
-                f[:, 2] = tmp
-            sdfs.append(sdf)
+        v, f, sdf = create_mesh(
+            sdf_decoder,
+            effective_file_name,
+            N=res,
+            level=level
+            if mlp_kwargs.output_type in ["occ", "logits"]
+            else 0,
+        )
+        if (
+                "occ" in mlp_kwargs.output_type
+                or "logits" in mlp_kwargs.output_type
+        ):
+            tmp = copy.deepcopy(f[:, 1])
+            f[:, 1] = f[:, 2]
+            f[:, 2] = tmp
+        sdfs.append(sdf)
 
-            mesh = trimesh.Trimesh(v, f)
-            meshes.append(mesh)
-        sdfs = torch.stack(sdfs)
+        mesh = trimesh.Trimesh(v, f)
+        meshes.append(mesh)
+    sdfs = torch.stack(sdfs)
 
     for mesh in meshes:
         mesh.vertices *= 2
