@@ -1,5 +1,5 @@
 from mlp_models import SingleBVPNet
-from hd_utils import generate_mlp_from_weights
+from hd_utils import generate_mlp_from_weights, render_meshes
 import torch
 import yaml
 from hd_utils import Config, get_mlp
@@ -11,6 +11,8 @@ from dataset import WeightDataset
 from pytorch_lightning.loggers import WandbLogger
 import wandb
 import os
+
+from siren.sdf_meshing import create_mesh
 from transformer import Transformer
 from torch.utils.data import DataLoader, random_split
 
@@ -141,6 +143,81 @@ if __name__ == '__main__':
 
         mean = torch.mean(pca_result, dim=0)  # Shape: (400,)
         std = torch.std(pca_result, dim=0)  # Shape: (400,)
+
+        mean = torch.mean(pca_result, dim=0)
+        std = torch.std(pca_result, dim=0)
+        coefficients = torch.normal(mean, std)  # Shape: (400,)
+
+        coefficients = pca_result[1]
+        weights = torch.zeros(36737)
+        for i in range(coefficients.shape[0]):
+            weights = weights + basis[i] * coefficients[i]
+        print(weights.shape)
+
+        model = generate_mlp_from_weights(weights, mlp_kwargs)
+        model_input = get_mgrid(128, 3).unsqueeze(0)
+
+        model_input = {'coords': model_input}
+
+        result = model(model_input)
+        x_0 = result['model_out']
+        x_0 = x_0.view(len(x_0), -1)
+
+        sdf_decoder = SDFDecoder(
+            mlp_kwargs.model_type,
+            None,
+            "nerf" if mlp_kwargs.model_type == "nerf" else "mlp",
+            mlp_kwargs,
+        )
+        sdf_decoder.model = model.eval()
+
+        os.makedirs("meshes", exist_ok=True)
+        folder_name = "meshes"
+        res = 128
+        sdfs = []
+        meshes = []
+        level = 0  # ????
+
+        with torch.no_grad():
+            effective_file_name = (
+                f"{folder_name}/plane_test"
+                if folder_name is not None
+                else None
+            )
+
+            v, f, sdf = create_mesh(
+                sdf_decoder,
+                effective_file_name,
+                N=res,
+                level=level
+                if mlp_kwargs.output_type in ["occ", "logits"]
+                else 0,
+            )
+            if (
+                    "occ" in mlp_kwargs.output_type
+                    or "logits" in mlp_kwargs.output_type
+            ):
+                tmp = copy.deepcopy(f[:, 1])
+                f[:, 1] = f[:, 2]
+                f[:, 2] = tmp
+            sdfs.append(sdf)
+
+            mesh = trimesh.Trimesh(v, f)
+            meshes.append(mesh)
+        sdfs = torch.stack(sdfs)
+
+    for mesh in meshes:
+        mesh.vertices *= 2
+    print(
+        "sdfs.stats",
+        sdfs.min().item(),
+        sdfs.max().item(),
+        sdfs.mean().item(),
+        sdfs.std().item(),
+    )
+    out_imgs = render_meshes(meshes)
+    plt.imsave('test_siren/output_mesh.png', out_imgs[0])
+
 
         # for j in range(50):
         #     # Draw new coefficients from a normal distribution with the computed mean and std
