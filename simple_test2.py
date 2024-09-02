@@ -30,7 +30,8 @@ def get_mgrid(sidelen, dim=2):
 if __name__ == '__main__':
     import os
 
-
+    os.environ['DISPLAY'] = ':1'
+    config_path = 'configs/diffusion_configs/train_plane.yaml'
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
 
