@@ -140,9 +140,15 @@ if __name__ == '__main__':
         all_weights = torch.cat(all_weights, dim=0)
         print(all_weights.shape)
         from sklearn.decomposition import PCA
-        pca = PCA(n_components=1000)  # You can choose the number of components
+        pca = PCA(n_components=7000)  # You can choose the number of components
         pca_result = torch.tensor(pca.fit_transform(all_weights))
         basis = torch.tensor(pca.components_)
+
+        torch.save({
+            'pca_result': pca_result,
+            'basis': basis
+        }, 'pca_data_7000.pth')
+
         print(pca_result.shape)
 
         mean = torch.mean(pca_result, dim=0)  # Shape: (400,)
@@ -158,68 +164,68 @@ if __name__ == '__main__':
             weights = weights + basis[i] * coefficients[i]
         print(weights.shape)
 
-        model = generate_mlp_from_weights(weights, mlp_kwargs).cuda()
-        model_input = get_mgrid(128, 3).unsqueeze(0).cuda()
-
-        model_input = {'coords': model_input}
-
-        result = model(model_input)
-        x_0 = result['model_out']
-        x_0 = x_0.view(len(x_0), -1)
-
-        sdf_decoder = SDFDecoder(
-            mlp_kwargs.model_type,
-            None,
-            "nerf" if mlp_kwargs.model_type == "nerf" else "mlp",
-            mlp_kwargs,
-        ).cuda()
-        sdf_decoder.model = model.eval()
-
-        os.makedirs("meshes", exist_ok=True)
-        folder_name = "meshes"
-        res = 128
-        sdfs = []
-        meshes = []
-        level = 0  # ????
-
-        effective_file_name = (
-            f"{folder_name}/plane_test"
-            if folder_name is not None
-            else None
-        )
-
-        v, f, sdf = create_mesh(
-            sdf_decoder,
-            effective_file_name,
-            N=res,
-            level=level
-            if mlp_kwargs.output_type in ["occ", "logits"]
-            else 0,
-        )
-        if (
-                "occ" in mlp_kwargs.output_type
-                or "logits" in mlp_kwargs.output_type
-        ):
-            tmp = copy.deepcopy(f[:, 1])
-            f[:, 1] = f[:, 2]
-            f[:, 2] = tmp
-        sdfs.append(sdf)
-
-        mesh = trimesh.Trimesh(v, f)
-        meshes.append(mesh)
-    sdfs = torch.stack(sdfs)
-
-    for mesh in meshes:
-        mesh.vertices *= 2
-    print(
-        "sdfs.stats",
-        sdfs.min().item(),
-        sdfs.max().item(),
-        sdfs.mean().item(),
-        sdfs.std().item(),
-    )
-    out_imgs = render_meshes(meshes)
-    plt.imsave('test_siren/output_mesh.png', out_imgs[0])
+    #     model = generate_mlp_from_weights(weights, mlp_kwargs).cuda()
+    #     model_input = get_mgrid(128, 3).unsqueeze(0).cuda()
+    #
+    #     model_input = {'coords': model_input}
+    #
+    #     result = model(model_input)
+    #     x_0 = result['model_out']
+    #     x_0 = x_0.view(len(x_0), -1)
+    #
+    #     sdf_decoder = SDFDecoder(
+    #         mlp_kwargs.model_type,
+    #         None,
+    #         "nerf" if mlp_kwargs.model_type == "nerf" else "mlp",
+    #         mlp_kwargs,
+    #     ).cuda()
+    #     sdf_decoder.model = model.eval()
+    #
+    #     os.makedirs("meshes", exist_ok=True)
+    #     folder_name = "meshes"
+    #     res = 128
+    #     sdfs = []
+    #     meshes = []
+    #     level = 0  # ????
+    #
+    #     effective_file_name = (
+    #         f"{folder_name}/plane_test"
+    #         if folder_name is not None
+    #         else None
+    #     )
+    #
+    #     v, f, sdf = create_mesh(
+    #         sdf_decoder,
+    #         effective_file_name,
+    #         N=res,
+    #         level=level
+    #         if mlp_kwargs.output_type in ["occ", "logits"]
+    #         else 0,
+    #     )
+    #     if (
+    #             "occ" in mlp_kwargs.output_type
+    #             or "logits" in mlp_kwargs.output_type
+    #     ):
+    #         tmp = copy.deepcopy(f[:, 1])
+    #         f[:, 1] = f[:, 2]
+    #         f[:, 2] = tmp
+    #     sdfs.append(sdf)
+    #
+    #     mesh = trimesh.Trimesh(v, f)
+    #     meshes.append(mesh)
+    # sdfs = torch.stack(sdfs)
+    #
+    # for mesh in meshes:
+    #     mesh.vertices *= 2
+    # print(
+    #     "sdfs.stats",
+    #     sdfs.min().item(),
+    #     sdfs.max().item(),
+    #     sdfs.mean().item(),
+    #     sdfs.std().item(),
+    # )
+    # out_imgs = render_meshes(meshes)
+    # plt.imsave('test_siren/output_mesh.png', out_imgs[0])
 
         # for j in range(50):
         #     # Draw new coefficients from a normal distribution with the computed mean and std
