@@ -23,7 +23,7 @@ def get_mgrid(sidelen, dim=2):
 
 
 if __name__ == '__main__':
-    config_path = 'configs/diffusion_configs/train_car_2d_img.yaml'
+    config_path = 'configs/diffusion_configs/train_plane.yaml'
 
     with open(config_path, 'r') as file:
         config = yaml.safe_load(file)
@@ -133,54 +133,54 @@ if __name__ == '__main__':
             all_weights.append(weights)
         all_weights = torch.cat(all_weights, dim=0)
         from sklearn.decomposition import PCA
-        pca = PCA(n_components=10000)  # You can choose the number of components
+        pca = PCA(n_components=1000)  # You can choose the number of components
         pca_result = torch.tensor(pca.fit_transform(all_weights))
         basis = torch.tensor(pca.components_)
-        #print(ca_result.shape)
+        print(pca_result.shape)
 
         mean = torch.mean(pca_result, dim=0)  # Shape: (400,)
         std = torch.std(pca_result, dim=0)  # Shape: (400,)
 
-        for j in range(50):
-            # Draw new coefficients from a normal distribution with the computed mean and std
-            coefficients = torch.normal(mean, std)  # Shape: (400,)
+        # for j in range(50):
+        #     # Draw new coefficients from a normal distribution with the computed mean and std
+        #     coefficients = torch.normal(mean, std)  # Shape: (400,)
+        #
+        #     # coefficients will have the same shape as one PCA component vector (400,)
+        #     print("Mean:", mean)
+        #     print("Standard Deviation:", std)
+        #     print("Random Coefficients:", coefficients)
+        #
+        #     sampled = torch.zeros(50307)
+        #
+        #     print(pca_result.shape)
+        #     print(basis.shape)
+        #     for i in range(coefficients.shape[0]):
+        #         sampled = sampled + basis[i] * coefficients[i]
+        #
+        #    # print(weights)
+        #     #print(weights.shape)
+        #     siren = generate_mlp_from_weights(sampled, mlp_kwargs)
+        #
+        #     model_input = get_mgrid(128, 2).unsqueeze(0)
+        #     model_input = {'coords': model_input}
+        #     result = siren(model_input)
+        #     img = result['model_out']
+        #     fig, axes = plt.subplots(1, 1, figsize=(9, 9))
+        #     axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
+        #     #os.makedirs("test", exist_ok=True)
+        #     plt.savefig(f"test_siren/dupa_{j}.png")
+        #
+        #
+        # siren = generate_mlp_from_weights(all_weights[5], mlp_kwargs)
 
-            # coefficients will have the same shape as one PCA component vector (400,)
-            print("Mean:", mean)
-            print("Standard Deviation:", std)
-            print("Random Coefficients:", coefficients)
-
-            dupa = torch.zeros(50307)
-
-            print(pca_result.shape)
-            print(basis.shape)
-            for i in range(coefficients.shape[0]):
-                dupa = dupa + basis[i]*coefficients[i]
-
-           # print(weights)
-            #print(weights.shape)
-            siren = generate_mlp_from_weights(dupa, mlp_kwargs)
-
-            model_input = get_mgrid(128, 2).unsqueeze(0)
-            model_input = {'coords': model_input}
-            result = siren(model_input)
-            img = result['model_out']
-            fig, axes = plt.subplots(1, 1, figsize=(9, 9))
-            axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
-            #os.makedirs("test", exist_ok=True)
-            plt.savefig(f"test_siren/dupa_{j}.png")
-
-
-        siren = generate_mlp_from_weights(all_weights[5], mlp_kwargs)
-
-        model_input = get_mgrid(128, 2).unsqueeze(0)
-        model_input = {'coords': model_input}
-        result = siren(model_input)
-        img = result['model_out']
-        fig, axes = plt.subplots(1, 1, figsize=(9, 9))
-        axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
-        os.makedirs("test", exist_ok=True)
-        plt.savefig(f"test_siren/dupa_ref.png")
+        # model_input = get_mgrid(128, 2).unsqueeze(0)
+        # model_input = {'coords': model_input}
+        # result = siren(model_input)
+        # img = result['model_out']
+        # fig, axes = plt.subplots(1, 1, figsize=(9, 9))
+        # axes.imshow(img.cpu().view(128, 128, 3).detach().numpy())
+        # os.makedirs("test", exist_ok=True)
+        # plt.savefig(f"test_siren/dupa_ref.png")
 
 
 
