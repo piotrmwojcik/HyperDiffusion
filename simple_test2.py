@@ -132,6 +132,7 @@ if __name__ == '__main__':
             weights = weights[0].view(-1).unsqueeze(0)
             all_weights.append(weights)
         all_weights = torch.cat(all_weights, dim=0)
+        print(all_weights.shape)
         from sklearn.decomposition import PCA
         pca = PCA(n_components=1000)  # You can choose the number of components
         pca_result = torch.tensor(pca.fit_transform(all_weights))
