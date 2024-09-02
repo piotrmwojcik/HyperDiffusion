@@ -28,6 +28,9 @@ def get_mgrid(sidelen, dim=2):
 
 
 if __name__ == '__main__':
+    import os
+
+    os.environ['DISPLAY'] = ':1'
     config_path = 'configs/diffusion_configs/train_plane.yaml'
 
     with open(config_path, 'r') as file:
@@ -219,7 +222,6 @@ if __name__ == '__main__':
     )
     out_imgs = render_meshes(meshes)
     plt.imsave('test_siren/output_mesh.png', out_imgs[0])
-
 
         # for j in range(50):
         #     # Draw new coefficients from a normal distribution with the computed mean and std
