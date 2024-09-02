@@ -143,6 +143,8 @@ if __name__ == '__main__':
         from sklearn.decomposition import PCA
         pca = PCA(n_components=4045)  # You can choose the number of components
         pca_result = torch.tensor(pca.fit_transform(all_weights))
+        print('!!!')
+        print(pca.mean_)
         basis = torch.tensor(pca.components_)
 
         torch.save({
