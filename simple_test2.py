@@ -11,6 +11,8 @@ from dataset import WeightDataset
 from pytorch_lightning.loggers import WandbLogger
 import wandb
 import os
+import copy
+import trimesh
 
 from siren.experiment_scripts.test_sdf import SDFDecoder
 from siren.sdf_meshing import create_mesh
