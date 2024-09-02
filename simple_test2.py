@@ -147,6 +147,7 @@ if __name__ == '__main__':
 
         torch.save({
             'pca_result': pca_result,
+            'all_weights': all_weights[:500],
             'basis': basis
         }, 'pca_data_7000.pth')
 
