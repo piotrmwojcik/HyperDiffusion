@@ -156,12 +156,10 @@ if __name__ == '__main__':
             print(basis.shape)
             for i in range(coefficients.shape[0]):
                 dupa = dupa + basis[i]*coefficients[i]
-            dupa = dupa + pca.mean_,
+            dupa = dupa + pca.mean_
 
            # print(weights)
             #print(weights.shape)
-            print('!!!')
-            print(dupa.shape)
             siren = generate_mlp_from_weights(dupa, mlp_kwargs)
 
             model_input = get_mgrid(128, 2).unsqueeze(0)
