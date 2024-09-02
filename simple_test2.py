@@ -29,10 +29,10 @@ def get_mgrid(sidelen, dim=2):
 
 if __name__ == '__main__':
     import os
-    import pyvirtualdisplay
+    #import pyvirtualdisplay
 
     # Creates a virtual display for OpenAI gym
-    pyvirtualdisplay.Display(visible=0, size=(1400, 900)).start()
+    #pyvirtualdisplay.Display(visible=0, size=(1400, 900)).start()
 
 
     with open(config_path, 'r') as file:
