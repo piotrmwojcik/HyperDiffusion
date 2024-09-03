@@ -217,7 +217,7 @@ def main(cfg: DictConfig):
 
     # Initialize HyperDiffusion
     diffuser = HyperDiffusion_2d_img(
-        model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, cfg, pca=pca
+        model, train_dt, val_dt, test_dt, mlp_kwargs, (1, 500), method, cfg, pca=pca
     )
 
     # Specify where to save checkpoints

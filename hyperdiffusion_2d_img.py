@@ -41,7 +41,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         print("encoded_outs.shape", encoded_outs.shape)
         timesteps = Config.config["timesteps"]
         betas = torch.tensor(np.linspace(1e-4, 2e-2, timesteps))
-        self.image_size = 500#encoded_outs[:1].shape
+        self.image_size = encoded_outs[:1].shape
 
         # Initialize diffusion utiities
         self.diff = GaussianDiffusion(
