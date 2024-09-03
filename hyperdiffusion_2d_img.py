@@ -155,7 +155,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             self.model, (16, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = (x_0s / self.cfg.normalization_factor)
-        x_0s = torch.matmult(x_0s, torch.tensor(self.pca.components_).cuda()) + torch.tensor(self.pca.mean_).cuda()
+        x_0s = torch.matmul(x_0s, torch.tensor(self.pca.components_).cuda()) + torch.tensor(self.pca.mean_).cuda()
 
         print(x_0s.shape)
         print(
