@@ -134,6 +134,9 @@ class HyperDiffusion_2d_img(pl.LightningModule):
 
         projected_vector = torch.matmul(centered_vector, pca_components)
 
+        print(input_data.dtype)
+        print(projected_vector.dtype)
+
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
             self.model,
