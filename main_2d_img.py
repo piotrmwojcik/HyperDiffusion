@@ -165,8 +165,8 @@ def main(cfg: DictConfig):
             pin_memory=True,
         )
         all_weights = []
-        for i, weights in enumerate(train_dl):
-            weights = weights.view(weights.shape[0], -1)
+        for i, weights in enumerate(train_dt):
+            weights = weights[0].view(-1).unsqueeze(0)
             all_weights.append(weights)
         all_weights = torch.cat(all_weights, dim=0)
         print(all_weights.shape)
