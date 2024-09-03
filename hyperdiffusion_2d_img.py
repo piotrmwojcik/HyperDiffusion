@@ -130,7 +130,8 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             .to(self.device)
         )
         centered_vector = input_data - torch.tensor(self.pca.mean_).cuda()
-        pca_components = torch.tensor(self.pca.components_.t()).cuda/()
+        pca_components = torch.tensor(self.pca.components_).cuda().t()
+
         projected_vector = torch.matmul(centered_vector, pca_components)
 
         # Execute a diffusion forward pass
