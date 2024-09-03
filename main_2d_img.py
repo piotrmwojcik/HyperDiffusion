@@ -60,16 +60,20 @@ def main(cfg: DictConfig):
     # Although it says train, it includes all the shapes but we only extract training ones in WeightDataset
     mlps_folder_train = Config.get("mlps_folder_train")
 
+
+
     # Initialize Transformer for HyperDiffusion
     if "hyper" in method:
         mlp = get_mlp(mlp_kwargs)
         state_dict = mlp.state_dict()
         layers = []
         layer_names = []
-        for l in state_dict:
-            shape = state_dict[l].shape
-            layers.append(np.prod(shape))
-            layer_names.append(l)
+        #for l in state_dict:
+        #    shape = state_dict[l].shape
+        #    layers.append(np.prod(shape))
+        #    layer_names.append(l)
+        layers.append(500)
+        layer_names.append('one')
         model = Transformer(
             layers, layer_names, **Config.config["transformer_config"]["params"]
         ).cuda()
@@ -160,6 +164,15 @@ def main(cfg: DictConfig):
             num_workers=8,
             pin_memory=True,
         )
+        all_weights = []
+        for i, weights in enumerate(train_dl):
+            weights = weights[0].view(-1).unsqueeze(0)
+            all_weights.append(weights)
+        all_weights = torch.cat(all_weights, dim=0)
+        print(all_weights.shape)
+        from sklearn.decomposition import PCA
+        pca = PCA(n_components=500)  # You can choose the number of components
+        pca_result = torch.tensor(pca.fit_transform(all_weights))
         val_dt = WeightDataset(
             mlps_folder_train,
             wandb_logger,
@@ -204,7 +217,7 @@ def main(cfg: DictConfig):
 
     # Initialize HyperDiffusion
     diffuser = HyperDiffusion_2d_img(
-        model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, cfg
+        model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, cfg, pca=pca, pca_mean=_p
     )
 
     # Specify where to save checkpoints
