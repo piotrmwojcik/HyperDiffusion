@@ -129,8 +129,8 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             .long()
             .to(self.device)
         )
-        centered_vector = input_data - torch.tensor(self.pca.mean_).cuda()
-        pca_components = torch.tensor(self.pca.components_).cuda().t()
+        centered_vector = input_data - torch.tensor(self.pca.mean_).double().cuda()
+        pca_components = torch.tensor(self.pca.components_).double().cuda().t()
 
         projected_vector = torch.matmul(centered_vector, pca_components)
 
@@ -155,7 +155,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             self.model, (16, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = (x_0s / self.cfg.normalization_factor)
-        x_0s = torch.matmult(x_0s, torch.tensor(self.pca.components_).cuda()) + torch.tensor(self.pca.mean_).cuda()
+        x_0s = torch.matmult(x_0s, torch.tensor(self.pca.components_).double().cuda()) + torch.tensor(self.pca.mean_).double().cuda()
 
         print(x_0s.shape)
         print(
