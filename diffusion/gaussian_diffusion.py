@@ -837,8 +837,14 @@ class GaussianDiffusion:
             splits_output = torch.split(model_output, segments, dim=1)
             splits_target = torch.split(target, segments, dim=1)
             for ii in range(len(splits_output)):
-                print('!!!')
-                print(splits_output[ii].shape)
+                o = splits_output[ii].clone()
+                t = splits_target[ii].clone()
+
+                o = torch.abs(o)
+                o = torch.where(o == 0.0, eps, o)
+                t = torch.abs(t)
+                t = torch.where(t == 0.0, eps, t)
+                print(self.JS_div(o, t))
 
 
             # import torch.nn.functional as F
