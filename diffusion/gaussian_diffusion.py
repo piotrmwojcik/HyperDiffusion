@@ -846,7 +846,7 @@ class GaussianDiffusion:
                 ta = torch.abs(ta)
                 ta = torch.where(ta == 0.0, eps, ta)
                 j = self.JS_div(o, ta)
-                if js[0] > 5.0:
+                if j[0] > 5.0:
                     print('!!! output')
                     print(splits_output[ii].shape)
                     print(splits_output[ii])
