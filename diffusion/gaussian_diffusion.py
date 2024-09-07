@@ -885,7 +885,7 @@ class GaussianDiffusion:
             print('!!!')
             terms["mse"] = 100.0 * mse + 0.1*js_mean
             print('mse', torch.mean(100.0 * mse))
-            print('js', torch.mean(0.04*js_mean))
+            print('js', torch.mean(0.01*js_mean))
 
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
