@@ -841,6 +841,10 @@ class GaussianDiffusion:
                 o = splits_output[ii].clone()
                 ta = splits_target[ii].clone()
 
+                mm = o * ta
+                mm = torch.where(mm < 0.0, 2.0, 1.0)
+                ta = mm * ta
+
                 o = torch.abs(o)
                 o = torch.where(o == 0.0, eps, o)
                 ta = torch.abs(ta)
@@ -876,8 +880,6 @@ class GaussianDiffusion:
             # mean_tensor = torch.mean(stacked_tensors, dim=0)
             # terms["mse"] = mean_tensor
             mse = mean_flat((target - model_output) ** 2)
-            print(mse)
-            print(js_mean)
 
             terms["mse"] = 50.0 * mse + 0.1*js_mean
             if "vb" in terms:
