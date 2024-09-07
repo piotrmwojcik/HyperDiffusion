@@ -876,7 +876,7 @@ class GaussianDiffusion:
             # mean_tensor = torch.mean(stacked_tensors, dim=0)
             # terms["mse"] = mean_tensor
 
-            terms["mse"] = mean_flat((target - model_output) ** 2) + 0.1*js_mean
+            terms["mse"] = 10.0 * mean_flat((target - model_output) ** 2) + 0.1*js_mean
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
             else:
