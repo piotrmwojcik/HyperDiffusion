@@ -843,8 +843,10 @@ class GaussianDiffusion:
                 o = torch.abs(o)
                 o = torch.where(o == 0.0, eps, o)
                 ta = torch.abs(ta)
-                t = torch.where(ta == 0.0, eps, ta)
-                print(self.JS_div(o, ta))
+                ta = torch.where(ta == 0.0, eps, ta)
+                js = self.JS_div(o, ta)
+                print(js.shape)
+                print(js)
 
 
             # import torch.nn.functional as F
