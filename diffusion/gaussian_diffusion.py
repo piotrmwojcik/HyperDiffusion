@@ -846,6 +846,13 @@ class GaussianDiffusion:
                 ta = torch.abs(ta)
                 ta = torch.where(ta == 0.0, eps, ta)
                 j = self.JS_div(o, ta)
+                if js[0] > 5.0:
+                    print('!!! output')
+                    print(splits_output[ii].shape)
+                    print(splits_output[ii])
+                    print('!!! target')
+                    print(splits_target[ii].shape)
+                    print(splits_target[ii])
                 js.append(j)
             concatenated_tensor = torch.stack(js , dim=1)  # Size becomes (32, N)
 
@@ -876,7 +883,7 @@ class GaussianDiffusion:
             # mean_tensor = torch.mean(stacked_tensors, dim=0)
             # terms["mse"] = mean_tensor
 
-            terms["mse"] = 10.0 * mean_flat((target - model_output) ** 2) + 0.1*js_mean
+            terms["mse"] = 20.0 * mean_flat((target - model_output) ** 2) + 0.1*js_mean
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
             else:
