@@ -846,7 +846,9 @@ class GaussianDiffusion:
                 ta = torch.where(ta == 0.0, eps, ta)
                 js = self.JS_div(o, ta)
                 print(js.shape)
-                print(js)
+                if torch.max(js > 5.0):
+                    print(ta)
+                    print(o)
 
 
             # import torch.nn.functional as F
