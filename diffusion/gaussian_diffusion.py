@@ -753,6 +753,15 @@ class GaussianDiffusion:
         output = th.where((t == 0), decoder_nll, kl)
         return {"output": output, "pred_xstart": out["pred_xstart"]}
 
+    def KL_div(self, x, y):
+        return torch.sum(x * (torch.log2(x) - torch.log2(y)), dim = -1)
+
+    def JS_div(self, img_node, cd_node):
+        img_node = img_node
+        cd_node = cd_node
+        M = (img_node + cd_node) / 2
+        return (self.KL_div(img_node, M) + self.KL_div(cd_node, M)) / 2
+
     def training_losses(
         self, model, x_start, t, mlp_kwargs, wandb_logger, model_kwargs=None, noise=None
     ):
@@ -820,7 +829,17 @@ class GaussianDiffusion:
                 ModelMeanType.EPSILON: noise,
             }[self.model_mean_type]
             assert model_output.shape == target.shape == x_start.shape
-            mse1 = torch.zeros(x_t.shape[0]).cuda()
+            #mse1 = torch.zeros(x_t.shape[0]).cuda()
+
+            eps = 1e-8
+
+            segments = [256, 128, 16384, 128, 16384, 128, 16384, 128, 384, 3]
+            splits_output = torch.split(model_output, segments, dim=1)
+            splits_target = torch.split(target, segments, dim=1)
+            for ii in range(len(splits_output)):
+                print('!!!')
+                print(splits_output[ii].shape)
+
 
             # import torch.nn.functional as F
             # for i in range(target.shape[0]):
