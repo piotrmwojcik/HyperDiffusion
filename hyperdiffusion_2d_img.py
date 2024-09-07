@@ -21,7 +21,7 @@ from siren.experiment_scripts.test_sdf import SDFDecoder
 
 class HyperDiffusion_2d_img(pl.LightningModule):
     def __init__(
-        self, model, train_dt, val_dt, test_dt, mlp_kwargs, image_shape, method, cfg, pca
+        self, model, train_dt, val_dt, test_dt, mlp_kwargs, image_shape, method, cfg
     ):
         super().__init__()
         self.model = model
@@ -29,7 +29,6 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         self.method = method
         self.mlp_kwargs = mlp_kwargs
         self.train_dt = train_dt
-        self.pca = pca
         self.test_dt = test_dt
         self.ae_model = None
         self.sample_count = min(
@@ -129,15 +128,11 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             .long()
             .to(self.device)
         )
-        centered_vector = input_data - torch.tensor(self.pca.mean_).cuda()
-        pca_components = torch.tensor(self.pca.components_).cuda().t()
-
-        projected_vector = torch.matmul(centered_vector, pca_components).float()
 
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
             self.model,
-            projected_vector * self.cfg.normalization_factor,
+            input_data * self.cfg.normalization_factor,
             t,
             self.mlp_kwargs,
             self.logger,
@@ -164,9 +159,6 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             x_0s.mean().item(),
             x_0s.std().item(),
         )
-
-
-        x_0s = torch.matmul(x_0s.double(), torch.tensor(self.pca.components_).cuda()) + torch.tensor(self.pca.mean_).cuda()
 
         weights = x_0s[0].view(-1)
         print(weights)
