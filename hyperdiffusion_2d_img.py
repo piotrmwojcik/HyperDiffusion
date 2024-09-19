@@ -84,15 +84,14 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             model_input = get_grid(64, 64, b=0).unsqueeze(0)#get_mgrid(128, 2).unsqueeze(0)
             model_input = {'coords': model_input}
             result = mlp(model_input)
-            print('!!!')
-            print(result['model_out'][0].shape)
-            print(result['model_out'][0])
             img = result['model_out'][0].view(1, 64, 64, 3)
             img_min = img.min().item()
             img_max = img.max().item()
             print(img_min, img_max)
             img = (img + 1.0) / 2.0
             img = (img * 255).byte().permute(0, 3, 1, 2)
+            print(img.shape)
+            print(img)
             # print(img.shape)
             # images = wandb.Image(img, caption="")
             # wandb.log({"examples": images})
