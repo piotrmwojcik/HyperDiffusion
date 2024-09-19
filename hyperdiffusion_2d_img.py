@@ -171,7 +171,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         print(result['model_out'].shape)
         # print(img)
         img = dataio.lin2img(result['model_out'], (64, 64))
-        img = dataio.rescale_img((img + 1) / 2, mode='clamp').permute(0, 3, 1, 2)
+        img = dataio.rescale_img((img + 1) / 2, mode='clamp')
         img = (img * 255).byte()
         #print(img)
         #print('!!!')
