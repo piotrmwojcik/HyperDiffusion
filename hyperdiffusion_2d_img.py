@@ -82,13 +82,12 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             img = input_data[0].flatten()[:curr_weights]
             mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
             model_input = get_grid(64, 64, b=0).unsqueeze(0)#get_mgrid(128, 2).unsqueeze(0)
-            print('!!!!!!!')
-            print(model_input.shape)
+
             model_input = {'coords': model_input}
             result = mlp(model_input)
             #print(img)
-            img = result['model_out'].view(1, 64, 64, 3)
-            img = dataio.rescale_img((img + 1) / 2, mode='clamp').permute(0, 3, 1, 2)
+            img = dataio.lin2img(result['model_out'], (64, 64))
+            img = dataio.rescale_img((img + 1) / 2, mode='clamp')
             img = (img * 255).byte()
             # print(img.shape)
             # images = wandb.Image(img, caption="")
@@ -171,7 +170,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         result = siren(model_input)
         print(result['model_out'].shape)
         # print(img)
-        img = result['model_out'].view(1, 64, 64, 3)
+        img = dataio.lin2img(result['model_out'], (64, 64))
         img = dataio.rescale_img((img + 1) / 2, mode='clamp').permute(0, 3, 1, 2)
         img = (img * 255).byte()
         #print(img)
