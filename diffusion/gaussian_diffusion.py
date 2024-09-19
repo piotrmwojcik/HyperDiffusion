@@ -882,7 +882,6 @@ class GaussianDiffusion:
             # terms["mse"] = mean_tensor
             mse = mean_flat((target - model_output) ** 2)
 
-            print('!!!')
             terms["mse"] = mse#100.0 * mse #+ 0.1*js_mean
             #print('mse', torch.mean(100.0 * mse))
             #print('js', torch.mean(0.05*js_mean))
