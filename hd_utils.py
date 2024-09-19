@@ -85,8 +85,6 @@ def generate_mlp_from_weights(weights, mlp_kwargs):
     state_dict = mlp.state_dict()
     weight_names = list(state_dict.keys())
     for layer in weight_names:
-        print('!!!')
-        print(layer)
         val = state_dict[layer]
         num_params = np.product(list(val.shape))
         w = weights[:num_params]
