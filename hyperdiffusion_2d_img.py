@@ -15,7 +15,7 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes)
 from siren import sdf_meshing
-from siren.dataio import anime_read, get_mgrid
+from siren.dataio import anime_read, get_mgrid, get_grid
 from siren.experiment_scripts.test_sdf import SDFDecoder
 
 
@@ -81,10 +81,10 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             curr_weights = Config.get("curr_weights")
             img = input_data[0].flatten()[:curr_weights]
             mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
-            model_input = get_mgrid(128, 2).unsqueeze(0)
+            model_input = get_grid(64, 64, b=1)#get_mgrid(128, 2).unsqueeze(0)
             model_input = {'coords': model_input}
             result = mlp(model_input)
-            img = result['model_out'][0].view(1, 128, 128, 3)
+            img = result['model_out'][0].view(1, 64, 64, 3)
             img_min = img.min().item()
             img_max = img.max().item()
             print(img_min, img_max)
@@ -166,10 +166,10 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         siren = generate_mlp_from_weights(weights, self.mlp_kwargs)
         #print(self.mlp_kwargs.model_type)
 
-        model_input = get_mgrid(128, 2).unsqueeze(0)
+        model_input = get_grid(64, 64, b=1)#get_mgrid(128, 2).unsqueeze(0)
         model_input = {'coords': model_input}
         result = siren(model_input)
-        img = result['model_out'][0].view(1, 128, 128, 3)
+        img = result['model_out'][0].view(1, 64, 64, 3)
         #print(img[0, :, :, 0])
         #print('!!!')
         #print(img[0, :, :, 1])

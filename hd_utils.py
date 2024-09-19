@@ -6,7 +6,7 @@ import torch
 import trimesh
 #from implicit_kan.implicit_kan import ImplicitEKAN
 
-from mlp_models import MLP, MLP3D, SingleBVPNet
+from mlp_models import MLP, MLP3D, SingleBVPNet, ImplicitMLP
 from Pointnet_Pointnet2_pytorch.log.classification.pointnet2_ssg_wo_normals import \
     pointnet2_cls_ssg
 from torchmetrics_fid import FrechetInceptionDistance
@@ -73,8 +73,8 @@ def get_mlp(mlp_kwargs):
             mlp = MLP3D(**mlp_kwargs)
         elif mlp_kwargs.model_type == "SingleBVPNet":
             mlp = SingleBVPNet(**mlp_kwargs)
-        #elif mlp_kwargs.model_type == "kan":
-        #    mlp = ImplicitEKAN(**mlp_kwargs)
+        elif mlp_kwargs.model_type == "ImplicitMLP":
+            mlp = ImplicitMLP()
     else:
         mlp = MLP(**mlp_kwargs)
     return mlp
