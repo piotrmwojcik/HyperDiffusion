@@ -88,7 +88,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             print(result['model_out'].shape)
             #print(img)
             img = result['model_out'].view(1, 64, 64, 3)
-            img = dataio.rescale_img((img + 1) / 2, mode='clamp').permute(0, 2, 3, 1)
+            img = dataio.rescale_img((img + 1.0) / 2.0, mode='clamp').permute(0, 3, 1, 2)
             img = (img * 255).byte()
             # print(img.shape)
             # images = wandb.Image(img, caption="")
