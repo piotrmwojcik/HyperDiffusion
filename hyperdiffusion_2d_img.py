@@ -14,7 +14,7 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes)
-from siren import sdf_meshing
+from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
 from siren.experiment_scripts.test_sdf import SDFDecoder
 
@@ -87,12 +87,8 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             print('!!!!')
             print(result['model_out'].shape)
             #print(img)
-            img = result['model_out'][0].view(1, 64, 64, 3)
-            img_min = img.min().item()
-            img_max = img.max().item()
-            print(img_min, img_max)
-            img = (img + 1.0) / 2.0
-            img = (img * 255).byte().permute(0, 3, 1, 2)
+            img = result['model_out'].view(1, 64, 64, 3)
+            dataio.rescale_img((img + 1) / 2, mode='clamp').permute(0, 2, 3, 1)
 
             # print(img.shape)
             # images = wandb.Image(img, caption="")
