@@ -81,7 +81,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             curr_weights = Config.get("curr_weights")
             img = input_data[0].flatten()[:curr_weights]
             mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
-            model_input = get_grid(64, 64, b=0)#get_mgrid(128, 2).unsqueeze(0)
+            model_input = get_grid(64, 64, b=0).unsqueeze(0)#get_mgrid(128, 2).unsqueeze(0)
             model_input = {'coords': model_input}
             result = mlp(model_input)
             print('!!!')
