@@ -85,8 +85,8 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             model_input = {'coords': model_input}
             result = mlp(model_input)
             print('!!!')
-            print(result.shape)
-            print(result)
+            print(result['model_out'][0].shape)
+            print(result['model_out'][0])
             img = result['model_out'][0].view(1, 64, 64, 3)
             img_min = img.min().item()
             img_max = img.max().item()
