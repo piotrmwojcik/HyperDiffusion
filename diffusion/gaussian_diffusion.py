@@ -831,31 +831,31 @@ class GaussianDiffusion:
             assert model_output.shape == target.shape == x_start.shape
             #mse1 = torch.zeros(x_t.shape[0]).cuda()
 
-            eps = 1e-8
-
-            segments = [256, 128, 16384, 128, 16384, 128, 16384, 128, 384, 3]
-            splits_output = torch.split(model_output, segments, dim=1)
-            splits_target = torch.split(target, segments, dim=1)
-            js = []
-            for ii in range(len(splits_output)):
-                o = splits_output[ii].clone()
-                ta = splits_target[ii].clone()
-
-                mm = o * ta
-                mm = torch.where(mm < 0.0, 2.0, 1.0)
-                ta = mm * ta
-
-                o = torch.abs(o)
-                o = torch.where(o == 0.0, eps, o)
-                ta = torch.abs(ta)
-                ta = torch.where(ta == 0.0, eps, ta)
-                j = self.JS_div(o, ta)
-                js.append(j)
-
-            concatenated_tensor = torch.stack(js , dim=1)  # Size becomes (32, N)
-
-            # Compute the mean along the new dimension (dim=1), resulting in a tensor of size (32,)
-            js_mean = concatenated_tensor.mean(dim=1)
+            # eps = 1e-8
+            #
+            # segments = [256, 128, 16384, 128, 16384, 128, 16384, 128, 384, 3]
+            # splits_output = torch.split(model_output, segments, dim=1)
+            # splits_target = torch.split(target, segments, dim=1)
+            # js = []
+            # for ii in range(len(splits_output)):
+            #     o = splits_output[ii].clone()
+            #     ta = splits_target[ii].clone()
+            #
+            #     mm = o * ta
+            #     mm = torch.where(mm < 0.0, 2.0, 1.0)
+            #     ta = mm * ta
+            #
+            #     o = torch.abs(o)
+            #     o = torch.where(o == 0.0, eps, o)
+            #     ta = torch.abs(ta)
+            #     ta = torch.where(ta == 0.0, eps, ta)
+            #     j = self.JS_div(o, ta)
+            #     js.append(j)
+            #
+            # concatenated_tensor = torch.stack(js , dim=1)  # Size becomes (32, N)
+            #
+            # # Compute the mean along the new dimension (dim=1), resulting in a tensor of size (32,)
+            # js_mean = concatenated_tensor.mean(dim=1)
 
 
             # import torch.nn.functional as F
@@ -884,8 +884,8 @@ class GaussianDiffusion:
 
             print('!!!')
             terms["mse"] = mse#100.0 * mse #+ 0.1*js_mean
-            print('mse', torch.mean(100.0 * mse))
-            print('js', torch.mean(0.05*js_mean))
+            #print('mse', torch.mean(100.0 * mse))
+            #print('js', torch.mean(0.05*js_mean))
 
             if "vb" in terms:
                 terms["loss"] = terms["mse"] + terms["vb"]
