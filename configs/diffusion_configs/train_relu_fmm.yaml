@@ -18,7 +18,7 @@ scheduler: True
 scheduler_step: 200
 best_model_save_path:
 mode: train
-mlps_folder_train: /data/pwojcik/mlp_fmm/
+mlps_folder_train: /data/pwojcik/mlp_fmm2/
 model_resume_path:
 sampling: ddim
 val_fid_calculation_period: 20
@@ -31,6 +31,7 @@ val:
 mlp_config:
   params:
     model_type: ImplicitMLP
+    B_path: /data/pwojcik/siren/random_mod/B.pth
 diff_config:
   params:
     model_mean_type: START_X
