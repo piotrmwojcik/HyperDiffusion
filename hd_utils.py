@@ -74,7 +74,7 @@ def get_mlp(mlp_kwargs):
         elif mlp_kwargs.model_type == "SingleBVPNet":
             mlp = SingleBVPNet(**mlp_kwargs)
         elif mlp_kwargs.model_type == "ImplicitMLP":
-            mlp = ImplicitMLP(**mlp_kwargs)
+            mlp = ImplicitMLP(B_path=mlp_kwargs['B_path'])
     else:
         mlp = MLP(**mlp_kwargs)
     return mlp
