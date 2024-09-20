@@ -111,7 +111,7 @@ class GaussianFourierFeatureTransform(nn.Module):
      returns a tensor of size [batches, mapping_dim*2, width, height].
     """
 
-    def __init__(self, B, num_input_channels=2, mapping_dim=256, scale=10):
+    def __init__(self, B, num_input_channels=2, mapping_dim=256):
         super().__init__()
 
         self._num_input_channels = num_input_channels
@@ -147,6 +147,8 @@ class ImplicitMLP(nn.Module):
     def __init__(self, B_path):
         super(ImplicitMLP, self).__init__()
         loaded_B = torch.load(B_path)
+        print('!!!')
+        print(loaded_B)
         self.gff = GaussianFourierFeatureTransform(B=loaded_B, mapping_dim=128)
         self.linear1 = FMMLinear(128 * 2, 256, 70)
         self.linear2 = FMMLinear(256, 128, 10)
