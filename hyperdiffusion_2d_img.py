@@ -19,7 +19,7 @@ from siren.dataio import anime_read, get_mgrid, get_grid
 from siren.experiment_scripts.test_sdf import SDFDecoder
 
 
-class HyperDiffusion_2d_img(torch.nn.Module):
+class HyperDiffusion_2d_img(pl.LightningModule):
     def __init__(
         self, model, train_dt, val_dt, test_dt, mlp_kwargs, image_shape, method, cfg
     ):
@@ -72,12 +72,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             return [optimizer], [scheduler]
         return optimizer
 
-    def training_step(self, train_batch, global_step):
+    def training_step(self, train_batch, batch_idx):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
-        input_data = train_batch[0].cuda()
+        input_data = train_batch[0]
 
         # At the first step output first element in the dataset as a sanit check
-        if "hyper" in self.method and global_step % 50 == 0:
+        if "hyper" in self.method and self.trainer.global_step % 50 == 0:
             curr_weights = Config.get("curr_weights")
             img = input_data[0].flatten()[:curr_weights]
             mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
@@ -92,7 +92,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             # print(img.shape)
             # images = wandb.Image(img, caption="")
             # wandb.log({"examples": images})
-            self.logger.log({"train": [img]})
+            self.logger.log_image("train", [img])
             #sdf_decoder = SDFDecoder(
             #    self.mlp_kwargs.model_type,
             #    None,
@@ -110,8 +110,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
             #print("Input images shape:", input_data.shape)
 
-        # Output statistics every 10 step
-        if global_step % 10 == 0:
+        # Output statistics every 100 step
+        if self.trainer.global_step % 10 == 0:
             print(input_data.shape)
             print(
                 "Orig weights[0].stats",
@@ -125,7 +125,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         t = (
             torch.randint(0, high=self.diff.num_timesteps, size=(input_data.shape[0],))
             .long()
-            .cuda()
+            .to(self.device)
         )
 
         # Execute a diffusion forward pass
@@ -139,12 +139,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         )
 
         loss_mse = loss_terms["loss"].mean()
-        self.logger.log({"train_loss": loss_mse})
+        self.log("train_loss", loss_mse)
 
         loss = loss_mse
         return loss
 
-    def validation_step(self):
+    def validation_step(self, val_batch, batch_idx):
         x_0s = self.diff.ddim_sample_loop(
             self.model, (16, *self.image_size[1:]), clip_denoised=False
         )
@@ -178,7 +178,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print(img.shape)
         #images = wandb.Image(img, caption="")
         #wandb.log({"examples": images})
-        self.logger.log({"val": [img]})
+        self.logger.log_image("val", [img])
         #metric_fn = (
         #    self.calc_metrics_4d
         #    if self.cfg.mlp_config.params.move
@@ -193,7 +193,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def training_epoch_end(self, outputs: EPOCH_OUTPUT) -> None:
         epoch_loss = sum(output["loss"] for output in outputs) / len(outputs)
-        self.log({"epoch_loss": epoch_loss})
+        self.log("epoch_loss", epoch_loss)
 
     def print_summary(self, flat, func):
         var = func(flat, dim=0)
