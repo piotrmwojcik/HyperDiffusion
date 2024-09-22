@@ -274,9 +274,9 @@ def main(cfg: DictConfig):
                 #   optimizer.zero_grad()
 
             epoch_loss = sum(output for output in outputs) / len(outputs)
-            run.log({"global_step": global_step, "epoch_loss": epoch_loss})
-            run.log({"global_step": global_step, "epoch": epoch})
-            run.log({"global_step": global_step, "lr-AdamW": optimizer.param_groups[0]['lr']})
+            run.log({"global_step": global_step / 10, "epoch_loss": epoch_loss})
+            run.log({"global_step": global_step / 10, "epoch": epoch})
+            run.log({"global_step": global_step / 10, "lr-AdamW": optimizer.param_groups[0]['lr']})
             # Learning rate step (if using a scheduler)
 
 
