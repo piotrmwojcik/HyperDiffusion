@@ -74,7 +74,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def training_step(self, train_batch, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
-        input_data = train_batch[0]
+        input_data = train_batch[0].cuda()
 
         # At the first step output first element in the dataset as a sanit check
         if "hyper" in self.method and global_step % 50 == 0:
