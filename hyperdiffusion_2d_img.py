@@ -146,8 +146,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         loss = loss_mse
         return loss
 
-    def validation_step(self, global_step):
-        log_interval = int(Config.get("log_interval"))
+    def validation_step(self, epoch):
 
         x_0s = self.diff.ddim_sample_loop(
             self.model, (16, *self.image_size[1:]), clip_denoised=False
@@ -182,8 +181,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print(img.shape)
         images = wandb.Image(img, caption="")
         #wandb.log({"examples": images})
-        if global_step % log_interval == 0:
-            self.logger.log({"global_step": global_step / log_interval, "val": images})
+        self.logger.log({"global_step": epoch, "val": images})
         #metric_fn = (
         #    self.calc_metrics_4d
         #    if self.cfg.mlp_config.params.move

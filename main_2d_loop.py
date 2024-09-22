@@ -287,7 +287,7 @@ def main(cfg: DictConfig):
             if epoch % Config.get("val_fid_calculation_period") == 0:
                 diffuser.eval()  # Set model to evaluation mode
                 with torch.no_grad():
-                    diffuser.validation_step(global_step)
+                    diffuser.validation_step(epoch)
 
 
             # Optionally save the model after certain epochs
