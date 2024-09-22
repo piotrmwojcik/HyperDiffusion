@@ -254,7 +254,7 @@ def main(cfg: DictConfig):
             diffuser.train()  # Set model to training mode
             total_train_loss = 0.0
             for batch_idx, data in enumerate(train_dl):
-                data = data.to(device)
+                #data = data.to(device)
 
                 optimizer.zero_grad()  # Zero gradients
                 loss = diffuser.training_step(data)  # Forward pass
