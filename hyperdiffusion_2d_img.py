@@ -111,7 +111,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             #print("Input images shape:", input_data.shape)
 
         # Output statistics every 100 step
-        if self.trainer.global_step % 10 == 0:
+        if global_step % 10 == 0:
             print(input_data.shape)
             print(
                 "Orig weights[0].stats",
