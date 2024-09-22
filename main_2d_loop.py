@@ -264,12 +264,10 @@ def main(cfg: DictConfig):
                 loss = diffuser.training_step(data, global_step)  # Forward pass
                 loss.backward()  # Backpropagation
                 optimizer.step()  # Update weights
-                scheduler.step()
                 global_step += 1
-
                 outputs.append(loss)
 
-
+            scheduler.step()
                 # Accumulate gradient batches if specified
                 #if (batch_idx + 1) % cfg.accumulate_grad_batches == 0:
                 #    optimizer.step()
