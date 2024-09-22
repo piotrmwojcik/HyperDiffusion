@@ -192,6 +192,10 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         #    self.log("val/" + metric_name, metrics[metric_name])
 
     def training_epoch_end(self, outputs: EPOCH_OUTPUT) -> None:
+        print('!!!!!!')
+        print(self.trainer.global_step)
+        print(len(outputs))
+
         epoch_loss = sum(output["loss"] for output in outputs) / len(outputs)
         self.log("epoch_loss", epoch_loss)
 
