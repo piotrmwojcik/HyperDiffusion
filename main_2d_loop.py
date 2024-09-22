@@ -257,8 +257,6 @@ def main(cfg: DictConfig):
             outputs = []
             diffuser.train()  # Set model to training mode
             #total_train_loss = 0.0
-            print('!!!!')
-            print(len(train_dl))
             for batch_idx, data in enumerate(train_dl):
                 #data = data.to(device)
 
@@ -277,6 +275,7 @@ def main(cfg: DictConfig):
 
             epoch_loss = sum(output for output in outputs) / len(outputs)
             run.log({"epoch_loss": epoch_loss})
+            run.log({"epoch": epoch})
             run.log({"lr-AdamW": optimizer.param_groups[0]['lr']})
             # Learning rate step (if using a scheduler)
             scheduler.step()
