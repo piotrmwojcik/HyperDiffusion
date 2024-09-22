@@ -207,6 +207,8 @@ def main(cfg: DictConfig):
         model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, cfg
     )
 
+    diffuser.logger = wandb_logger
+
     # Specify where to save checkpoints
     checkpoint_path = join(
         config["tensorboard_log_dir"],
