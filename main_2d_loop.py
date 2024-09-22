@@ -247,6 +247,8 @@ def main(cfg: DictConfig):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     diffuser.to(device)
 
+    global_step = 0
+
     if Config.get("mode") == "train":
         for epoch in range(Config.get("epochs")):
             # Training phase
@@ -257,9 +259,10 @@ def main(cfg: DictConfig):
                 #data = data.to(device)
 
                 optimizer.zero_grad()  # Zero gradients
-                loss = diffuser.training_step(data)  # Forward pass
+                loss = diffuser.training_step(data, global_step)  # Forward pass
                 loss.backward()  # Backpropagation
                 optimizer.step()  # Update weights
+                global_step += 1
 
                 outputs.append(loss)
 

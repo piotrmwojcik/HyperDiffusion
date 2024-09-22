@@ -72,12 +72,12 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             return [optimizer], [scheduler]
         return optimizer
 
-    def training_step(self, train_batch):
+    def training_step(self, train_batch, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_data = train_batch[0]
 
         # At the first step output first element in the dataset as a sanit check
-        if "hyper" in self.method and self.trainer.global_step % 50 == 0:
+        if "hyper" in self.method and global_step % 50 == 0:
             curr_weights = Config.get("curr_weights")
             img = input_data[0].flatten()[:curr_weights]
             mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
