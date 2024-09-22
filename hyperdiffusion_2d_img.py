@@ -92,7 +92,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             # print(img.shape)
             images = wandb.Image(img, caption="")
             # wandb.log({"examples": images})
-            self.logger.log({"train": images})
+            self.logger.log({"train": images}, step=global_step)
             #sdf_decoder = SDFDecoder(
             #    self.mlp_kwargs.model_type,
             #    None,
@@ -144,7 +144,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         loss = loss_mse
         return loss
 
-    def validation_step(self):
+    def validation_step(self, global_step):
         x_0s = self.diff.ddim_sample_loop(
             self.model, (16, *self.image_size[1:]), clip_denoised=False
         )
@@ -178,7 +178,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print(img.shape)
         images = wandb.Image(img, caption="")
         #wandb.log({"examples": images})
-        self.logger.log({"val": images})
+        self.logger.log({"val": images}, step=global_step)
         #metric_fn = (
         #    self.calc_metrics_4d
         #    if self.cfg.mlp_config.params.move

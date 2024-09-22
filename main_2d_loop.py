@@ -276,9 +276,9 @@ def main(cfg: DictConfig):
                 #   optimizer.zero_grad()
 
             epoch_loss = sum(output for output in outputs) / len(outputs)
-            run.log({"epoch_loss": epoch_loss})
-            run.log({"epoch": epoch})
-            run.log({"lr-AdamW": optimizer.param_groups[0]['lr']})
+            run.log({"epoch_loss": epoch_loss}, step=global_step)
+            run.log({"epoch": epoch}, step=global_step)
+            run.log({"lr-AdamW": optimizer.param_groups[0]['lr']}, step=global_step)
             # Learning rate step (if using a scheduler)
 
 
@@ -286,7 +286,7 @@ def main(cfg: DictConfig):
         if epoch % Config.get("val_fid_calculation_period") == 0:
             diffuser.eval()  # Set model to evaluation mode
             with torch.no_grad():
-                diffuser.validation_step()
+                diffuser.validation_step(global_step)
 
 
             # Optionally save the model after certain epochs
