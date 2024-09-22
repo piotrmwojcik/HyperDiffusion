@@ -139,7 +139,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         )
 
         loss_mse = loss_terms["loss"].mean()
-        self.logger.log("train_loss", loss_mse)
+        self.logger.log({"train_loss": loss_mse})
 
         loss = loss_mse
         return loss
@@ -178,7 +178,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print(img.shape)
         #images = wandb.Image(img, caption="")
         #wandb.log({"examples": images})
-        self.logger.log_image("val", [img])
+        self.logger.log({"val": [img]})
         #metric_fn = (
         #    self.calc_metrics_4d
         #    if self.cfg.mlp_config.params.move
@@ -193,7 +193,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def training_epoch_end(self, outputs: EPOCH_OUTPUT) -> None:
         epoch_loss = sum(output["loss"] for output in outputs) / len(outputs)
-        self.log("epoch_loss", epoch_loss)
+        self.log({"epoch_loss": epoch_loss})
 
     def print_summary(self, flat, func):
         var = func(flat, dim=0)
