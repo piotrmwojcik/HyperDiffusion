@@ -50,7 +50,7 @@ def main(cfg: DictConfig):
         mode="disabled" if Config.get("disable_wandb") else "online",
         config=dict(config),
     )
-
+    wandb.define_metric("*", step_metric="global_step")
     wandb_logger = WandbLogger()
     wandb_logger.log_text("config", ["config"], [[str(config)]])
     print("wandb", wandb.run.name, wandb.run.id)
@@ -276,9 +276,9 @@ def main(cfg: DictConfig):
                 #   optimizer.zero_grad()
 
             epoch_loss = sum(output for output in outputs) / len(outputs)
-            run.log({"epoch_loss": epoch_loss}, step=global_step)
-            run.log({"epoch": epoch}, step=global_step)
-            run.log({"lr-AdamW": optimizer.param_groups[0]['lr']}, step=global_step)
+            run.log({"global_step": global_step, "epoch_loss": epoch_loss})
+            run.log({"global_step": global_step, "epoch": epoch})
+            run.log({"global_step": global_step, "lr-AdamW": optimizer.param_groups[0]['lr']})
             # Learning rate step (if using a scheduler)
 
 
