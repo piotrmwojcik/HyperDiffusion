@@ -276,7 +276,7 @@ def main(cfg: DictConfig):
 
             epoch_loss = sum(output for output in outputs) / len(outputs)
             run.log({"epoch": epoch, "epoch_loss": epoch_loss})
-            log_interval = int(Config.get("curr_weights"))
+            log_interval = int(Config.get("log_interval"))
             if global_step % log_interval == 0:
                 run.log({"global_step": global_step / log_interval, "epoch": epoch})
                 run.log({"global_step": global_step / log_interval, "lr-AdamW": optimizer.param_groups[0]['lr']})
