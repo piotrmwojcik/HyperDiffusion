@@ -253,11 +253,11 @@ def main(cfg: DictConfig):
             outputs = []
             diffuser.train()  # Set model to training mode
             total_train_loss = 0.0
-            for batch_idx, (data, target) in enumerate(train_dl):
-                data, target = data.to(device), target.to(device)
+            for batch_idx, data in enumerate(train_dl):
+                data = data.to(device)
 
                 optimizer.zero_grad()  # Zero gradients
-                loss = diffuser.training_step((data, target))  # Forward pass
+                loss = diffuser.training_step(data)  # Forward pass
                 loss.backward()  # Backpropagation
                 optimizer.step()  # Update weights
 
