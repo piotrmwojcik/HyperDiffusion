@@ -92,8 +92,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             # print(img.shape)
             # images = wandb.Image(img, caption="")
             # wandb.log({"examples": images})
-            print('!!!')
-            print(global_step)
             self.logger.log({"train": [img]})
             #sdf_decoder = SDFDecoder(
             #    self.mlp_kwargs.model_type,
@@ -112,7 +110,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
             #print("Input images shape:", input_data.shape)
 
-        # Output statistics every 100 step
+        # Output statistics every 10 step
         if global_step % 10 == 0:
             print(input_data.shape)
             print(
