@@ -274,7 +274,7 @@ def main(cfg: DictConfig):
                     optimizer.zero_grad()
 
             epoch_loss = sum(output for output in outputs) / len(outputs)
-            run.log("epoch_loss", epoch_loss)
+            run.log({"epoch_loss": epoch_loss})
 
             # Learning rate step (if using a scheduler)
             scheduler.step()
