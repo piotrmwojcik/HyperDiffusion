@@ -76,8 +76,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_data = train_batch[0].cuda()
 
+        log_interval = int(Config.get("curr_weights"))
+
         # At the first step output first element in the dataset as a sanit check
-        if "hyper" in self.method and global_step % 50 == 0:
+        if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
             curr_weights = Config.get("curr_weights")
             img = input_data[0].flatten()[:curr_weights]
             mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
@@ -92,7 +94,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             # print(img.shape)
             images = wandb.Image(img, caption="")
             # wandb.log({"examples": images})
-            self.logger.log({"global_step": global_step / 10, "train": images})
+            self.logger.log({"global_step": global_step / log_interval, "train": images})
             #sdf_decoder = SDFDecoder(
             #    self.mlp_kwargs.model_type,
             #    None,
@@ -139,12 +141,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         )
 
         loss_mse = loss_terms["loss"].mean()
-        self.logger.log({"global_step": global_step / 10, "train_loss": loss_mse})
+        self.logger.log({"global_step": global_step, "train_loss": loss_mse})
 
         loss = loss_mse
         return loss
 
     def validation_step(self, global_step):
+        log_interval = int(Config.get("curr_weights"))
+
         x_0s = self.diff.ddim_sample_loop(
             self.model, (16, *self.image_size[1:]), clip_denoised=False
         )
@@ -178,7 +182,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print(img.shape)
         images = wandb.Image(img, caption="")
         #wandb.log({"examples": images})
-        self.logger.log({"global_step": global_step, "val": images})
+        if global_step % log_interval == 0:
+            self.logger.log({"global_step": global_step / log_interval, "val": images})
         #metric_fn = (
         #    self.calc_metrics_4d
         #    if self.cfg.mlp_config.params.move

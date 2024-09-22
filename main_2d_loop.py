@@ -51,6 +51,7 @@ def main(cfg: DictConfig):
         config=dict(config),
     )
     wandb.define_metric("*", step_metric="global_step")
+    wandb.define_metric("epoch_loss", step_metric="epoch")
     wandb_logger = WandbLogger()
     wandb_logger.log_text("config", ["config"], [[str(config)]])
     print("wandb", wandb.run.name, wandb.run.id)
@@ -274,9 +275,11 @@ def main(cfg: DictConfig):
                 #   optimizer.zero_grad()
 
             epoch_loss = sum(output for output in outputs) / len(outputs)
-            run.log({"global_step": global_step / 10, "epoch_loss": epoch_loss})
-            run.log({"global_step": global_step / 10, "epoch": epoch})
-            run.log({"global_step": global_step / 10, "lr-AdamW": optimizer.param_groups[0]['lr']})
+            run.log({"epoch": epoch, "epoch_loss": epoch_loss})
+            log_interval = int(Config.get("curr_weights"))
+            if global_step % log_interval == 0:
+                run.log({"global_step": global_step / log_interval, "epoch": epoch})
+                run.log({"global_step": global_step / log_interval, "lr-AdamW": optimizer.param_groups[0]['lr']})
             # Learning rate step (if using a scheduler)
 
 
