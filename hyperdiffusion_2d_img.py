@@ -19,7 +19,7 @@ from siren.dataio import anime_read, get_mgrid, get_grid
 from siren.experiment_scripts.test_sdf import SDFDecoder
 
 
-class HyperDiffusion_2d_img:
+class HyperDiffusion_2d_img(torch.nn.Module):
     def __init__(
         self, model, train_dt, val_dt, test_dt, mlp_kwargs, image_shape, method, cfg
     ):
