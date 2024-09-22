@@ -42,7 +42,7 @@ def main(cfg: DictConfig):
     if "hyper" in method:
         mlp_kwargs = Config.config["mlp_config"]["params"]
 
-    wandb.init(
+    run = wandb.init(
         project="hyperdiffusion",
         dir=config["tensorboard_log_dir"],
         settings=wandb.Settings(_disable_stats=True, _disable_meta=True),
@@ -207,7 +207,7 @@ def main(cfg: DictConfig):
         model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, cfg
     )
 
-    diffuser.logger = wandb_logger
+    diffuser.logger = run
 
     # Specify where to save checkpoints
     checkpoint_path = join(
@@ -256,7 +256,7 @@ def main(cfg: DictConfig):
             # Training phase
             outputs = []
             diffuser.train()  # Set model to training mode
-            total_train_loss = 0.0
+            #total_train_loss = 0.0
             for batch_idx, data in enumerate(train_dl):
                 #data = data.to(device)
 
@@ -274,7 +274,7 @@ def main(cfg: DictConfig):
                     optimizer.zero_grad()
 
             epoch_loss = sum(output["loss"] for output in outputs) / len(outputs)
-            wandb_logger.log("epoch_loss", epoch_loss)
+            run.log("epoch_loss", epoch_loss)
 
             # Learning rate step (if using a scheduler)
             scheduler.step()
