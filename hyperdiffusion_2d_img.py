@@ -72,7 +72,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
             return [optimizer], [scheduler]
         return optimizer
 
-    def training_step(self, train_batch, batch_idx):
+    def training_step(self, train_batch):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_data = train_batch[0]
 
@@ -144,7 +144,7 @@ class HyperDiffusion_2d_img(pl.LightningModule):
         loss = loss_mse
         return loss
 
-    def validation_step(self, val_batch, batch_idx):
+    def validation_step(self):
         x_0s = self.diff.ddim_sample_loop(
             self.model, (16, *self.image_size[1:]), clip_denoised=False
         )
