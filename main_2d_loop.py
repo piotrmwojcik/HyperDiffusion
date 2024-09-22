@@ -264,11 +264,11 @@ def main(cfg: DictConfig):
                 loss = diffuser.training_step(data, global_step)  # Forward pass
                 loss.backward()  # Backpropagation
                 optimizer.step()  # Update weights
+                scheduler.step()
                 global_step += 1
-                run.log({"epoch": epoch})
 
                 outputs.append(loss)
-            scheduler.step()
+
 
                 # Accumulate gradient batches if specified
                 #if (batch_idx + 1) % cfg.accumulate_grad_batches == 0:
@@ -277,6 +277,7 @@ def main(cfg: DictConfig):
 
             epoch_loss = sum(output for output in outputs) / len(outputs)
             run.log({"epoch_loss": epoch_loss})
+            run.log({"epoch": epoch})
             run.log({"lr-AdamW": optimizer.param_groups[0]['lr']})
             # Learning rate step (if using a scheduler)
 
