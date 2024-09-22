@@ -125,7 +125,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         t = (
             torch.randint(0, high=self.diff.num_timesteps, size=(input_data.shape[0],))
             .long()
-            .to(self.device)
+            .cuda()
         )
 
         # Execute a diffusion forward pass
