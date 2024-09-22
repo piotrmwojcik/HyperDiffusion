@@ -268,8 +268,7 @@ def main(cfg: DictConfig):
                 run.log({"epoch": epoch})
 
                 outputs.append(loss)
-                if global_step % Config.get("scheduler_step") == 0:
-                    scheduler.step()
+            scheduler.step()
 
                 # Accumulate gradient batches if specified
                 #if (batch_idx + 1) % cfg.accumulate_grad_batches == 0:
