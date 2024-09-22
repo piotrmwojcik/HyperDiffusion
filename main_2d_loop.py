@@ -275,11 +275,6 @@ def main(cfg: DictConfig):
                 #    optimizer.step()
                 #   optimizer.zero_grad()
 
-            print('!!!')
-            print(epoch)
-            print()
-            print(len(outputs))
-
             epoch_loss = sum(output for output in outputs) / len(outputs)
             run.log({"epoch_loss": epoch_loss})
             run.log({"lr-AdamW": optimizer.param_groups[0]['lr']})
