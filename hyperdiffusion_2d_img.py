@@ -90,9 +90,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             img = dataio.rescale_img((img + 1) / 2, mode='clamp')
             img = (img * 255).byte()
             # print(img.shape)
-            # images = wandb.Image(img, caption="")
+            images = wandb.Image(img, caption="")
             # wandb.log({"examples": images})
-            self.logger.log({"train": img})
+            self.logger.log({"train": images})
             #sdf_decoder = SDFDecoder(
             #    self.mlp_kwargs.model_type,
             #    None,
@@ -176,9 +176,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print(img)
         #print('!!!')
         #print(img.shape)
-        #images = wandb.Image(img, caption="")
+        images = wandb.Image(img, caption="")
         #wandb.log({"examples": images})
-        self.logger.log({"val": img})
+        self.logger.log({"val": images})
         #metric_fn = (
         #    self.calc_metrics_4d
         #    if self.cfg.mlp_config.params.move
