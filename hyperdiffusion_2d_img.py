@@ -139,7 +139,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         )
 
         loss_mse = loss_terms["loss"].mean()
-        self.log("train_loss", loss_mse)
+        self.logger.log("train_loss", loss_mse)
 
         loss = loss_mse
         return loss
