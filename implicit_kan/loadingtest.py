@@ -5,6 +5,8 @@ import torch.nn as nn
 from einops import rearrange
 import torch.nn.functional as F
 import torch
+import time
+import numpy as np
 
 h = 128
 w = 128
@@ -46,6 +48,11 @@ class ImplicitMLP(nn.Module):
 
 if __name__ == '__main__':
     d = {}
+    start = time.time()
     for i in range(200_000):
+        if i % 10000 == 0:
+            end = time.time()
+            print(i, np.round(end - start,2))
+            start = time.time()
         d[i] = ImplicitMLP().to(device)
     print("ok")
