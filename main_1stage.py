@@ -163,7 +163,7 @@ def main(cfg: DictConfig):
     print(
         "Train dataset length: {}".format(len(train_dt))
     )
-    input_data = next(iter(train_dl))[0]
+    input_data = next(iter(train_dl))['gt_img']
     print(
         "Input data shape, min, max:",
         input_data.shape,
