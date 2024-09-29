@@ -8,6 +8,10 @@ import trimesh
 from pytorch_lightning.utilities.types import EPOCH_OUTPUT
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
+from collections import defaultdict, abc as container_abcs
+from itertools import chain
+from functools import partial
+from six.moves import map, zip
 
 import wandb
 from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
@@ -21,7 +25,7 @@ from siren.experiment_scripts.test_sdf import SDFDecoder
 
 class HyperDiffusion_2d_img(torch.nn.Module):
     def __init__(
-        self, model, train_dt, val_dt, test_dt, mlp_kwargs, image_shape, method, cfg
+        self, model, train_dt, val_dt, test_dt, mlp_kwargs, image_shape, method, cache_size, cfg
     ):
         super().__init__()
         self.model = model
@@ -30,6 +34,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.mlp_kwargs = mlp_kwargs
         self.train_dt = train_dt
         self.test_dt = test_dt
+        self.cache_size = cache_size
         self.ae_model = None
         self.sample_count = min(
             8, Config.get("batch_size")
@@ -50,6 +55,100 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             loss_type=LossType[cfg.diff_config.params.loss_type],
             diff_pl_module=self,
         )
+
+        if cache_size > 0:
+            split_points = np.round(np.linspace(0, cache_size, num=1)).astype(np.int64)
+            inds = np.arange(start=split_points[0], stop=split_points[1])
+            self.cache = {ind: None for ind in inds}
+        else:
+            self.cache = None
+        self.cache_loaded = False
+
+    def optimizer_set_state(self, optimizer, state_dict):
+        groups = optimizer.param_groups
+        saved_groups = state_dict['param_groups']
+
+        if len(groups) != len(saved_groups):
+            raise ValueError("loaded state dict has a different number of "
+                             "parameter groups")
+        param_lens = (len(g['params']) for g in groups)
+        saved_lens = (len(g['params']) for g in saved_groups)
+        if any(p_len != s_len for p_len, s_len in zip(param_lens, saved_lens)):
+            raise ValueError("loaded state dict contains a parameter group "
+                             "that doesn't match the size of optimizer's group")
+
+        # Update the state
+        id_map = {old_id: p for old_id, p in
+                  zip(chain.from_iterable((g['params'] for g in saved_groups)),
+                      chain.from_iterable((g['params'] for g in groups)))}
+
+        def cast(param, value, key=None):
+            r"""Make a deep copy of value, casting all tensors to device of param."""
+            if isinstance(value, torch.Tensor):
+                if key != "step":
+                    if param.is_floating_point():
+                        value = value.to(param.dtype)
+                    value = value.to(param.device)
+                return value
+            elif isinstance(value, dict):
+                return {k: cast(param, v, key=k) for k, v in value.items()}
+            elif isinstance(value, container_abcs.Iterable):
+                return type(value)(cast(param, v) for v in value)
+            else:
+                return value
+
+        state = defaultdict(dict)
+        for k, v in state_dict['state'].items():
+            if k in id_map:
+                param = id_map[k]
+                state[param] = cast(param, v)
+            else:
+                state[k] = v
+
+        optimizer.__setstate__({'state': state})
+
+    def load_cache(self, data):
+        #device = get_module_device(self)
+        num_scenes = len(data['scene_id'])
+
+        if self.cache is not None:
+            if not self.cache_loaded:
+                cache_load_from = self.train_cfg.get('cache_load_from', None)
+                loaded = False
+                if cache_load_from is not None:
+                    cache_files = os.listdir(cache_load_from)
+                    cache_files.sort()
+                    if len(cache_files) > 0:
+                        assert len(cache_files) == self.cache_size
+                        for ind in self.cache.keys():
+                            self.cache[ind] = torch.load(
+                                os.path.join(cache_load_from, cache_files[ind]), map_location='cpu')
+                        loaded = True
+                        print('Loaded cache files from ' + cache_load_from)
+                if not loaded:
+                    print('Initialize codes from scratch.')
+                self.cache_loaded = True
+            cache_list = [self.cache[scene_id_single] for scene_id_single in data['scene_id']]
+        else:
+            cache_list = [None for _ in range(num_scenes)]
+        code_list_ = []
+        for scene_state_single in cache_list:
+            if scene_state_single is None:
+                code_list_.append(self.get_init_code_(None, device))
+            else:
+                if 'code_' in scene_state_single['param']:
+                    code_ = scene_state_single['param']['code_'].to(dtype=torch.float32, device=device)
+                else:
+                    assert 'code' in scene_state_single['param']
+                    code_ = self.code_activation.inverse(
+                        scene_state_single['param']['code'].to(dtype=torch.float32, device=device))
+                code_list_.append(code_.requires_grad_(True))
+
+        code_optimizers = self.build_optimizer(code_list_, self.train_cfg)
+        for ind, scene_state_single in enumerate(cache_list):
+            if scene_state_single is not None and 'optimizer' in scene_state_single:
+                self.optimizer_set_state(code_optimizers[ind], scene_state_single['optimizer'])
+        return code_list_, code_optimizers
 
     def forward(self, images):
         t = (

@@ -5,6 +5,8 @@ from os.path import join
 import numpy as np
 import torch
 import trimesh
+from PIL import Image
+from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from trimesh.voxel import creation as vox_creation
 
@@ -241,3 +243,37 @@ class WeightDataset(Dataset):
 
     def __len__(self):
         return len(self.mlp_files)
+
+
+class CelebAHQ(DataLoader):
+    def __init__(self, downsampled=False, resolution=64, dataset_root='datasets'):
+        # SIZE (128 x 128)
+        # super().__init__(self)
+        # assert split in ['train', 'test'], "Unknown split"
+
+        self.dataset_root = dataset_root
+        self.root = os.path.join(self.dataset_root, 'CelebAHQ')
+        self.img_channels = 3
+        all_files = os.listdir(self.root)  # Ensure we list files from the correct folder
+        self.fnames = [f for f in all_files if f.endswith('.png') or f.endswith('.jpg')]
+        self.fnames.sort()
+
+        self.downsampled = downsampled
+        self.res = resolution
+
+    def __len__(self):
+        return len(self.fnames)
+
+    def __getitem__(self, idx):
+        filename = self.fnames[idx]
+        scene_id = os.path.splitext(filename)[0]
+        path = os.path.join(self.root, filename)
+        img = Image.open(path)
+        if self.downsampled:
+            width, height = img.size  # Get dimensions
+            img = img.resize((self.res, self.res), resample=Image.BICUBIC)
+
+        return {
+            'gt_img': img,
+            'scene_id': scene_id
+        }
