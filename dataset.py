@@ -272,8 +272,8 @@ class CelebAHQ(DataLoader):
         if self.downsampled:
             width, height = img.size  # Get dimensions
             img = img.resize((self.res, self.res), resample=Image.BICUBIC)
-
-        return {
-            'gt_img': img,
-            'scene_id': scene_id
-        }
+        return img, scene_id
+        #return {
+        #    'gt_img': img,
+        #    'scene_id': scene_id
+        #}
