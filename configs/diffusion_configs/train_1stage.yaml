@@ -18,7 +18,7 @@ scheduler: True
 scheduler_step: 200
 best_model_save_path:
 mode: train
-data_folder_train: /data/pwojcik/mlp_fmm2/
+data_folder_train: /data/pwojcik/
 image_resolution: 64
 cache_size: 50000
 code_optimizer: 'Adam'
