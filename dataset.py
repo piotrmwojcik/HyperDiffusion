@@ -14,6 +14,9 @@ from augment import random_permute_flat, random_permute_mlp, sorted_permute_mlp
 from hd_utils import generate_mlp_from_weights, get_mlp
 from siren.dataio import anime_read
 
+from torch.utils.data import Dataset
+from torchvision.transforms import Resize, Compose, ToTensor, Normalize
+
 
 class VoxelDataset(Dataset):
     def __init__(
@@ -261,6 +264,18 @@ class CelebAHQ(DataLoader):
         self.downsampled = downsampled
         self.res = resolution
 
+        if downsampled:
+            self.transform = Compose([
+                Resize(self.res),
+                ToTensor(),
+                Normalize(torch.Tensor([0.5]), torch.Tensor([0.5]), torch.Tensor([0.5]))
+            ])
+        else:
+            self.transform = Compose([
+                ToTensor(),
+                Normalize(torch.Tensor([0.5]), torch.Tensor([0.5]), torch.Tensor([0.5]))
+            ])
+
     def __len__(self):
         return len(self.fnames)
 
@@ -271,9 +286,8 @@ class CelebAHQ(DataLoader):
         img = Image.open(path)
         if self.downsampled:
             width, height = img.size  # Get dimensions
-            img = img.resize((self.res, self.res), resample=Image.BICUBIC)
-        return img, scene_id
-        #return {
-        #    'gt_img': img,
-        #    'scene_id': scene_id
-        #}
+            img = self.transform(img)
+        return {
+            'gt_img': img,
+            'scene_id': scene_id
+        }
