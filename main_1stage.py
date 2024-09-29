@@ -234,6 +234,9 @@ def main(cfg: DictConfig):
                 for batch_idx, data in enumerate(train_dl):
                     #data = data.to(device)
 
+                    print('!!!')
+                    print(data['scene_id'])
+
                     #optimizer.zero_grad()  # Zero gradients
                     diffuser.training_step(data, global_step)  # Forward pass
                     #loss.backward()  # Backpropagation
