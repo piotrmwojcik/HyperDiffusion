@@ -289,5 +289,5 @@ class CelebAHQ(DataLoader):
             img = self.transform(img)
         return {
             'gt_img': img,
-            'scene_id': scene_id
+            'scene_id': int(scene_id)
         }

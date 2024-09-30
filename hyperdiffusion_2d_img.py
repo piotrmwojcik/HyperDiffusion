@@ -18,6 +18,7 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes)
+from mlp_models import ImplicitMLP
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
 from siren.experiment_scripts.test_sdf import SDFDecoder
@@ -60,8 +61,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             split_points = np.round(np.linspace(0, cache_size, num=2)).astype(np.int64)
             inds = np.arange(start=split_points[0], stop=split_points[1])
             self.cache = {ind: None for ind in inds}
-            print('!!!')
-            print(self.cache)
         else:
             self.cache = None
         self.cache_loaded = False
@@ -109,6 +108,18 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         optimizer.__setstate__({'state': state})
 
+    def get_init_code_(self, device=None):
+        model = ImplicitMLP(B_path=self.mlp_kwargs['B_path'])
+        state_dict = model.state_dict()
+        #layers = []
+        #layer_names = []
+        #for l in state_dict:
+        #    shape = state_dict[l].shape
+        #    layers.append(np.prod(shape))
+        #    layer_names.append(l)
+
+        return state_dict
+
     def load_cache(self, data):
         #device = get_module_device(self)
         num_scenes = len(data['scene_id'])
@@ -136,14 +147,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         code_list_ = []
         for scene_state_single in cache_list:
             if scene_state_single is None:
-                code_list_.append(self.get_init_code_(None, device))
+                code_list_.append(self.get_init_code_(None, self.device))
             else:
                 if 'code_' in scene_state_single['param']:
-                    code_ = scene_state_single['param']['code_'].to(dtype=torch.float32, device=device)
+                    code_ = scene_state_single['param']['code_'].to(dtype=torch.float32, device=self.device)
                 else:
                     assert 'code' in scene_state_single['param']
                     code_ = self.code_activation.inverse(
-                        scene_state_single['param']['code'].to(dtype=torch.float32, device=device))
+                        scene_state_single['param']['code'].to(dtype=torch.float32, device=self.device))
                 code_list_.append(code_.requires_grad_(True))
 
         code_optimizers = self.build_optimizer(code_list_, self.train_cfg)
@@ -175,25 +186,29 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def training_step(self, train_batch, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
-        input_data = train_batch[0].cuda()
+        input_img = train_batch['gt_img'][0].cuda()
 
         log_interval = int(Config.get("log_interval"))
 
+        #if 'code_optimizer' in self.train_cfg:
+        #    code_list_, code_optimizers = self.load_cache(train_batch)
+        #    code = torch.stack(code_list_, dim=0)
+
         # At the first step output first element in the dataset as a sanit check
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
-            curr_weights = Config.get("curr_weights")
-            img = input_data[0].flatten()[:curr_weights]
-            mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
-            model_input = get_grid(64, 64, b=0).unsqueeze(0)#get_mgrid(128, 2).unsqueeze(0)
+            #curr_weights = Config.get("curr_weights")
+            #img = input_data[0].flatten()[:curr_weights]
+            #mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
+            #model_input = get_grid(64, 64, b=0).unsqueeze(0)#get_mgrid(128, 2).unsqueeze(0)
 
-            model_input = {'coords': model_input}
-            result = mlp(model_input)
+            #model_input = {'coords': model_input}
+            #result = mlp(model_input)
             #print(img)
-            img = dataio.lin2img(result['model_out'], (64, 64))
-            img = dataio.rescale_img((img + 1) / 2, mode='clamp')
-            img = (img * 255).byte()
+            #img = dataio.lin2img(result['model_out'], (64, 64))
+            #img = dataio.rescale_img((img + 1) / 2, mode='clamp')
+            #img = (img * 255).byte()
             # print(img.shape)
-            images = wandb.Image(img, caption="")
+            images = wandb.Image(input_img, caption="")
             # wandb.log({"examples": images})
             self.logger.log({"global_step": global_step / log_interval, "train": images})
             #sdf_decoder = SDFDecoder(
