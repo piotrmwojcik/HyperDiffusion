@@ -284,9 +284,7 @@ class CelebAHQ(DataLoader):
         scene_id = os.path.splitext(filename)[0]
         path = os.path.join(self.root, filename)
         img = Image.open(path)
-        if self.downsampled:
-            width, height = img.size  # Get dimensions
-            img = self.transform(img)
+        img = self.transform(img)
         return {
             'gt_img': img,
             'scene_id': int(scene_id)

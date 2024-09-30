@@ -123,6 +123,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def load_cache(self, data):
         #device = get_module_device(self)
         num_scenes = len(data['scene_id'])
+        print('!!!')
+        print(data['scene_id'])
 
         if self.cache is not None:
             if not self.cache_loaded:
