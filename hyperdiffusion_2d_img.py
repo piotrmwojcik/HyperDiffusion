@@ -60,6 +60,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             split_points = np.round(np.linspace(0, cache_size, num=2)).astype(np.int64)
             inds = np.arange(start=split_points[0], stop=split_points[1])
             self.cache = {ind: None for ind in inds}
+            print('!!!')
+            print(self.cache)
         else:
             self.cache = None
         self.cache_loaded = False
