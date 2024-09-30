@@ -190,7 +190,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         log_interval = int(Config.get("log_interval"))
 
-        if 'code_optimizer' in self.train_cfg:
+        if 'code_optimizer' in self.cfg:
             code_list_, code_optimizers = self.load_cache(train_batch)
             code = torch.stack(code_list_, dim=0)
 
