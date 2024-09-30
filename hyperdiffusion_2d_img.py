@@ -126,7 +126,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         if self.cache is not None:
             if not self.cache_loaded:
-                cache_load_from = self.train_cfg.get('cache_load_from', None)
+                cache_load_from = self.cfg.get('cache_load_from', None)
                 loaded = False
                 if cache_load_from is not None:
                     cache_files = os.listdir(cache_load_from)
@@ -157,7 +157,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                         scene_state_single['param']['code'].to(dtype=torch.float32, device=self.device))
                 code_list_.append(code_.requires_grad_(True))
 
-        code_optimizers = self.build_optimizer(code_list_, self.train_cfg)
+        code_optimizers = self.build_optimizer(code_list_, self.cfg)
         for ind, scene_state_single in enumerate(cache_list):
             if scene_state_single is not None and 'optimizer' in scene_state_single:
                 self.optimizer_set_state(code_optimizers[ind], scene_state_single['optimizer'])
