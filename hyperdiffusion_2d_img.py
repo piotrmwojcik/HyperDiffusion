@@ -111,13 +111,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def get_init_code_(self, device=None):
         model = ImplicitMLP(B_path=self.mlp_kwargs['B_path'])
         state_dict = model.state_dict()
-        layers = []
-        layer_names = []
-        for l in state_dict:
-            shape = state_dict[l].shape
-            layers.append(np.prod(shape))
-            layer_names.append(l)
-        weights = torch.hstack(layers)
+        weights = []
+        shapes = []
+        for weight in state_dict:
+            shapes.append(np.prod(state_dict[weight].shape))
+            weights.append(state_dict[weight].flatten().cpu())
+        weights = torch.hstack(weights)
 
         print('!!!')
         print(weights.shape)
