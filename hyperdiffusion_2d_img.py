@@ -122,8 +122,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     @staticmethod
     def build_optimizer(code_, cfg):
-        optimizer_cfg = dict(code_optimizer=cfg['code_optimizer'], code_lr=cfg['code_lr'])
-        optimizer_class = cfg['code_optimizer']
+        optimizer_cfg = dict(type=cfg['code_optimizer'], code_lr=cfg['code_lr'])
+        optimizer_class = getattr(torch.optim, optimizer_cfg.pop('type'))
         if isinstance(code_, list):
             code_optimizer = [
                 optimizer_class([code_single_], **optimizer_cfg)
