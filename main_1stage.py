@@ -228,7 +228,7 @@ def main(cfg: DictConfig):
     if Config.get("mode") == "train":
         with tqdm(total=len(train_dl) * num_epochs) as pbar:
             for epoch in range(num_epochs):
-                print(epoch)
+                print(f"epoch: {epoch}")
 
                 # Training phase
                 #outputs = []
