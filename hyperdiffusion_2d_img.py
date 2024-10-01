@@ -117,8 +117,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             shape = state_dict[l].shape
             layers.append(np.prod(shape))
             layer_names.append(l)
+        weights = torch.hstack(layers)
 
-        return state_dict
+        print('!!!')
+        print(weights.shape)
+
+        return weights
 
     @staticmethod
     def build_optimizer(code_, cfg):
