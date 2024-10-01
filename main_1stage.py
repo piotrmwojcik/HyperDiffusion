@@ -151,14 +151,14 @@ def main(cfg: DictConfig):
 
         train_dt = CelebAHQ(downsampled=True,
                             resolution=data_res,
-                            dataset_root=data_folder_train,
-                            collate_fn=CelebAHQ_collate_fn)
+                            dataset_root=data_folder_train)
         train_dl = DataLoader(
             train_dt,
             batch_size=Config.get("batch_size"),
             shuffle=True,
             num_workers=8,
             pin_memory=True,
+            collate_fn=CelebAHQ_collate_fn
         )
 
     print(
