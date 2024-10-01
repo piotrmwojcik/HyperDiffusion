@@ -228,6 +228,8 @@ def main(cfg: DictConfig):
     if Config.get("mode") == "train":
         with tqdm(total=len(train_dl) * num_epochs) as pbar:
             for epoch in range(num_epochs):
+                print(epoch)
+
                 # Training phase
                 #outputs = []
                 #diffuser.train()  # Set model to training mode
@@ -261,7 +263,6 @@ def main(cfg: DictConfig):
                     diffuser.eval()  # Set model to evaluation mode
                     with torch.no_grad():
                         diffuser.validation_step(epoch)
-
 
                 # Optionally save the model after certain epochs
                 #if epoch % 10 == 0:  # Save every 10 epochs as an example
