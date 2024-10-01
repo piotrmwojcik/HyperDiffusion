@@ -1,6 +1,6 @@
 import os
 
-from dataset import VoxelDataset, WeightDataset, CelebAHQ
+from dataset import VoxelDataset, WeightDataset, CelebAHQ, CelebAHQ_collate_fn
 from hd_utils import Config, get_mlp
 from hyperdiffusion import HyperDiffusion
 
@@ -151,7 +151,8 @@ def main(cfg: DictConfig):
 
         train_dt = CelebAHQ(downsampled=True,
                             resolution=data_res,
-                            dataset_root=data_folder_train)
+                            dataset_root=data_folder_train,
+                            collate_fn=CelebAHQ_collate_fn)
         train_dl = DataLoader(
             train_dt,
             batch_size=Config.get("batch_size"),

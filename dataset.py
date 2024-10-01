@@ -248,6 +248,21 @@ class WeightDataset(Dataset):
         return len(self.mlp_files)
 
 
+def CelebAHQ_collate_fn(batch):
+    # Separate images and scene_ids from the batch
+    images = [item['gt_img'] for item in batch]
+    scene_ids = [item['scene_id'] for item in batch]  # scene_ids are already lists
+
+    # Stack images along the batch dimension (i.e., into a single tensor)
+    images = torch.stack(images, dim=0)
+
+    # No need to convert scene_ids to tensors if you want them as lists
+    return {
+        'gt_img': images,
+        'scene_id': scene_ids  # Keep scene_id as a list of lists
+    }
+
+
 class CelebAHQ(DataLoader):
     def __init__(self, downsampled=False, resolution=64, dataset_root='datasets'):
         # SIZE (128 x 128)
@@ -287,5 +302,5 @@ class CelebAHQ(DataLoader):
         img = self.transform(img)
         return {
             'gt_img': img,
-            'scene_id': [int(scene_id)]
+            'scene_id': int(scene_id)
         }
