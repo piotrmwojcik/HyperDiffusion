@@ -118,9 +118,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             weights.append(state_dict[weight].flatten().cpu())
         weights = torch.hstack(weights)
 
-        print('!!!')
-        print(weights.shape)
-
         return weights
 
     @staticmethod
@@ -173,6 +170,37 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             if scene_state_single is not None and 'optimizer' in scene_state_single:
                 self.optimizer_set_state(code_optimizers[ind], scene_state_single['optimizer'])
         return code_list_, code_optimizers
+
+    # def save_cache(self, code_list_, code_optimizers, scene_id):
+    #     code_dtype = code_list_[0].dtype
+    #     optimizer_dtype = torch.float32
+    #     for ind, code_single_ in enumerate(code_list_):
+    #         scene_id_single = scene_id[ind]
+    #         out = dict(
+    #             scene_id=scene_id_single,
+    #             param=dict(
+    #                 code_=code_single_.data),
+    #             optimizer=code_optimizers[ind].state_dict())
+    #         if self.cache is not None:
+    #             if self.cache[scene_id_single] is None:
+    #                 self.cache[scene_id_single] = out_dict_to(
+    #                     out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype)
+    #             else:
+    #                 if 'scene_id' not in self.cache[scene_id_single]:
+    #                     self.cache[scene_id_single]['scene_id'] = out['scene_id']
+    #                 if 'scene_name' not in self.cache[scene_id_single]:
+    #                     self.cache[scene_id_single]['scene_name'] = out['scene_name']
+    #                 if 'code' in self.cache[scene_id_single]['param']:
+    #                     del self.cache[scene_id_single]['param']['code']
+    #                 for key, val in out['param'].items():
+    #                     load_tensor_to_dict(self.cache[scene_id_single]['param'], key, val,
+    #                                         device='cpu', dtype=code_dtype)
+    #                 if 'optimizer' in self.cache[scene_id_single]:
+    #                     optimizer_state_copy(out['optimizer'], self.cache[scene_id_single]['optimizer'],
+    #                                          device='cpu', dtype=optimizer_dtype)
+    #                 else:
+    #                     self.cache[scene_id_single]['optimizer'] = optimizer_state_to(
+    #                         out['optimizer'], device='cpu', dtype=optimizer_dtype)
 
     def forward(self, images):
         t = (
@@ -240,19 +268,19 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             #print("Input images shape:", input_data.shape)
 
         # Output statistics every 10 step
-        if global_step % 10 == 0:
-            print(input_data.shape)
-            print(
-                "Orig weights[0].stats",
-                input_data.min().item(),
-                input_data.max().item(),
-                input_data.mean().item(),
-                input_data.std().item(),
-            )
+        #if global_step % 10 == 0:
+        #    print(input_data.shape)
+        #    print(
+        #        "Orig weights[0].stats",
+        #        input_data.min().item(),
+        #        input_data.max().item(),
+        #        input_data.mean().item(),
+        #        input_data.std().item(),
+        #    )
 
         # Sample a diffusion timestep
         t = (
-            torch.randint(0, high=self.diff.num_timesteps, size=(input_data.shape[0],))
+            torch.randint(0, high=self.diff.num_timesteps, size=(code.shape[0],))
             .long()
             .cuda()
         )
@@ -260,7 +288,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
             self.model,
-            input_data * self.cfg.normalization_factor,
+            code * self.cfg.normalization_factor,
             t,
             self.mlp_kwargs,
             self.logger,
