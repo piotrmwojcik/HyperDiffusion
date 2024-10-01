@@ -123,8 +123,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def load_cache(self, data):
         #device = get_module_device(self)
         num_scenes = len(data['scene_id'])
-        print('!!!')
-        print(data['scene_id'])
 
         if self.cache is not None:
             if not self.cache_loaded:
@@ -149,14 +147,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         code_list_ = []
         for scene_state_single in cache_list:
             if scene_state_single is None:
-                code_list_.append(self.get_init_code_(None, self.device))
+                code_list_.append(self.get_init_code_(None))
             else:
                 if 'code_' in scene_state_single['param']:
-                    code_ = scene_state_single['param']['code_'].to(dtype=torch.float32, device=self.device)
+                    code_ = scene_state_single['param']['code_'].to(dtype=torch.float32)
                 else:
                     assert 'code' in scene_state_single['param']
                     code_ = self.code_activation.inverse(
-                        scene_state_single['param']['code'].to(dtype=torch.float32, device=self.device))
+                        scene_state_single['param']['code'].to(dtype=torch.float32))
                 code_list_.append(code_.requires_grad_(True))
 
         code_optimizers = self.build_optimizer(code_list_, self.cfg)
