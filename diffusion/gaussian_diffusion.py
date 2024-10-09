@@ -783,6 +783,9 @@ class GaussianDiffusion:
             noise = th.randn_like(x_start)
         x_t, _ = self.q_sample(x_start, t, noise=noise)
 
+        print('!!!')
+        print(x_t.requires_grad)
+
         terms = {}
 
         if self.loss_type == LossType.KL or self.loss_type == LossType.RESCALED_KL:
@@ -809,8 +812,7 @@ class GaussianDiffusion:
                 model_output, model_var_values = th.split(model_output, C, dim=1)
                 # Learn the variance using the variational bound, but don't let
                 # it affect our mean prediction.
-                #frozen_out = th.cat([model_output.detach(), model_var_values], dim=1)
-                frozen_out = th.cat([model_output, model_var_values], dim=1)
+                frozen_out = th.cat([model_output.detach(), model_var_values], dim=1)
                 terms["vb"] = self._vb_terms_bpd(
                     model=lambda *args, r=frozen_out: r,
                     x_start=x_start,
