@@ -172,7 +172,7 @@ def main(cfg: DictConfig):
     for weight in state_dict:
         shapes.append(np.prod(state_dict[weight].shape))
         weights.append(state_dict[weight].flatten().cpu())
-    input_data = torch.hstack(weights)
+    input_data = torch.hstack(weights).unsqueeze(0)
 
     print(
         "Input data shape, min, max:",

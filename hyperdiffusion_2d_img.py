@@ -329,7 +329,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer.step()
         #print(code)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
-        print(prior_grad)
 
         self.logger.log({"global_step": global_step, "train_loss": loss_mse})
 
