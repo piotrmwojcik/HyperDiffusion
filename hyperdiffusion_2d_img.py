@@ -256,9 +256,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         if 'code_optimizer' in self.cfg:
             code_list_, code_optimizers = self.load_cache(train_batch)
-            for _code in code_list_:
-                print('!!! ', _code.requires_grad)
             code = torch.stack(code_list_, dim=0).cuda()
+
+            print('!!!')
+            print(code.requires_grad)
 
 
         # At the first step output first element in the dataset as a sanit check
