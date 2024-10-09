@@ -783,9 +783,6 @@ class GaussianDiffusion:
             noise = th.randn_like(x_start)
         x_t, _ = self.q_sample(x_start, t, noise=noise)
 
-        print('!!!')
-        print(x_t.requires_grad)
-
         terms = {}
 
         if self.loss_type == LossType.KL or self.loss_type == LossType.RESCALED_KL:
