@@ -312,9 +312,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             .cuda()
         )
 
-        print('!!!')
-        print((code * self.cfg.normalization_factor).requires_grad)
-
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
             self.model,
