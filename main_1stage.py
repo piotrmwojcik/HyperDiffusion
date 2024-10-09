@@ -165,8 +165,8 @@ def main(cfg: DictConfig):
     print(
         "Train dataset length: {}".format(len(train_dt))
     )
-    model = ImplicitMLP(B_path=mlp_kwargs['B_path'])
-    state_dict = model.state_dict()
+    inr_model = ImplicitMLP(B_path=mlp_kwargs['B_path'])
+    state_dict = inr_model.state_dict()
     weights = []
     shapes = []
     for weight in state_dict:
