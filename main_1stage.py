@@ -240,27 +240,24 @@ def main(cfg: DictConfig):
                 print(f"epoch: {epoch}")
 
                 # Training phase
-                #outputs = []
-                #diffuser.train()  # Set model to training mode
+                outputs = []
+                diffuser.train()  # Set model to training mode
                 #total_train_loss = 0.0
                 for batch_idx, data in enumerate(train_dl):
                     #data = data.to(device)
 
-                    #optimizer.zero_grad()  # Zero gradients
-                    diffuser.training_step(data, global_step)  # Forward pass
-                    #loss.backward()  # Backpropagation
-                    #optimizer.step()  # Update weights
-                    #global_step += 1
-                    #outputs.append(loss)
+                    optimizer.zero_grad()  # Zero gradients
 
-                #scheduler.step()
+                    loss = diffuser.training_step(data, optimizer, global_step)  # Forward pass
+                    outputs.append(loss)
+                    scheduler.step()
                     # Accumulate gradient batches if specified
                     #if (batch_idx + 1) % cfg.accumulate_grad_batches == 0:
                     #    optimizer.step()
                     #   optimizer.zero_grad()
 
-                #epoch_loss = sum(output for output in outputs) / len(outputs)
-                #run.log({"epoch": epoch, "epoch_loss": epoch_loss})
+                epoch_loss = sum(output for output in outputs) / len(outputs)
+                run.log({"epoch": epoch, "epoch_loss": epoch_loss})
                 log_interval = int(Config.get("log_interval"))
                 if global_step % log_interval == 0:
                     run.log({"global_step": global_step / log_interval, "epoch": epoch})

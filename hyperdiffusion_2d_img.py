@@ -248,7 +248,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             return [optimizer], [scheduler]
         return optimizer
 
-    def training_step(self, train_batch, global_step):
+    def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_img = train_batch['gt_img'][0].cuda()
 
@@ -322,10 +322,15 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         )
 
         loss_mse = loss_terms["loss"].mean()
+        global_step += 1
+        loss_mse.backward()  # Backpropagation
+        optimizer.step()
+
+        prior_grad = [code_.grad.data.clone() for code_ in code_list_]
+
         self.logger.log({"global_step": global_step, "train_loss": loss_mse})
 
-        loss = loss_mse
-        return loss
+        return loss_mse
 
     def validation_step(self, epoch):
 
