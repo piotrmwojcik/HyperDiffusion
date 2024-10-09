@@ -326,7 +326,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         global_step += 1
         loss_mse.backward()  # Backpropagation
         optimizer.step()
-        for name, param in self.diff.named_parameters():
+        for name, param in self.diff.diff_module.named_parameters():
             print(param.grad.data())
         print(code.grad.data())
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
