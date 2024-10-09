@@ -303,6 +303,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #        input_data.std().item(),
         #    )
 
+        print('!!!')
+        print(code.shape)
+
         # Sample a diffusion timestep
         t = (
             torch.randint(0, high=self.diff.num_timesteps, size=(code.shape[0],))
