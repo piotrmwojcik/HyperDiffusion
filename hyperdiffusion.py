@@ -159,6 +159,7 @@ class HyperDiffusion(pl.LightningModule):
             .to(self.device)
         )
 
+
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
             self.model,

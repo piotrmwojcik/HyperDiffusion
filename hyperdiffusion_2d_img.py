@@ -258,9 +258,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             code_list_, code_optimizers = self.load_cache(train_batch)
             code = torch.stack(code_list_, dim=0).cuda()
 
-            print('!!!')
-            print(code.requires_grad)
-
 
         # At the first step output first element in the dataset as a sanit check
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
@@ -314,6 +311,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             .long()
             .cuda()
         )
+
+        print('!!!')
+        print((code * self.cfg.normalization_factor).requires_grad)
 
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
