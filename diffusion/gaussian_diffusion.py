@@ -894,7 +894,6 @@ class GaussianDiffusion:
             else:
                 terms["loss"] = terms["mse"]
 
-            terms["x_t"] = x_t
         else:
             raise NotImplementedError(self.loss_type)
 
