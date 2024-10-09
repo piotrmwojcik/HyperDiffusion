@@ -229,8 +229,6 @@ class GaussianDiffusion:
             _extract_into_tensor(self.posterior_mean_coef1, t, x_t.shape) * x_start
             + _extract_into_tensor(self.posterior_mean_coef2, t, x_t.shape) * x_t
         )
-        print('!!!!!')
-        print(posterior_mean.requires_grad)
 
         posterior_variance = _extract_into_tensor(self.posterior_variance, t, x_t.shape)
         posterior_log_variance_clipped = _extract_into_tensor(
@@ -786,6 +784,9 @@ class GaussianDiffusion:
             noise = th.randn_like(x_start)
         x_t, _ = self.q_sample(x_start, t, noise=noise)
 
+        print('!!!!!')
+        print(x_t.requires_grad)
+
         terms = {}
 
         if self.loss_type == LossType.KL or self.loss_type == LossType.RESCALED_KL:
@@ -833,6 +834,10 @@ class GaussianDiffusion:
                 ModelMeanType.EPSILON: noise,
             }[self.model_mean_type]
             assert model_output.shape == target.shape == x_start.shape
+
+            print('!!!sss!!')
+            print(x_t.requires_grad)
+
             #mse1 = torch.zeros(x_t.shape[0]).cuda()
 
             # eps = 1e-8
