@@ -784,9 +784,6 @@ class GaussianDiffusion:
             noise = th.randn_like(x_start)
         x_t, _ = self.q_sample(x_start, t, noise=noise)
 
-        print('!!!!!')
-        print(x_t.requires_grad)
-
         terms = {}
 
         if self.loss_type == LossType.KL or self.loss_type == LossType.RESCALED_KL:
@@ -834,9 +831,6 @@ class GaussianDiffusion:
                 ModelMeanType.EPSILON: noise,
             }[self.model_mean_type]
             assert model_output.shape == target.shape == x_start.shape
-
-            print('!!!sss!!')
-            print(x_t.requires_grad)
 
             #mse1 = torch.zeros(x_t.shape[0]).cuda()
 
@@ -899,6 +893,8 @@ class GaussianDiffusion:
                 terms["loss"] = terms["mse"] + terms["vb"]
             else:
                 terms["loss"] = terms["mse"]
+
+            terms["x_t"] = x_t
         else:
             raise NotImplementedError(self.loss_type)
 
