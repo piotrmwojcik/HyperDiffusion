@@ -171,36 +171,61 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 self.optimizer_set_state(code_optimizers[ind], scene_state_single['optimizer'])
         return code_list_, code_optimizers
 
-    # def save_cache(self, code_list_, code_optimizers, scene_id):
-    #     code_dtype = code_list_[0].dtype
-    #     optimizer_dtype = torch.float32
-    #     for ind, code_single_ in enumerate(code_list_):
-    #         scene_id_single = scene_id[ind]
-    #         out = dict(
-    #             scene_id=scene_id_single,
-    #             param=dict(
-    #                 code_=code_single_.data),
-    #             optimizer=code_optimizers[ind].state_dict())
-    #         if self.cache is not None:
-    #             if self.cache[scene_id_single] is None:
-    #                 self.cache[scene_id_single] = out_dict_to(
-    #                     out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype)
-    #             else:
-    #                 if 'scene_id' not in self.cache[scene_id_single]:
-    #                     self.cache[scene_id_single]['scene_id'] = out['scene_id']
-    #                 if 'scene_name' not in self.cache[scene_id_single]:
-    #                     self.cache[scene_id_single]['scene_name'] = out['scene_name']
-    #                 if 'code' in self.cache[scene_id_single]['param']:
-    #                     del self.cache[scene_id_single]['param']['code']
-    #                 for key, val in out['param'].items():
-    #                     load_tensor_to_dict(self.cache[scene_id_single]['param'], key, val,
-    #                                         device='cpu', dtype=code_dtype)
-    #                 if 'optimizer' in self.cache[scene_id_single]:
-    #                     optimizer_state_copy(out['optimizer'], self.cache[scene_id_single]['optimizer'],
-    #                                          device='cpu', dtype=optimizer_dtype)
-    #                 else:
-    #                     self.cache[scene_id_single]['optimizer'] = optimizer_state_to(
-    #                         out['optimizer'], device='cpu', dtype=optimizer_dtype)
+    def optimizer_state_to(self, state_dict, device=None, dtype=None):
+        assert dtype.is_floating_point
+        out = dict(state=dict(),
+                   param_groups=state_dict['param_groups'])
+        for key_state_single, state_single in state_dict['state'].items():
+            state_single_out = dict()
+            for key, val in state_single.items():
+                if isinstance(val, torch.Tensor):
+                    if key != 'step' and val.dtype != dtype:
+                        val = val.clamp(min=torch.finfo(dtype).min, max=torch.finfo(dtype).max)
+                    state_single_out[key] = val.to(
+                        device=device, dtype=None if key == 'step' else dtype)
+                else:
+                    state_single_out[key] = val
+            out['state'][key_state_single] = state_single_out
+        return out
+
+    def out_dict_to(self, d, device=None, code_dtype=torch.float32, optimizer_dtype=torch.float32):
+        assert code_dtype.is_floating_point and optimizer_dtype.is_floating_point
+        return dict(
+            scene_id=d['scene_id'],
+            param=dict(
+                code_=d['param']['code_'].clamp(
+                    min=torch.finfo(code_dtype).min, max=torch.finfo(code_dtype).max
+                ).to(device=device, dtype=code_dtype),
+            optimizer=self.optimizer_state_to(d['optimizer'], device=device, dtype=optimizer_dtype)))
+
+    def save_cache(self, code_list_, code_optimizers, scene_id, scene_name):
+        code_dtype = code_list_[0].dtype
+        optimizer_dtype = torch.float32
+        for ind, code_single_ in enumerate(code_list_):
+            out = dict(
+                scene_name=scene_name[ind],
+                param=dict(
+                    code_=code_single_.data,
+                optimizer=code_optimizers[ind].state_dict()))
+            if self.cache is not None:
+                scene_id_single = scene_id[ind]
+                if self.cache[scene_id_single] is None:
+                    self.cache[scene_id_single] = self.out_dict_to(
+                        out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype)
+                else:
+                    if 'scene_id' not in self.cache[scene_id_single]:
+                        self.cache[scene_id_single]['scene_id'] = out['scene_id']
+                    if 'code' in self.cache[scene_id_single]['param']:
+                        del self.cache[scene_id_single]['param']['code']
+                    for key, val in out['param'].items():
+                        self.load_tensor_to_dict(self.cache[scene_id_single]['param'], key, val,
+                                                 device='cpu', dtype=code_dtype)
+                    if 'optimizer' in self.cache[scene_id_single]:
+                        self.optimizer_state_copy(out['optimizer'], self.cache[scene_id_single]['optimizer'],
+                                                 device='cpu', dtype=optimizer_dtype)
+                    else:
+                        self.cache[scene_id_single]['optimizer'] = self.optimizer_state_to(
+                            out['optimizer'], device='cpu', dtype=optimizer_dtype)
 
     def forward(self, images):
         t = (
@@ -232,9 +257,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         if 'code_optimizer' in self.cfg:
             code_list_, code_optimizers = self.load_cache(train_batch)
             code = torch.stack(code_list_, dim=0).cuda()
-
-        print('!!!')
-        print(code.shape, self.image_size[1:])
 
         # At the first step output first element in the dataset as a sanit check
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
