@@ -311,7 +311,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             .long()
             .cuda()
         )
-        print(t.requires_grad)
 
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
@@ -323,12 +322,13 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             model_kwargs=None,
         )
 
+        print(loss_terms.keys())
+
         loss_mse = loss_terms["loss"].mean()
         global_step += 1
         loss_mse.backward()  # Backpropagation
         optimizer.step()
 
-        print(t.grad.data())
         print(code.grad.data())
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
 

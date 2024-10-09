@@ -229,6 +229,9 @@ class GaussianDiffusion:
             _extract_into_tensor(self.posterior_mean_coef1, t, x_t.shape) * x_start
             + _extract_into_tensor(self.posterior_mean_coef2, t, x_t.shape) * x_t
         )
+        print('!!!!!')
+        print(posterior_mean.requires_grad)
+
         posterior_variance = _extract_into_tensor(self.posterior_variance, t, x_t.shape)
         posterior_log_variance_clipped = _extract_into_tensor(
             self.posterior_log_variance_clipped, t, x_t.shape
