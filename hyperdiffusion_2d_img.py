@@ -17,7 +17,7 @@ import wandb
 from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
-                      render_mesh, render_meshes)
+                      render_mesh, render_meshes, image_mse)
 from mlp_models import ImplicitMLP
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
@@ -273,10 +273,13 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def inverse_code(self, gt_imgs, grids, code_, code_optimizer, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
+        mse_loss = []
+
         for inverse_step_id in range(n_inverse_steps):
             for code_single in code_:
                 mlp = generate_mlp_from_weights(code_single, self.mlp_kwargs)
                 output = mlp({'coords': grids})
+                mse_loss.append(image_mse(mask=None, model_output=output, gt=gt_imgs))
 
             for code_single in code_:
                 for code_single_, prior_grad_single in zip(code_, prior_grad):
