@@ -279,12 +279,15 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             for code_single in code_:
                 mlp = generate_mlp_from_weights(code_single, self.mlp_kwargs)
                 output = mlp({'coords': grids})
+                print('!!!, ', output['model_out'].shape)
+                print('!!!, ', gt_imgs.shape)
+                print()
                 mse_loss.append(image_mse(mask=None, model_output=output, gt=gt_imgs))
 
             for code_single in code_:
                 for code_single_, prior_grad_single in zip(code_, prior_grad):
                     code_single_.grad.copy_(prior_grad_single)
-                print('!!!, ', code_single.shape)
+
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
