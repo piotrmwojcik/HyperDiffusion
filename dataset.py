@@ -11,7 +11,7 @@ from torch.utils.data import Dataset
 from trimesh.voxel import creation as vox_creation
 
 from augment import random_permute_flat, random_permute_mlp, sorted_permute_mlp
-from hd_utils import generate_mlp_from_weights, get_mlp
+from hd_utils import generate_mlp_from_weights, get_mlp, get_grid
 from siren.dataio import anime_read
 
 from torch.utils.data import Dataset
@@ -291,6 +291,8 @@ class CelebAHQ(DataLoader):
                 Normalize(torch.Tensor([0.5]), torch.Tensor([0.5]), torch.Tensor([0.5]))
             ])
 
+        self.mgrid = get_grid(resolution, resolution, b=0)
+
     def __len__(self):
         return len(self.fnames)
 
@@ -302,5 +304,6 @@ class CelebAHQ(DataLoader):
         img = self.transform(img)
         return {
             'gt_img': img,
+            'coords': self.mgrid,
             'scene_id': int(scene_id)
         }

@@ -211,6 +211,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         else:
             d[key] = value
 
+    def optimizer_state_copy(self, d_src, d_dst, device=None, dtype=None):
+        d_dst['param_groups'] = d_src['param_groups']
+        for key_state_single, state_single in d_src['state'].items():
+            if key_state_single not in d_dst['state']:
+                d_dst['state'][key_state_single] = dict()
+            for key, val in state_single.items():
+                self.load_tensor_to_dict(d_dst['state'][key_state_single], key, val,
+                                         device=device, dtype=dtype)
 
     def save_cache(self, code_list_, code_optimizers, scene_name):
         code_dtype = code_list_[0].dtype
@@ -232,7 +240,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     if 'code' in self.cache[scene_name_single]['param']:
                         del self.cache[scene_name_single]['param']['code']
                     for key, val in out['param'].items():
-                        print('!!!, ', key)
                         self.load_tensor_to_dict(self.cache[scene_name_single]['param'], key, val,
                                                  device='cpu', dtype=code_dtype)
                     if 'optimizer' in self.cache[scene_name_single]:
@@ -262,6 +269,13 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             )
             return [optimizer], [scheduler]
         return optimizer
+
+    def inverse_code(self, gt_imgs, grids, code_, code_optimizer, cfg):
+        n_inverse_steps = cfg['inverse_steps']
+
+        for inverse_step_id in range(n_inverse_steps):
+            for code in code_:
+                print('!!!, ', code.shape)
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
