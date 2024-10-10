@@ -61,8 +61,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             split_points = np.round(np.linspace(0, cache_size, num=2)).astype(np.int64)
             inds = np.arange(start=split_points[0], stop=split_points[1])
             self.cache = {ind: None for ind in inds}
-            print('!!!')
-            print('dupa')
         else:
             self.cache = None
         self.cache_loaded = False
@@ -160,8 +158,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             cache_list = [None for _ in range(num_scenes)]
         code_list_ = []
         for scene_state_single in cache_list:
-            print('!!!')
-            print(scene_state_single)
             if scene_state_single is None:
                 code_list_.append(self.get_init_code_(None))
             else:
@@ -202,7 +198,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 ).to(device=device, dtype=code_dtype),
             optimizer=self.optimizer_state_to(d['optimizer'], device=device, dtype=optimizer_dtype)))
 
-    def save_cache(self, code_list_, code_optimizers, scene_id, scene_name):
+    def save_cache(self, code_list_, code_optimizers, scene_name):
         code_dtype = code_list_[0].dtype
         optimizer_dtype = torch.float32
         for ind, code_single_ in enumerate(code_list_):
@@ -212,23 +208,23 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     code_=code_single_.data,
                 optimizer=code_optimizers[ind].state_dict()))
             if self.cache is not None:
-                scene_id_single = scene_id[ind]
-                if self.cache[scene_id_single] is None:
-                    self.cache[scene_id_single] = self.out_dict_to(
+                scene_name_single = scene_name[ind]
+                if self.cache[scene_name_single] is None:
+                    self.cache[scene_name_single] = self.out_dict_to(
                         out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype)
                 else:
-                    if 'scene_id' not in self.cache[scene_id_single]:
-                        self.cache[scene_id_single]['scene_id'] = out['scene_id']
-                    if 'code' in self.cache[scene_id_single]['param']:
-                        del self.cache[scene_id_single]['param']['code']
+                    if 'scene_id' not in self.cache[scene_name_single]:
+                        self.cache[scene_name_single]['scene_id'] = out['scene_id']
+                    if 'code' in self.cache[scene_name_single]['param']:
+                        del self.cache[scene_name_single]['param']['code']
                     for key, val in out['param'].items():
-                        self.load_tensor_to_dict(self.cache[scene_id_single]['param'], key, val,
+                        self.load_tensor_to_dict(self.cache[scene_name_single]['param'], key, val,
                                                  device='cpu', dtype=code_dtype)
-                    if 'optimizer' in self.cache[scene_id_single]:
-                        self.optimizer_state_copy(out['optimizer'], self.cache[scene_id_single]['optimizer'],
+                    if 'optimizer' in self.cache[scene_name_single]:
+                        self.optimizer_state_copy(out['optimizer'], self.cache[scene_name_single]['optimizer'],
                                                  device='cpu', dtype=optimizer_dtype)
                     else:
-                        self.cache[scene_id_single]['optimizer'] = self.optimizer_state_to(
+                        self.cache[scene_name_single]['optimizer'] = self.optimizer_state_to(
                             out['optimizer'], device='cpu', dtype=optimizer_dtype)
 
     def forward(self, images):
@@ -333,6 +329,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer.step()
         #print(code)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
+        # ==== save cache ====
+        self.save_cache(code_list_, code_optimizers, train_batch['scene_id'])
 
         self.logger.log({"global_step": global_step, "train_loss": loss_mse})
 
