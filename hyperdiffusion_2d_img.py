@@ -287,7 +287,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             code_list_, code_optimizers = self.load_cache(train_batch)
             code = torch.stack(code_list_, dim=0).cuda()
 
-
         # At the first step output first element in the dataset as a sanit check
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
             #curr_weights = Config.get("curr_weights")
@@ -358,6 +357,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer.step()
         #print(code)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
+        print('!!!')
+        print(train_batch.keys())
+
         self.inverse_code(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizer, self.cfg)
 
         # ==== save cache ====
