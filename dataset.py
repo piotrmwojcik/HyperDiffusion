@@ -294,7 +294,7 @@ class CelebAHQ(DataLoader):
                 Normalize(torch.Tensor([0.5]), torch.Tensor([0.5]), torch.Tensor([0.5]))
             ])
 
-        self.mgrid = get_grid(resolution, resolution, b=0)
+        self.mgrid = get_grid(self.res, self.res, b=0)
 
     def __len__(self):
         return len(self.fnames)
