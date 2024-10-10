@@ -198,6 +198,20 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 ).to(device=device, dtype=code_dtype),
             optimizer=self.optimizer_state_to(d['optimizer'], device=device, dtype=optimizer_dtype)))
 
+    def load_tensor_to_dict(self, d, key, value, device=None, dtype=None):
+        assert dtype.is_floating_point
+        if isinstance(value, torch.Tensor):
+            if key not in ['step'] and value.dtype != dtype:
+                value = value.clamp(min=torch.finfo(dtype).min, max=torch.finfo(dtype).max)
+            if key in d:
+                d[key].copy_(value)
+            else:
+                d[key] = value.to(
+                    device=device, dtype=None if key in ['step'] else dtype)
+        else:
+            d[key] = value
+
+
     def save_cache(self, code_list_, code_optimizers, scene_name):
         code_dtype = code_list_[0].dtype
         optimizer_dtype = torch.float32
@@ -218,6 +232,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     if 'code' in self.cache[scene_name_single]['param']:
                         del self.cache[scene_name_single]['param']['code']
                     for key, val in out['param'].items():
+                        print('!!!, ', key)
                         self.load_tensor_to_dict(self.cache[scene_name_single]['param'], key, val,
                                                  device='cpu', dtype=code_dtype)
                     if 'optimizer' in self.cache[scene_name_single]:
