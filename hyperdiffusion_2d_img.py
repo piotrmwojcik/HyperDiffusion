@@ -270,12 +270,18 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             return [optimizer], [scheduler]
         return optimizer
 
-    def inverse_code(self, gt_imgs, grids, code_, code_optimizer, cfg):
+    def inverse_code(self, gt_imgs, grids, code_, code_optimizer, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
         for inverse_step_id in range(n_inverse_steps):
-            for code in code_:
-                print('!!!, ', code.shape)
+            for code_single in code_:
+                mlp = generate_mlp_from_weights(code_single, self.mlp_kwargs)
+                output = mlp({'coords': cfg['coords']})
+
+            for code_single in code_:
+                for code_single_, prior_grad_single in zip(code_, prior_grad):
+                    code_single_.grad.copy_(prior_grad_single)
+                print('!!!, ', code_single.shape)
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
