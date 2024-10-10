@@ -305,6 +305,7 @@ class CelebAHQ(DataLoader):
         path = os.path.join(self.root, filename)
         img = Image.open(path)
         img = self.transform(img)
+        img = img.permute(1, 2, 0).view(-1, self.dataset.img_channels)
         return {
             'gt_img': img,
             'coords': self.mgrid,
