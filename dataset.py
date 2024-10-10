@@ -251,6 +251,7 @@ class WeightDataset(Dataset):
 def CelebAHQ_collate_fn(batch):
     # Separate images and scene_ids from the batch
     images = [item['gt_img'] for item in batch]
+    coordinates = [item['coords'] for item in batch]
     scene_ids = [item['scene_id'] for item in batch]  # scene_ids are already lists
 
     # Stack images along the batch dimension (i.e., into a single tensor)
@@ -259,6 +260,7 @@ def CelebAHQ_collate_fn(batch):
     # No need to convert scene_ids to tensors if you want them as lists
     return {
         'gt_img': images,
+        'coords': coordinates,
         'scene_id': scene_ids  # Keep scene_id as a list of lists
     }
 

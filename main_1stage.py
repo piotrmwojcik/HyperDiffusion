@@ -247,8 +247,6 @@ def main(cfg: DictConfig):
                     #data = data.to(device)
 
                     optimizer.zero_grad()  # Zero gradients
-                    print('!!!!')
-                    print(data.keys())
 
                     loss = diffuser.training_step(data, optimizer, global_step)  # Forward pass
                     outputs.append(loss)
