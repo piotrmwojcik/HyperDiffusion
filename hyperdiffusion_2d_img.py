@@ -203,7 +203,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer_dtype = torch.float32
         for ind, code_single_ in enumerate(code_list_):
             out = dict(
-                scene_name=scene_name[ind],
+                scene_id=scene_name[ind],
                 param=dict(
                     code_=code_single_.data,
                 optimizer=code_optimizers[ind].state_dict()))
