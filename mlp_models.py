@@ -62,7 +62,6 @@ class MLP(nn.Module):
         return x, None
 
 
-
 class FMMLinear(nn.Module):
     """
     FMM layer via BMM instead of F.conv

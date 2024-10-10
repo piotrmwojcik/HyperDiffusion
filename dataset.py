@@ -256,6 +256,7 @@ def CelebAHQ_collate_fn(batch):
 
     # Stack images along the batch dimension (i.e., into a single tensor)
     images = torch.stack(images, dim=0)
+    coordinates = torch.stack(coordinates, dim=0)
 
     # No need to convert scene_ids to tensors if you want them as lists
     return {
