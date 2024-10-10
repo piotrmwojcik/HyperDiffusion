@@ -276,7 +276,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for inverse_step_id in range(n_inverse_steps):
             for code_single in code_:
                 mlp = generate_mlp_from_weights(code_single, self.mlp_kwargs)
-                output = mlp({'coords': cfg['coords']})
+                output = mlp({'coords': grids})
 
             for code_single in code_:
                 for code_single_, prior_grad_single in zip(code_, prior_grad):
