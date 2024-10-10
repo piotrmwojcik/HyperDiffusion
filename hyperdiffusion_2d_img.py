@@ -158,6 +158,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             cache_list = [None for _ in range(num_scenes)]
         code_list_ = []
         for scene_state_single in cache_list:
+            print('!!!')
+            print(scene_state_single)
             if scene_state_single is None:
                 code_list_.append(self.get_init_code_(None))
             else:
