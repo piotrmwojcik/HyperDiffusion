@@ -376,6 +376,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
 
         self.inverse_code(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
+        print('inverse code')
 
         # ==== save cache ====
         self.save_cache(code_list_, code_optimizers, train_batch['scene_id'])
