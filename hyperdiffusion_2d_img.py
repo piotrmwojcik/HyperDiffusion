@@ -275,7 +275,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for inverse_step_id in range(n_inverse_steps):
             mse_loss = []
 
-            for param_group in code_optimizer[code_idx].param_groups:
+            for param_group in code_optimizer[0].param_groups:
                 print("Learning rate:", param_group['lr'])
 
                 for param in param_group['params']:
