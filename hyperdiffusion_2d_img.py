@@ -272,18 +272,20 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def inverse_code(self, gt_imgs, grids, code_, code_optimizer, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
-        mlps = [None for _ in code_]
-
         for inverse_step_id in range(n_inverse_steps):
             mse_loss = []
 
-            for code_idx, code_single in enumerate(code_):
+            for param_group in code_optimizer[code_idx].param_groups:
+                print("Learning rate:", param_group['lr'])
 
-                if mlps[code_idx] is None:
-                    mlp = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
-                    mlps[code_idx] = mlp
-                else:
-                    mlp = mlps[code_idx]
+                for param in param_group['params']:
+                    print(param)  # This prints the parameter tensor
+
+                    # If you want to see whether the parameter requires gradients:
+                    print(f"Requires grad: {param.requires_grad}")
+
+            for code_idx, code_single in enumerate(code_):
+                mlp = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
 
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
