@@ -17,7 +17,7 @@ import wandb
 from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
-                      render_mesh, render_meshes, image_mse)
+                      render_mesh, render_meshes, image_mse, generate_mlp_from_weights_trainable)
 from mlp_models import ImplicitMLP
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
@@ -277,7 +277,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
             for code_idx, code_single in enumerate(code_):
 
-                mlp = generate_mlp_from_weights(code_single, self.mlp_kwargs)
+                mlp = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
 
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
@@ -289,12 +289,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
             mse_loss.backward()
             for code_idx, _ in enumerate(code_):
-                for param_group in code_optimizer[code_idx].param_groups:
-                    print(f"Learning Rate: {param_group['lr']}")
                 code_optimizer[code_idx].step()
             print(mse_loss.item())
         print()
-
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple

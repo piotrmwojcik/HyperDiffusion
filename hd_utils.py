@@ -121,6 +121,33 @@ def generate_mlp_from_weights(weights, mlp_kwargs):
     return mlp
 
 
+def generate_mlp_from_weights_trainable(weights, mlp_kwargs):
+    # Define a new MLP model based on the mlp_kwargs
+    mlp = get_mlp(mlp_kwargs)
+    current_idx = 0
+    new_params = []
+
+    for param in mlp.parameters():
+        num_params = param.numel()  # Equivalent to np.product(list(val.shape))
+
+        w = weights[current_idx:current_idx + num_params].view(param.shape)
+
+        # Replace the parameter with the new weight tensor
+        new_params.append(w)  # Collect weights as parameters
+
+        current_idx += num_params
+
+    assert current_idx == len(weights), f"len(weights) = {len(weights)}"
+
+    # Load the new parameters into the model
+    # This method sets up weights as learnable parameters
+    for new_param, (name, param) in zip(new_params, mlp.named_parameters()):
+        with torch.no_grad():
+            param.copy_(new_param)  # Directly copy the values but still use the newly created weights
+
+    return mlp   # Return the model and weights for optimization
+
+
 def render_meshes(meshes):
     out_imgs = []
     for mesh in meshes:
