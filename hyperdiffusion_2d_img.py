@@ -281,9 +281,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 mlp = generate_mlp_from_weights(code_single, self.mlp_kwargs)
                 output = mlp({'coords': grids[0].unsqueeze(0)})
 
-                print(gt_imgs.shape)
-                print(output['model_out'].shape)
-
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
                 mse_loss.append(loss['img_loss'])
 
