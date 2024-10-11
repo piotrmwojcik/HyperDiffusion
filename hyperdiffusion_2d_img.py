@@ -273,7 +273,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def inverse_code(self, gt_imgs, grids, code_, code_optimizer, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
-
         for inverse_step_id in range(n_inverse_steps):
             mse_loss = []
 
@@ -292,6 +291,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mse_loss.backward()
             for code_idx, _ in enumerate(code_):
                 code_optimizer[code_idx].step()
+            print(mse_loss.item())
+        print()
 
 
     def training_step(self, train_batch, optimizer, global_step):
