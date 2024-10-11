@@ -281,7 +281,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
                 code_optimizer[code_idx].zero_grad()
-                loss.backward()
+                loss['img_loss'].backward()
                 code_optimizer[code_idx].step()
                 #mse_loss.append(loss['img_loss'])
 
