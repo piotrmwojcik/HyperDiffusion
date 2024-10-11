@@ -142,7 +142,8 @@ def generate_mlp_from_weights_trainable(weights, mlp_kwargs):
     # Load the new parameters into the model
     # This method sets up weights as learnable parameters
     for new_param, (name, param) in zip(new_params, mlp.named_parameters()):
-        param.copy_(new_param)  # Directly copy the values but still use the newly created weights
+        with torch.no_grad():
+            param.copy_(new_param)
 
     return mlp, weights   # Return the model and weights for optimization
 
