@@ -287,7 +287,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 code_optimizer[code_idx].zero_grad()
 
-                loss.backward()
+                loss['img_loss'].backward()
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
