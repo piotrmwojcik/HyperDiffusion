@@ -280,6 +280,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 for param in param_group['params']:
                     print(param)  # This prints the parameter tensor
+                    print(code_[0])
 
                     # If you want to see whether the parameter requires gradients:
                     print(f"Requires grad: {param.requires_grad}")
