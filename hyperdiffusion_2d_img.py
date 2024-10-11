@@ -284,7 +284,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 print(gt_imgs.shape)
                 print(output['model_out'].shape)
 
-                loss = image_mse(mask=None, model_output=output, gt=gt_imgs)
+                loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
                 mse_loss.append(loss['img_loss'])
 
             mse_loss = torch.mean(torch.stack(mse_loss))
