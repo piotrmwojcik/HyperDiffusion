@@ -282,6 +282,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 output = mlp({'coords': grids[0].unsqueeze(0)})
 
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs)
+                print(inverse_step_id)
                 code_single.grad.copy_(prior_grad[code_idx])
                 loss['img_loss'].backward()
 
