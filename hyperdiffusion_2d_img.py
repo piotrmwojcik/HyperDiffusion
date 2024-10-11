@@ -282,12 +282,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 output = mlp({'coords': grids[0].unsqueeze(0)})
 
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs)
-                code_[code_idx].grad.copy_(prior_grad[code_idx])
+                code_single.grad.copy_(prior_grad[code_idx])
+                loss['img_loss'].backward()
+
                 code_optimizer[code_idx].step()
 
                 code_optimizer[code_idx].zero_grad()
-
-                loss['img_loss'].backward()
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
