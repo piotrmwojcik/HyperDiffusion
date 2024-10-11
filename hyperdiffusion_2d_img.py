@@ -275,31 +275,24 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for inverse_step_id in range(n_inverse_steps):
             mse_loss = []
 
-            for param_group in code_optimizer[5].param_groups:
-                print("Learning rate:", param_group['lr'])
-
-                for param in param_group['params']:
-                    print(param)  # This prints the parameter tensor
-                    print(code_[5])
-
-                    # If you want to see whether the parameter requires gradients:
-                    print(f"Requires grad: {param.requires_grad}")
-
             for code_idx, code_single in enumerate(code_):
-                mlp = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
+                mlp = generate_mlp_from_weights(code_single, self.mlp_kwargs)
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
 
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
-                mse_loss.append(loss['img_loss'])
-
-            mse_loss = torch.mean(torch.stack(mse_loss))
-            for code_idx, _ in enumerate(code_):
                 code_optimizer[code_idx].zero_grad()
-
-            mse_loss.backward()
-            for code_idx, _ in enumerate(code_):
+                loss.backward()
                 code_optimizer[code_idx].step()
-            print(mse_loss.item())
+                #mse_loss.append(loss['img_loss'])
+
+            # mse_loss = torch.mean(torch.stack(mse_loss))
+            # for code_idx, _ in enumerate(code_):
+            #     code_optimizer[code_idx].zero_grad()
+            #
+            # mse_loss.backward()
+            # for code_idx, _ in enumerate(code_):
+            #     code_optimizer[code_idx].step()
+            # print(mse_loss.item())
         print()
 
     def training_step(self, train_batch, optimizer, global_step):
