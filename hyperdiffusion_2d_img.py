@@ -126,8 +126,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer_class = getattr(torch.optim, optimizer_cfg.pop('type'))
         if isinstance(code_, list):
             code_optimizer = [
-                optimizer_class([code_single_], **optimizer_cfg)
-                for code_single_ in code_]
+                optimizer_class([code_single_], **optimizer_cfg) for code_single_ in code_]
         else:
             code_optimizer = optimizer_class([code_], **optimizer_cfg)
         return code_optimizer
@@ -290,6 +289,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
             mse_loss.backward()
             for code_idx, _ in enumerate(code_):
+                for param_group in code_optimizer[code_idx].param_groups:
+                    print(f"Learning Rate: {param_group['lr']}")
                 code_optimizer[code_idx].step()
             print(mse_loss.item())
         print()
