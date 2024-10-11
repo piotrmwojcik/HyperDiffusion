@@ -276,10 +276,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mse_loss = []
 
             for code_idx, code_single in enumerate(code_):
-                mlp = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
+                mlp, weights = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
+                code_optimizer[code_idx].param_groups[0]['params'] = weights
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
 
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
+
                 code_optimizer[code_idx].zero_grad()
                 loss['img_loss'].backward()
                 print(loss['img_loss'].item())

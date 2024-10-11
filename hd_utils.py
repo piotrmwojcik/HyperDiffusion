@@ -144,7 +144,7 @@ def generate_mlp_from_weights_trainable(weights, mlp_kwargs):
     for new_param, (name, param) in zip(new_params, mlp.named_parameters()):
         param.copy_(new_param)  # Directly copy the values but still use the newly created weights
 
-    return mlp   # Return the model and weights for optimization
+    return mlp, weights   # Return the model and weights for optimization
 
 
 def render_meshes(meshes):
