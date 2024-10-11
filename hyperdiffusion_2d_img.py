@@ -282,9 +282,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
 
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
-                print(loss['img_loss'])
                 mse_loss.append(loss['img_loss'])
-            print()
+
             mse_loss = torch.mean(torch.stack(mse_loss))
             for code_idx, _ in enumerate(code_):
                 code_optimizer[code_idx].zero_grad()
@@ -292,7 +291,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mse_loss.backward()
             for code_idx, _ in enumerate(code_):
                 code_optimizer[code_idx].step()
-            #print(mse_loss.item())
+            print(mse_loss.item())
         print()
 
 
