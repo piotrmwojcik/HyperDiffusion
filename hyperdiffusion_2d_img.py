@@ -1,5 +1,6 @@
 import copy
 import os
+import time
 
 import numpy as np
 import pytorch_lightning as pl
@@ -387,7 +388,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
 
         print('before inverse code')
+        start = time.time()
         self.inverse_code(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
+        end = time.time()
+        print(f"inverse_code took {round(end - start, 2)} seconds")
         print('inverse code')
 
         # ==== save cache ====
