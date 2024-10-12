@@ -288,7 +288,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 code_single.grad.copy_(prior_grad[code_idx])
 
-                code_optimizer[code_idx].zero_grad()
                 loss['img_loss'].backward()
                 #print(loss['img_loss'].item())
 
