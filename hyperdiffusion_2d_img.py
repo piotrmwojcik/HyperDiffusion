@@ -287,24 +287,24 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #    print(code_single)
                 #    print(loss)
 
-                code_single.grad.copy_(prior_grad[code_idx])
+                #code_single.grad.copy_(prior_grad[code_idx])
 
                 loss['img_loss'].backward()
                 #print(loss['img_loss'].item())
 
                 #print(inverse_step_id, code_idx, loss['img_loss'].item())
                 #code_optimizer[code_idx].step()
-                #mse_loss.append(loss['img_loss'])
+                mse_loss.append(loss['img_loss'])
         #print()
 
-            # mse_loss = torch.mean(torch.stack(mse_loss))
-            # for code_idx, _ in enumerate(code_):
-            #     code_optimizer[code_idx].zero_grad()
-            #
-            # mse_loss.backward()
-            # for code_idx, _ in enumerate(code_):
-            #     code_optimizer[code_idx].step()
-            # print(mse_loss.item())
+            mse_loss = torch.mean(torch.stack(mse_loss))
+            for code_idx, code_single in enumerate(code_):
+                code_single.grad.copy_(prior_grad[code_idx])
+
+            mse_loss.backward()
+            for code_idx, _ in enumerate(code_):
+                code_optimizer[code_idx].step()
+            print(mse_loss.item())
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
