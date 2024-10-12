@@ -301,10 +301,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mse_loss = torch.mean(torch.stack(mse_loss))
             for code_idx, code_single in enumerate(code_):
                 code_single.grad.copy_(prior_grad[code_idx])
-            start = time.time()
+            #start = time.time()
             mse_loss.backward()
-            end = time.time()
-            print(f"backward took {round(end - start, 2)} seconds")
+            #end = time.time()
+            #print(f"backward took {round(end - start, 2)} seconds")
             for code_idx, _ in enumerate(code_):
                 code_optimizer[code_idx].step()
             #print(mse_loss.item())
