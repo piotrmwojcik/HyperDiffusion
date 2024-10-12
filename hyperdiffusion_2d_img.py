@@ -278,12 +278,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             for code_idx, code_single in enumerate(code_):
                 if code_idx == 2:
                     print(code_single)
-                mlp, weights = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
+                mlp = generate_mlp_from_weights(code_single, self.mlp_kwargs)
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
 
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
                 if code_idx == 2:
-                    print(weights)
+                    print(code_single)
                     print(loss)
 
                 code_optimizer[code_idx].zero_grad()
