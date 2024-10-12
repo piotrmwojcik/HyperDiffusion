@@ -291,8 +291,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #print(inverse_step_id, code_idx, loss['img_loss'].item())
                 code_optimizer[code_idx].step()
                 #mse_loss.append(loss['img_loss'])
-            print(code_)
-            print()
+        print(code_)
+        print()
 
             # mse_loss = torch.mean(torch.stack(mse_loss))
             # for code_idx, _ in enumerate(code_):
