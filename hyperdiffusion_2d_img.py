@@ -272,11 +272,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def inverse_code(self, gt_imgs, grids, code_, code_optimizer, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
-        print(code_)
         for inverse_step_id in range(n_inverse_steps):
             mse_loss = []
 
             for code_idx, code_single in enumerate(code_):
+                if code_idx == 2:
+                    print(code_single)
                 mlp, weights = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
 
@@ -289,7 +290,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #print(inverse_step_id, code_idx, loss['img_loss'].item())
                 code_optimizer[code_idx].step()
                 #mse_loss.append(loss['img_loss'])
-        print(code_)
         print()
 
             # mse_loss = torch.mean(torch.stack(mse_loss))
