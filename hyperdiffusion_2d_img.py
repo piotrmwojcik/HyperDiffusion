@@ -277,7 +277,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mse_loss = []
 
             for code_idx, code_single in enumerate(code_):
-                mlp, _ = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
+                mlp, weights = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
+
+            print(weights)
+
+            for code_idx, code_single in enumerate(code_):
+                mlp, weights = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
 
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
@@ -287,7 +292,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #print(inverse_step_id, code_idx, loss['img_loss'].item())
                 code_optimizer[code_idx].step()
                 #mse_loss.append(loss['img_loss'])
-            #print()
+            print(weights)
+            print()
 
             # mse_loss = torch.mean(torch.stack(mse_loss))
             # for code_idx, _ in enumerate(code_):
@@ -297,8 +303,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             # for code_idx, _ in enumerate(code_):
             #     code_optimizer[code_idx].step()
             # print(mse_loss.item())
-        print(code_)
-        print()
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
