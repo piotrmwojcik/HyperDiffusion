@@ -95,6 +95,7 @@ class FMMLinear(nn.Module):
 
     def forward(self, input):
         W = self.left_matrix @ self.right_matrix # [batch_size, out_channel, in_channel]
+        W /= np.sqrt(self.rank)
         out = F.linear(input, W, self.bias)
 
         return out
