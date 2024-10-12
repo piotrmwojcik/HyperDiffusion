@@ -276,8 +276,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for inverse_step_id in range(n_inverse_steps):
             mse_loss = []
 
-            print(code_)
-
             for code_idx, code_single in enumerate(code_):
                 mlp, weights = generate_mlp_from_weights_trainable(code_single, self.mlp_kwargs)
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
