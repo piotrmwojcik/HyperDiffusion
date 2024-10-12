@@ -134,15 +134,12 @@ def generate_mlp_from_weights_trainable(weights, mlp_kwargs):
 
         # Replace the parameter with the new weight tensor
         new_params.append(w)  # Collect weights as parameters
-
         current_idx += num_params
 
     assert current_idx == len(weights), f"len(weights) = {len(weights)}"
 
-    # Load the new parameters into the model
-    # This method sets up weights as learnable parameters
-    for new_param, (name, param) in zip(new_params, mlp.named_parameters()):
-        param.clone(new_param)
+    for new_param, (_, param) in zip(new_params, mlp.named_parameters()):
+        param = new_param.clone()
 
     return mlp, weights   # Return the model and weights for optimization
 
