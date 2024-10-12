@@ -85,7 +85,7 @@ class FMMLinear(nn.Module):
         nn.init.kaiming_uniform_(self.left_matrix, a=math.sqrt(5))
         nn.init.kaiming_uniform_(self.right_matrix, a=math.sqrt(5))
 
-        W = self.left_matrix @ self.right_matrix
+        W = (self.left_matrix @ self.right_matrix) / np.sqrt(self.rank)
 
         if self.bias is not None:
             # Initialize bias uniformly
@@ -99,6 +99,7 @@ class FMMLinear(nn.Module):
         out = F.linear(input, W, self.bias)
 
         return out
+
 
 class GaussianFourierFeatureTransform(nn.Module):
     """
