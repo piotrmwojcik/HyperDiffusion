@@ -284,15 +284,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 code_optimizer[code_idx].zero_grad()
                 loss['img_loss'].backward()
                 #print(loss['img_loss'].item())
-                for name, param in mlp.named_parameters():
-                    if 'linear3.weight' in name:
-                        print(f"Name: {name}")
-                        print(f"Value: {param}")
                 code_optimizer[code_idx].step()
-                for name, param in mlp.named_parameters():
-                    if 'linear3.weight' in name:
-                        print(f"Name after: {name}")
-                        print(f"Value after: {param}")
                 #mse_loss.append(loss['img_loss'])
             print()
 
