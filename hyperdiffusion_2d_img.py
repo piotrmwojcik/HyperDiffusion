@@ -284,10 +284,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #   print(code_single)
                 mlp = mlps[code_idx]
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
-                start = time.time()
+
                 loss = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
-                end = time.time()
-                print(f"mse took {round(end - start, 2)} seconds")
                 #if code_idx == 2:
                 #    print(code_single)
                 #    print(loss)
@@ -304,8 +302,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mse_loss = torch.mean(torch.stack(mse_loss))
             for code_idx, code_single in enumerate(code_):
                 code_single.grad.copy_(prior_grad[code_idx])
-
+            start = time.time()
             mse_loss.backward()
+            end = time.time()
+            print(f"mse took {round(end - start, 2)} seconds")
             for code_idx, _ in enumerate(code_):
                 code_optimizer[code_idx].step()
             #print(mse_loss.item())
