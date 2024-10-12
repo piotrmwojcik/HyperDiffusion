@@ -305,7 +305,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             start = time.time()
             mse_loss.backward()
             end = time.time()
-            print(f"mse took {round(end - start, 2)} seconds")
+            print(f"backward took {round(end - start, 2)} seconds")
             for code_idx, _ in enumerate(code_):
                 code_optimizer[code_idx].step()
             #print(mse_loss.item())
