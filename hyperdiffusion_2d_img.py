@@ -287,8 +287,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
                 grad_inner = torch.autograd.grad(loss_inner['img_loss'],
                                                  mlp_params,
-                                                 create_graph=False)[0]
-                print(grad_inner.shape)
+                                                 create_graph=False)
+                for p_idx, params in enumerate(mlp_params):
+                    mlp_params[p_idx] = params - cfg['code_lr'] * grad_inner
+                print(loss_inner['img_loss'].item())
 
                 #if code_idx == 2:
                 #    print(code_single)
@@ -299,20 +301,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #print(inverse_step_id, code_idx, loss['img_loss'].item())
                 #code_optimizer[code_idx].step()
                 #mse_loss.append(loss['img_loss'])
-        #print()
-
-            #mse_loss = torch.mean(torch.stack(mse_loss))
-            #for code_idx, code_single in enumerate(code_):
-            #    code_single.grad.copy_(prior_grad[code_idx])
-            #start = time.time()
-            #mse_loss.backward()
-            #print(mse_loss.item())
-            #end = time.time()
-            #print(f"backward took {round(end - start, 2)} seconds")
-            #for code_idx, _ in enumerate(code_):
-            #    code_optimizer[code_idx].step()
-            #print(mse_loss.item())
         print()
+
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
