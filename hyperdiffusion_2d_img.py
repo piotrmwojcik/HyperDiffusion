@@ -311,6 +311,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_img = train_batch['gt_img'][0].cuda()
 
+        print('!!!')
+        print(input_img.shape)
+
         log_interval = int(Config.get("log_interval"))
 
         if 'code_optimizer' in self.cfg:
@@ -390,12 +393,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print(code)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
 
-        print('before inverse code')
-        start = time.time()
+        #print('before inverse code')
+        #start = time.time()
         self.inverse_code(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
-        end = time.time()
-        print(f"inverse_code took {round(end - start, 2)} seconds")
-        print('inverse code')
+        #end = time.time()
+        #print(f"inverse_code took {round(end - start, 2)} seconds")
+        #print('inverse code')
 
         # ==== save cache ====
         self.save_cache(code_list_, code_optimizers, train_batch['scene_id'])
