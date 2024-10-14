@@ -273,7 +273,7 @@ class CelebAHQ(DataLoader):
         # assert split in ['train', 'test'], "Unknown split"
 
         self.dataset_root = dataset_root
-        self.root = os.path.join(self.dataset_root, 'CelebAHQ')
+        self.root = os.path.join(self.dataset_root, 'CelebAHQ_small')
         self.img_channels = 3
         all_files = os.listdir(self.root)  # Ensure we list files from the correct folder
         self.fnames = [f for f in all_files if f.endswith('.png') or f.endswith('.jpg')]
