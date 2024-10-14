@@ -292,6 +292,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 current_idx = 0
                 with torch.no_grad():
                     for grad, param in zip(grad_inner, mlp.parameters()):
+                        print(grad.shape, param.shape)
                         grad_shape = grad.shape
                         num_params = np.product(list(grad.shape))
                         grad = grad.view(-1)
