@@ -282,16 +282,16 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #   print(code_single)
                 mlp = mlps[code_idx]
                 mlp_params = [param for name, param in mlp.named_parameters()]
-                output = mlp({'coords': grids[code_idx].unsqueeze(0)})
+                input = grids[code_idx].unsqueeze(0)
+                output = mlp({'coords': input})
 
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
                 grad_inner = torch.autograd.grad(loss_inner['img_loss'],
-                                                 mlp_params,
+                                                 input,
                                                  create_graph=False)
                 for p_idx, params in enumerate(mlp_params):
-                    print(':,', mlp_params[p_idx])
+                    print(grad_inner[p_idx])
                     mlp_params[p_idx] = params - cfg['code_lr'] * grad_inner[p_idx]
-                    print(':,', mlp_params[p_idx])
                 print(loss_inner['img_loss'].item())
             print()
                 #if code_idx == 2:
