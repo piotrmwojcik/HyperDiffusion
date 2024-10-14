@@ -291,20 +291,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                                  create_graph=False)
                 for p_idx, params in enumerate(mlp_params):
                     #print(grad_inner[p_idx])
-                    print(cfg['code_lr'] * grad_inner[p_idx])
                     mlp_params[p_idx] = params - cfg['code_lr'] * grad_inner[p_idx]
                 print(loss_inner['img_loss'].item())
             print()
-                #if code_idx == 2:
-                #    print(code_single)
-                #    print(loss)
-                #code_single.grad.copy_(prior_grad[code_idx])
-                #print(loss['img_loss'].item())
-                #loss.backward()
-                #print(inverse_step_id, code_idx, loss['img_loss'].item())
-                #code_optimizer[code_idx].step()
-                #mse_loss.append(loss['img_loss'])
-
 
 
     def training_step(self, train_batch, optimizer, global_step):
