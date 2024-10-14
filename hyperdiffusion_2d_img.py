@@ -275,10 +275,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
 
-
         for inverse_step_id in range(n_inverse_steps):
             mse_loss = []
-
             for code_idx, code_single in enumerate(code_):
                 #if code_idx == 2:
                 #   print(code_single)
@@ -289,25 +287,25 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #if code_idx == 2:
                 #    print(code_single)
                 #    print(loss)
-
-                #code_single.grad.copy_(prior_grad[code_idx])
+                loss.backward()
+                code_single.grad.copy_(prior_grad[code_idx])
                 #print(loss['img_loss'].item())
 
                 #print(inverse_step_id, code_idx, loss['img_loss'].item())
-                #code_optimizer[code_idx].step()
-                mse_loss.append(loss['img_loss'])
+                code_optimizer[code_idx].step()
+                #mse_loss.append(loss['img_loss'])
         #print()
 
-            mse_loss = torch.mean(torch.stack(mse_loss))
+            #mse_loss = torch.mean(torch.stack(mse_loss))
             for code_idx, code_single in enumerate(code_):
                 code_single.grad.copy_(prior_grad[code_idx])
             #start = time.time()
-            mse_loss.backward()
-            print(mse_loss.item())
+            #mse_loss.backward()
+            #print(mse_loss.item())
             #end = time.time()
             #print(f"backward took {round(end - start, 2)} seconds")
-            for code_idx, _ in enumerate(code_):
-                code_optimizer[code_idx].step()
+            #for code_idx, _ in enumerate(code_):
+            #    code_optimizer[code_idx].step()
             #print(mse_loss.item())
         print()
 
@@ -367,6 +365,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #    )
 
         optimizer.zero_grad()
+        for code_optimizer in code_optimizers:
+            code_optimizer.zero_grad()
         # Sample a diffusion timestep
         t = (
             torch.randint(0, high=self.diff.num_timesteps, size=(code.shape[0],))

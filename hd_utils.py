@@ -114,7 +114,7 @@ def generate_mlp_from_weights(weights, mlp_kwargs):
         num_params = np.product(list(val.shape))
         w = weights[:num_params]
         w = w.view(*val.shape)
-        state_dict[layer] = torch.nn.Parameter(w)
+        state_dict[layer] = w
         weights = weights[num_params:]
     assert len(weights) == 0, f"len(weights) = {len(weights)}"
     mlp.load_state_dict(state_dict)
