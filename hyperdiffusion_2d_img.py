@@ -274,9 +274,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         n_inverse_steps = cfg['inverse_steps']
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
-
+        mse_loss = []
         for inverse_step_id in range(n_inverse_steps):
-            #mse_loss = []
+
             for code_idx, code_single in enumerate(code_):
                 #if code_idx == 2:
                 #   print(code_single)
@@ -286,6 +286,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 output = mlp({'coords': input})
 
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
+                mse_loss.append(loss_inner['img_loss'].clone())
                 grad_inner = torch.autograd.grad(loss_inner['img_loss'],
                                                  list(mlp.parameters()),
                                                  create_graph=False)
@@ -306,6 +307,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
+        return torch.mean(torch.hstack(mse_loss))
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
@@ -391,15 +393,15 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         #print('before inverse code')
         #start = time.time()
-        self.inverse_code(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
+        inv_loss = self.inverse_code(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
         #end = time.time()
         #print(f"inverse_code took {round(end - start, 2)} seconds")
         #print('inverse code')
 
         # ==== save cache ====
         self.save_cache(code_list_, code_optimizers, train_batch['scene_id'])
-
-        self.logger.log({"global_step": global_step, "train_loss": loss_mse})
+        self.logger.log({"global_step": global_step, "diff_train_loss": loss_mse})
+        self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
 
         return loss_mse
 
