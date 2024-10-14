@@ -289,9 +289,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 grad_inner = torch.autograd.grad(loss_inner['img_loss'],
                                                  list(mlp.parameters()),
                                                  create_graph=False)
-                for grad, params in zip(grad_inner, mlp.parameters()):
-                    #print(grad_inner[p_idx])
-                    params = params - cfg['code_lr'] * grad
+                with torch.no_grad():
+                    for grad, param in zip(grad_inner, mlp.parameters()):
+                        # In-place update of the parameter
+                        param -= cfg['code_lr'] * grad
                 print(loss_inner['img_loss'].item())
             print()
 
