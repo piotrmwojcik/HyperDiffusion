@@ -297,7 +297,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                         num_params = np.product(list(grad.shape))
                         grad = grad.view(-1)
                         grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
-                        grad.view(grad_shape)
+                        grad = grad.view(grad_shape)
                         param -= cfg['code_lr'] * grad
                         current_idx += num_params
                 print(loss_inner['img_loss'].item())
