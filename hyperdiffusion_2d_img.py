@@ -278,9 +278,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for inverse_step_id in range(n_inverse_steps):
             mse_loss = []
             for code_idx, code_single in enumerate(code_):
-                print('!!!')
-                print(code_single.shape)
-
                 #if code_idx == 2:
                 #   print(code_single)
                 mlp = mlps[code_idx]
@@ -303,7 +300,13 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                         param -= cfg['code_lr'] * grad
                         current_idx += num_params
                 #print(loss_inner['img_loss'].item())
-         #print()
+         for single_code, mlp in zip(code_, mlps):
+             state_dict = mlp.state_dict()
+             weights = []
+             for weight in state_dict:
+                 weights.append(state_dict[weight].flatten().cpu())
+             input_data = torch.hstack(weights)
+            print(input_data.grad.data)
 
 
     def training_step(self, train_batch, optimizer, global_step):
