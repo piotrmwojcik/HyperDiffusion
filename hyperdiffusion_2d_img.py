@@ -291,7 +291,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                                  create_graph=False)
                 for p_idx, params in enumerate(mlp_params):
                     #print(grad_inner[p_idx])
-                    mlp_params[p_idx] = torch.zeros(mlp_params[p_idx])##mlp_params[p_idx] - cfg['code_lr'] * grad_inner[p_idx]
+                    mlp_params[p_idx] = torch.zeros(mlp_params[p_idx].shape)##mlp_params[p_idx] - cfg['code_lr'] * grad_inner[p_idx]
                 print(loss_inner['img_loss'].item())
             print()
 
