@@ -291,7 +291,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 for p_idx, params in enumerate(mlp_params):
                     mlp_params[p_idx] = params - cfg['code_lr'] * grad_inner[p_idx]
                 print(loss_inner['img_loss'].item())
-        print()
+            print()
                 #if code_idx == 2:
                 #    print(code_single)
                 #    print(loss)
