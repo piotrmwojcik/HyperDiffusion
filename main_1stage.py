@@ -245,7 +245,7 @@ def main(cfg: DictConfig):
                 #total_train_loss = 0.0
                 for batch_idx, data in enumerate(train_dl):
                     #data = data.to(device)
-                    print(batch_idx, len(train_dl))
+                    print(batch_idx, len(train_dl), global_step)
 
                     optimizer.zero_grad()  # Zero gradients
 
