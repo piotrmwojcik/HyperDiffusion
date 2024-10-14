@@ -296,8 +296,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print()
 
             #mse_loss = torch.mean(torch.stack(mse_loss))
-            for code_idx, code_single in enumerate(code_):
-                code_single.grad.copy_(prior_grad[code_idx])
+            #for code_idx, code_single in enumerate(code_):
+            #    code_single.grad.copy_(prior_grad[code_idx])
             #start = time.time()
             #mse_loss.backward()
             #print(mse_loss.item())
