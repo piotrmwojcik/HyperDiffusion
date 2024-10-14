@@ -288,6 +288,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 grad_inner = torch.autograd.grad(loss_inner['img_loss'],
                                                  mlp_params,
                                                  create_graph=False)[0]
+                print(grad_inner.shape)
 
                 #if code_idx == 2:
                 #    print(code_single)
