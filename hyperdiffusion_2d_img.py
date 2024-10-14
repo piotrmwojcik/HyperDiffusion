@@ -300,14 +300,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                         param -= cfg['code_lr'] * grad
                         current_idx += num_params
                 #print(loss_inner['img_loss'].item())
-        for single_code, mlp in zip(code_, mlps):
+        for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
             weights = []
             for weight in state_dict:
-                weights.append(state_dict[weight].flatten().cpu())
-            input_data = torch.hstack(weights)
-            print(input_data.grad.data)
-
+                weights.append(state_dict[weight].flatten())
+            code_[idx] = torch.hstack(weights)
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
