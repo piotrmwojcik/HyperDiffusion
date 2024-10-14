@@ -303,11 +303,13 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 code_single.grad.copy_(prior_grad[code_idx])
             #start = time.time()
             mse_loss.backward()
+            print(mse_loss.item())
             #end = time.time()
             #print(f"backward took {round(end - start, 2)} seconds")
             for code_idx, _ in enumerate(code_):
                 code_optimizer[code_idx].step()
             #print(mse_loss.item())
+        print()
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
