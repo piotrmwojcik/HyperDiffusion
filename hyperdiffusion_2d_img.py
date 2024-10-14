@@ -284,7 +284,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 mlp_params = [param for name, param in mlp.named_parameters() if 'context' in name]
                 output = mlp({'coords': grids[code_idx].unsqueeze(0)})
 
-                loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))['img_loss']
+                loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
                 grad_inner = torch.autograd.grad(loss_inner['img_loss'],
                                                  mlp_params,
                                                  create_graph=False)[0]
