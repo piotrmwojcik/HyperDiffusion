@@ -247,8 +247,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                         self.cache[scene_name_single]['optimizer'] = self.optimizer_state_to(
                             out['optimizer'], device='cpu', dtype=optimizer_dtype)
 
-                print('!!!!!!!')
-                print(self.cache[scene_name_single].keys())
 
     def forward(self, images):
         t = (
@@ -278,8 +276,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         code_optimizers = self.build_optimizer(mlps, cfg)
         for sidx, state in enumerate(code_optimizer_states):
             if state is not None:
-                print(state)
-                msg = code_optimizers[sidx].load_state_dict(state)
+                optim = code_optimizers[sidx].state_dict()
+                optim['state'] = state
+                code_optimizers[sidx].load_state_dict(optim)
 
         for code_optimizer in code_optimizers:
             code_optimizer.zero_grad()
