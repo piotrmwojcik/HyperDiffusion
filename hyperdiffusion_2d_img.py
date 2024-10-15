@@ -293,24 +293,25 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 output = mlp({'coords': input})
 
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
-                mse_loss.append(loss_inner['img_loss'].clone())
-                grad_inner = torch.autograd.grad(loss_inner['img_loss'],
-                                                 list(mlp.parameters()),
-                                                 create_graph=False)
-                current_idx = 0
-                for grad, param in zip(grad_inner, mlp.parameters()):
-                    grad_shape = grad.shape
-                    num_params = np.product(list(grad.shape))
-                    grad = grad.view(-1)
-                    grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
-                    grad = grad.view(grad_shape)
-                    param.grad = torch.zeros_like(param)
-                    current_idx += num_params
-                    param.grad.copy_(grad)
-                    #param -= cfg['code_lr'] * grad
-                #print('before step !!!!!!')
-                #print(code_optimizer[code_idx].state_dict())
-                code_optimizers[code_idx].step()
+                mse_loss.append(loss_inner['img_loss'])
+            mse_loss = torch.mean(torch.hstack(mse_loss))
+            grad_inner = torch.autograd.grad(mse_loss['img_loss'],
+                                             list(mlp.parameters()),
+                                             create_graph=False)
+            current_idx = 0
+            for grad, param in zip(grad_inner, mlp.parameters()):
+                grad_shape = grad.shape
+                num_params = np.product(list(grad.shape))
+                grad = grad.view(-1)
+                grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
+                grad = grad.view(grad_shape)
+                param.grad = torch.zeros_like(param)
+                current_idx += num_params
+                param.grad.copy_(grad)
+                #param -= cfg['code_lr'] * grad
+            #print('before step !!!!!!')
+            #print(code_optimizer[code_idx].state_dict())
+            code_optimizers[code_idx].step()
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
             weights = []
@@ -321,7 +322,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             del optim_state['param_groups']
             code_optimizer_states[idx] = code_optimizers[idx].state_dict()
 
-        return torch.mean(torch.hstack(mse_loss))
+        return mse_loss
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
