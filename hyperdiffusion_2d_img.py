@@ -171,8 +171,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def optimizer_state_to(self, state_dict, device=None, dtype=None):
         assert dtype.is_floating_point
-        out = dict(state=dict(),
-                   param_groups=state_dict['param_groups'])
+        out = dict(state=dict())
         for key_state_single, state_single in state_dict['state'].items():
             state_single_out = dict()
             for key, val in state_single.items():
@@ -210,7 +209,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             d[key] = value
 
     def optimizer_state_copy(self, d_src, d_dst, device=None, dtype=None):
-        d_dst['param_groups'] = d_src['param_groups']
         for key_state_single, state_single in d_src['state'].items():
             if key_state_single not in d_dst['state']:
                 d_dst['state'][key_state_single] = dict()
@@ -310,15 +308,15 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #print('before step !!!!!!')
                 #print(code_optimizer[code_idx].state_dict())
                 code_optimizers[code_idx].step()
-                print('after step !!!!!!')
-                print(code_optimizers[code_idx].state_dict())
-                print(loss_inner['img_loss'].item())
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
             weights = []
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
+            optim_state = code_optimizers[idx].state_dict()
+            del optim_state['param_groups']
+            code_optimizer_states[idx] = code_optimizers[idx].state_dict()
 
         return torch.mean(torch.hstack(mse_loss))
 
