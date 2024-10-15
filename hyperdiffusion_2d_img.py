@@ -121,15 +121,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         return weights
 
-    @staticmethod
-    def build_optimizer(code_, cfg):
+    def build_optimizer(self, code_, cfg):
         optimizer_cfg = dict(type=cfg['code_optimizer'], lr=cfg['code_lr'])
         optimizer_class = getattr(torch.optim, optimizer_cfg.pop('type'))
-        if isinstance(code_, list):
-            code_optimizer = [
-                optimizer_class([code_single_], **optimizer_cfg) for code_single_ in code_]
-        else:
-            code_optimizer = optimizer_class([code_], **optimizer_cfg)
+        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
+        code_optimizer = [
+            optimizer_class(mlp.parameters(), **optimizer_cfg) for mlp in mlps]
         print('in build')
         print(code_optimizer[0].state_dict())
         return code_optimizer
@@ -318,9 +315,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
 
-            code_optimizer[idx].param_groups[0]['params'] = list(code_[idx])
-            print('last step !!!!!!')
-            print(code_optimizer[code_idx].state_dict())
+            #code_optimizer[idx].param_groups[0]['params'] = list(code_[idx])
+            #print('last step !!!!!!')
+            #print(code_optimizer[code_idx].state_dict())
 
         return torch.mean(torch.hstack(mse_loss))
 
