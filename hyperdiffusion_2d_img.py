@@ -299,7 +299,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             for model in mlps:
                 joint_parameters += list(model.parameters())
 
-            grad_inner = torch.autograd.grad(mse_loss['img_loss'],
+            grad_inner = torch.autograd.grad(mse_loss,
                                              list(joint_parameters),
                                              create_graph=False)
             current_idx = 0
