@@ -159,8 +159,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 code_list_.append(self.get_init_code_(None))
                 optimizer_states.append(None)
             else:
-                print('!!!')
-                print(scene_state_single.keys())
                 assert 'code_' in scene_state_single['param']
                 code_ = scene_state_single['param']['code_'].to(dtype=torch.float32)
                 code_list_.append(code_.requires_grad_(True))
@@ -194,8 +192,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             param=dict(
                 code_=d['param']['code_'].clamp(
                     min=torch.finfo(code_dtype).min, max=torch.finfo(code_dtype).max
-                ).to(device=device, dtype=code_dtype),
-            optimizer=self.optimizer_state_to(d['optimizer'], device=device, dtype=optimizer_dtype)))
+                ).to(device=device, dtype=code_dtype)),
+            optimizer=self.optimizer_state_to(d['optimizer'], device=device, dtype=optimizer_dtype))
 
     def load_tensor_to_dict(self, d, key, value, device=None, dtype=None):
         assert dtype.is_floating_point
@@ -247,8 +245,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                         self.cache[scene_name_single]['optimizer'] = self.optimizer_state_to(
                             out['optimizer'], device='cpu', dtype=optimizer_dtype)
 
-                print('!!!!!!!')
-                print(self.cache[scene_name_single].keys())
 
     def forward(self, images):
         t = (
@@ -278,16 +274,15 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         code_optimizers = self.build_optimizer(mlps, cfg)
         for sidx, state in enumerate(code_optimizer_states):
             if state is not None:
-                print(state)
-                msg = code_optimizers[sidx].load_state_dict(state, strict=False)
-                print(msg)
+                optim = code_optimizers[sidx].state_dict()
+                optim['state'] = state
+                code_optimizers[sidx].load_state_dict(optim)
 
         for code_optimizer in code_optimizers:
             code_optimizer.zero_grad()
 
-        mse_loss = []
         for inverse_step_id in range(n_inverse_steps):
-
+            mse_loss = []
             for code_idx, code_single in enumerate(code_):
                 #if code_idx == 2:
                 #   print(code_single)
@@ -297,24 +292,35 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 output = mlp({'coords': input})
 
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
-                mse_loss.append(loss_inner['img_loss'].clone())
-                grad_inner = torch.autograd.grad(loss_inner['img_loss'],
-                                                 list(mlp.parameters()),
-                                                 create_graph=False)
-                current_idx = 0
-                for grad, param in zip(grad_inner, mlp.parameters()):
-                    grad_shape = grad.shape
-                    num_params = np.product(list(grad.shape))
-                    grad = grad.view(-1)
-                    grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
-                    grad = grad.view(grad_shape)
-                    param.grad = torch.zeros_like(param)
-                    current_idx += num_params
-                    param.grad.copy_(grad)
-                    #param -= cfg['code_lr'] * grad
-                #print('before step !!!!!!')
-                #print(code_optimizer[code_idx].state_dict())
-                code_optimizers[code_idx].step()
+                mse_loss.append(loss_inner['img_loss'])
+            mse_loss = torch.mean(torch.hstack(mse_loss))
+            joint_parameters = []
+            for model in mlps:
+                ps = list(model.parameters())
+                joint_parameters += ps
+                num_parameters = len(ps)
+
+            grad_inner = torch.autograd.grad(mse_loss,
+                                             joint_parameters,
+                                             create_graph=False)
+            current_idx = 0
+            code_idx = 0
+            for ii, (grad, param) in enumerate(zip(grad_inner, joint_parameters)):
+                grad_shape = grad.shape
+                num_params = np.product(list(grad.shape))
+                grad = grad.view(-1)
+                grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
+                grad = grad.view(grad_shape)
+                param.grad = torch.zeros_like(param)
+                current_idx += num_params
+                param.grad.copy_(grad)
+
+                if ((ii + 1) % num_parameters) == 0:
+                    code_idx += 1
+                    current_idx = 0
+
+            for code_optim in code_optimizers:
+                code_optim.step()
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
             weights = []
@@ -325,7 +331,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             del optim_state['param_groups']
             code_optimizer_states[idx] = code_optimizers[idx].state_dict()
 
-        return torch.mean(torch.hstack(mse_loss))
+        return mse_loss
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
@@ -336,42 +342,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         if 'code_optimizer' in self.cfg:
             code_list_, code_optimizers = self.load_cache(train_batch)
             code = torch.stack(code_list_, dim=0).cuda()
-
-        # At the first step output first element in the dataset as a sanit check
-        if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
-            mlp = generate_mlp_from_weights(code[0], self.mlp_kwargs)
-            #model_input = {'coords': model_input}
-            input = train_batch['coords'][0].unsqueeze(0)
-            inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
-            #print(inr_output.shape)
-
-            images = wandb.Image(input_img, caption="")
-            inr_images = wandb.Image(inr_output, caption="")
-            # wandb.log({"examples": images})
-            self.logger.log({"global_step": global_step / log_interval, "gt": images})
-            self.logger.log({"global_step": global_step / log_interval, "inr": inr_images})
-
-            #sdf_decoder.model = mlp.cuda()
-            # if not self.mlp_kwargs.move:
-            #     sdf_meshing.create_mesh(
-            #         sdf_decoder,
-            #         "meshes/first_mesh",
-            #         N=128,
-            #         level=0.5 if self.mlp_kwargs.output_type == "occ" else 0,
-            #     )
-
-            #print("Input images shape:", input_data.shape)
-
-        # Output statistics every 10 step
-        #if global_step % 10 == 0:
-        #    print(input_data.shape)
-        #    print(
-        #        "Orig weights[0].stats",
-        #        input_data.min().item(),
-        #        input_data.max().item(),
-        #        input_data.mean().item(),
-        #        input_data.std().item(),
-        #    )
 
         optimizer.zero_grad()
         # Sample a diffusion timestep
@@ -401,9 +371,20 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print('before inverse code')
         #start = time.time()
         inv_loss = self.inverse_code(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
-        #end = time.time()
-        #print(f"inverse_code took {round(end - start, 2)} seconds")
-        #print('inverse code')
+        # At the first step output first element in the dataset as a sanit check
+        if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
+            mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs)
+            #model_input = {'coords': model_input}
+            input = train_batch['coords'][0].unsqueeze(0)
+            inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
+            #print(inr_output.shape)
+
+            images = wandb.Image(input_img, caption="")
+            inr_images = wandb.Image(inr_output, caption="")
+            # wandb.log({"examples": images})
+            self.logger.log({"global_step": global_step / log_interval, "gt": images})
+            self.logger.log({"global_step": global_step / log_interval, "inr": inr_images})
+
 
         # ==== save cache ====
         self.save_cache(code_list_, code_optimizers, train_batch['scene_id'])
