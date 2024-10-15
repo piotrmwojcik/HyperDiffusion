@@ -293,8 +293,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
                 mse_loss.append(loss_inner['img_loss'])
-                print('!!!')
-                print(mse_loss[-1].shape)
+            print('!!!')
+            print(torch.hstack(mse_loss).shape)
             mse_loss = torch.mean(torch.hstack(mse_loss))
             joint_parameters = []
             for model in mlps:
