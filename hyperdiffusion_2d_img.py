@@ -318,10 +318,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 if ((ii + 1) % num_parameters) == 0:
                     code_idx += 1
                     current_idx = 0
-                #param -= cfg['code_lr'] * grad
-            #print('before step !!!!!!')
-            #print(code_optimizer[code_idx].state_dict())
-            code_optimizers[code_idx].step()
+
+            for code_optim in code_optimizers:
+                code_optim.step()
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
             weights = []
