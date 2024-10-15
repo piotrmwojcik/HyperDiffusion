@@ -305,7 +305,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                              create_graph=False)
             current_idx = 0
             code_idx = 0
-            for ii, grad, param in enumerate(zip(grad_inner, joint_parameters)):
+            for ii, (grad, param) in enumerate(zip(grad_inner, joint_parameters)):
                 grad_shape = grad.shape
                 num_params = np.product(list(grad.shape))
                 grad = grad.view(-1)
