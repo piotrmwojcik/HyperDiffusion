@@ -224,6 +224,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         code_dtype = code_list_[0].dtype
         optimizer_dtype = torch.float32
         for ind, code_single_ in enumerate(code_list_):
+            print('!!!', ind)
             print(code_optimizers[ind].state_dict())
             out = dict(
                 scene_id=scene_name[ind],
