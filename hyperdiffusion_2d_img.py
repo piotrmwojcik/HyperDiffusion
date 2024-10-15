@@ -154,15 +154,19 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         else:
             cache_list = [None for _ in range(num_scenes)]
         code_list_ = []
+        optimizer_states = []
         for scene_state_single in cache_list:
             if scene_state_single is None:
                 code_list_.append(self.get_init_code_(None))
+                optimizer_states.append(None)
             else:
-                assert 'code_' in scene_state_single['param']
-                code_ = scene_state_single['param']['code_'].to(dtype=torch.float32)
+                assert 'code' in scene_state_single['param']
+                code_ = scene_state_single['param']['code'].to(dtype=torch.float32)
                 code_list_.append(code_.requires_grad_(True))
-
-        optimizer_states = [scene_state_single.get('optimizer', None) for scene_state_single in cache_list]
+                if 'optimizer' in scene_state_single:
+                    optimizer_states.append(scene_state_single['optimizer'])
+                else:
+                    optimizer_states.append(None)
         return code_list_, optimizer_states
 
 
@@ -270,6 +274,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
         code_optimizers = self.build_optimizer(code_, cfg)
+        for sidx, state in enumerate(code_optimizer_states):
+            code_optimizers[sidx].load_state_dict(state)
 
         mse_loss = []
         for inverse_step_id in range(n_inverse_steps):
@@ -300,9 +306,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     #param -= cfg['code_lr'] * grad
                 #print('before step !!!!!!')
                 #print(code_optimizer[code_idx].state_dict())
-                code_optimizer_states[code_idx].step()
+                code_optimizers[code_idx].step()
                 print('after step !!!!!!')
-                print(code_optimizer[code_idx].state_dict())
+                print(code_optimizers[code_idx].state_dict())
                 print(loss_inner['img_loss'].item())
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
