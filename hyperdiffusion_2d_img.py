@@ -171,7 +171,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def optimizer_state_to(self, state_dict, device=None, dtype=None):
         assert dtype.is_floating_point
         out = dict(state=dict(),
-                   param_groups=None)
+                   param_groups=state_dict['param_groups'])
         for key_state_single, state_single in state_dict['state'].items():
             state_single_out = dict()
             for key, val in state_single.items():
@@ -303,7 +303,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #print('before step !!!!!!')
                 #print(code_optimizer[code_idx].state_dict())
                 code_optimizer[code_idx].step()
-                #print('after step !!!!!!')
+                print('after step !!!!!!')
                 print(code_optimizer[code_idx].state_dict())
                 #print(loss_inner['img_loss'].item())
         for idx, mlp in enumerate(mlps):
