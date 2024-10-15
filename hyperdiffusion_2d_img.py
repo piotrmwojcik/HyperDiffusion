@@ -194,8 +194,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             param=dict(
                 code_=d['param']['code_'].clamp(
                     min=torch.finfo(code_dtype).min, max=torch.finfo(code_dtype).max
-                ).to(device=device, dtype=code_dtype),
-            optimizer=self.optimizer_state_to(d['optimizer'], device=device, dtype=optimizer_dtype)))
+                ).to(device=device, dtype=code_dtype)),
+            optimizer=self.optimizer_state_to(d['optimizer'], device=device, dtype=optimizer_dtype))
 
     def load_tensor_to_dict(self, d, key, value, device=None, dtype=None):
         assert dtype.is_floating_point
