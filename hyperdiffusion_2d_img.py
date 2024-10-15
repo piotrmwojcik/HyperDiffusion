@@ -279,8 +279,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for sidx, state in enumerate(code_optimizer_states):
             if state is not None:
                 print(state)
-                msg = code_optimizers[sidx].load_state_dict(state, strict=False)
-                print(msg)
+                msg = code_optimizers[sidx].load_state_dict(state)
 
         for code_optimizer in code_optimizers:
             code_optimizer.zero_grad()
