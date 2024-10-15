@@ -159,8 +159,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 code_list_.append(self.get_init_code_(None))
                 optimizer_states.append(None)
             else:
-                print('!!!')
-                print(scene_state_single.keys())
                 assert 'code_' in scene_state_single['param']
                 code_ = scene_state_single['param']['code_'].to(dtype=torch.float32)
                 code_list_.append(code_.requires_grad_(True))
