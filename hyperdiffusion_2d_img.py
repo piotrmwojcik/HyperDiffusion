@@ -162,11 +162,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 code_ = scene_state_single['param']['code_'].to(dtype=torch.float32)
                 code_list_.append(code_.requires_grad_(True))
 
-        code_optimizers = self.build_optimizer(code_list_, self.cfg)
-        for ind, scene_state_single in enumerate(cache_list):
-            if scene_state_single is not None and 'optimizer' in scene_state_single:
-                self.optimizer_set_state(code_optimizers[ind], scene_state_single['optimizer'])
-        return code_list_, code_optimizers
+        optimizer_states = [scene_state_single.get('optimizer', None) for scene_state_single in cache_list]
+        return code_list_, optimizer_states
+
 
     def optimizer_state_to(self, state_dict, device=None, dtype=None):
         assert dtype.is_floating_point
@@ -267,15 +265,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             return [optimizer], [scheduler]
         return optimizer
 
-    def inverse_code(self, gt_imgs, grids, code_, code_optimizer, prior_grad, cfg):
+    def inverse_code(self, gt_imgs, grids, code_, code_optimizer_states, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
-        for code_idx, _ in enumerate(code_optimizer):
-            print('first')
-            print(code_optimizer[code_idx].state_dict())
-            print(code_optimizer[code_idx].state_dict()['param_groups'].keys())
-            code_optimizer[code_idx].param_groups[0]['params'] = mlps[code_idx].parameters()
+        code_optimizers = self.build_optimizer(code_, cfg)
+
         mse_loss = []
         for inverse_step_id in range(n_inverse_steps):
 
@@ -305,20 +300,16 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     #param -= cfg['code_lr'] * grad
                 #print('before step !!!!!!')
                 #print(code_optimizer[code_idx].state_dict())
-                code_optimizer[code_idx].step()
-                #print('after step !!!!!!')
-                #print(code_optimizer[code_idx].state_dict())
-                #print(loss_inner['img_loss'].item())
+                code_optimizer_states[code_idx].step()
+                print('after step !!!!!!')
+                print(code_optimizer[code_idx].state_dict())
+                print(loss_inner['img_loss'].item())
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
             weights = []
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
-
-            #code_optimizer[idx].param_groups[0]['params'] = list(code_[idx])
-            #print('last step !!!!!!')
-            #print(code_optimizer[code_idx].state_dict())
 
         return torch.mean(torch.hstack(mse_loss))
 
