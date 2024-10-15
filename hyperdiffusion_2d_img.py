@@ -247,6 +247,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                         self.cache[scene_name_single]['optimizer'] = self.optimizer_state_to(
                             out['optimizer'], device='cpu', dtype=optimizer_dtype)
 
+                print('!!!!!!!')
+                print(self.cache[scene_name_single].keys())
+
     def forward(self, images):
         t = (
             torch.randint(0, high=self.diff.num_timesteps, size=(images.shape[0],))
