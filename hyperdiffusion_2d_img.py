@@ -293,15 +293,13 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
                 mse_loss.append(loss_inner['img_loss'])
-            print('!!!')
-            print(torch.hstack(mse_loss).shape)
             mse_loss = torch.mean(torch.hstack(mse_loss))
             joint_parameters = []
             for model in mlps:
                 joint_parameters += list(model.parameters())
 
             grad_inner = torch.autograd.grad(mse_loss,
-                                             list(joint_parameters),
+                                             joint_parameters,
                                              create_graph=False)
             current_idx = 0
             for grad, param in zip(grad_inner, joint_parameters):
