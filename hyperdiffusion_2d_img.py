@@ -272,9 +272,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
         for code_idx, _ in enumerate(code_):
-            print('first')
-            print(code_optimizer[code_idx].state_dict())
-            code_optimizer[code_idx].param_groups[0]['params'] = mlps[code_idx].parameters()
+            #print('first')
+            #print(code_optimizer[code_idx].state_dict())
+            #code_optimizer[code_idx].param_groups[0]['params'] = mlps[code_idx].parameters()
         mse_loss = []
         for inverse_step_id in range(n_inverse_steps):
 
