@@ -121,10 +121,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         return weights
 
-    def build_optimizer(self, code_, cfg):
+    def build_optimizer(self, mlps, cfg):
         optimizer_cfg = dict(type=cfg['code_optimizer'], lr=cfg['code_lr'])
         optimizer_class = getattr(torch.optim, optimizer_cfg.pop('type'))
-        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
         code_optimizer = [
             optimizer_class(mlp.parameters(), **optimizer_cfg) for mlp in mlps]
         return code_optimizer
@@ -273,7 +272,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         n_inverse_steps = cfg['inverse_steps']
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
-        code_optimizers = self.build_optimizer(code_, cfg)
+        code_optimizers = self.build_optimizer(mlps, cfg)
         for sidx, state in enumerate(code_optimizer_states):
             if state is not None:
                 code_optimizers[sidx].load_state_dict(state)
