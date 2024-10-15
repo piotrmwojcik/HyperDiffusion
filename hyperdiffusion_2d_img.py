@@ -229,6 +229,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 param=dict(
                     code_=code_single_.data),
                 optimizer=code_optimizers[ind].state_dict())
+            print(code_optimizers[ind].state_dict())
             if self.cache is not None:
                 scene_name_single = scene_name[ind]
                 if self.cache[scene_name_single] is None:
