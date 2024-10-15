@@ -224,8 +224,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         code_dtype = code_list_[0].dtype
         optimizer_dtype = torch.float32
         for ind, code_single_ in enumerate(code_list_):
-            print('!!!', ind)
-            print(code_optimizers[ind].state_dict())
             out = dict(
                 scene_id=scene_name[ind],
                 param=dict(
@@ -315,6 +313,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
             code_optimizer[idx].param_groups[0]['params'] = list(code_[idx])
+            print(code_optimizer[idx].state_dict())
         return torch.mean(torch.hstack(mse_loss))
 
     def training_step(self, train_batch, optimizer, global_step):
