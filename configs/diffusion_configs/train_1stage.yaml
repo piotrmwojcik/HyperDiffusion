@@ -30,6 +30,9 @@ val_fid_calculation_period: 1
 lr: 0.0001
 log_interval: 10
 batch_size: 16
+model_update_hook:
+  step_epoch: 5
+  inverse_steps: 5
 accumulate_grad_batches: 1
 val:
   num_points: 2048
