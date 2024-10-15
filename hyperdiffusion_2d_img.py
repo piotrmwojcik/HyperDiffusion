@@ -321,27 +321,16 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         # At the first step output first element in the dataset as a sanit check
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
-            #curr_weights = Config.get("curr_weights")
-            #img = input_data[0].flatten()[:curr_weights]
-            #mlp = generate_mlp_from_weights(img, self.mlp_kwargs)
-            #model_input = get_grid(64, 64, b=0).unsqueeze(0)#get_mgrid(128, 2).unsqueeze(0)
-
+            mlp = generate_mlp_from_weights(code[0], self.mlp_kwargs)
             #model_input = {'coords': model_input}
-            #result = mlp(model_input)
-            #print(img)
-            #img = dataio.lin2img(result['model_out'], (64, 64))
-            #img = dataio.rescale_img((img + 1) / 2, mode='clamp')
-            #img = (img * 255).byte()
-            # print(img.shape)
+            input = train_batch['coords'][0].unsqueeze(0)
+            inr_output = mlp({'coords': input})['model_out']
+            print(inr_output.shape)
+
             images = wandb.Image(input_img, caption="")
             # wandb.log({"examples": images})
-            self.logger.log({"global_step": global_step / log_interval, "train": images})
-            #sdf_decoder = SDFDecoder(
-            #    self.mlp_kwargs.model_type,
-            #    None,
-            #    "nerf" if self.mlp_kwargs.model_type == "nerf" else "mlp",
-            #    self.mlp_kwargs,
-            #)
+            self.logger.log({"global_step": global_step / log_interval, "gt": images})
+
             #sdf_decoder.model = mlp.cuda()
             # if not self.mlp_kwargs.move:
             #     sdf_meshing.create_mesh(

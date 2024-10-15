@@ -22,11 +22,11 @@ data_folder_train: /data/pwojcik/
 image_resolution: 64
 cache_size: 5000
 code_optimizer: 'Adam'
-code_lr: 5e-2
+code_lr: 5e-3
 inverse_steps: 5
 model_resume_path:
 sampling: ddim
-val_fid_calculation_period: 20
+val_fid_calculation_period: 1
 lr: 0.0001
 log_interval: 10
 batch_size: 8

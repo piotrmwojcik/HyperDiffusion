@@ -251,8 +251,8 @@ def main(cfg: DictConfig):
 
                     loss = diffuser.training_step(data, optimizer, global_step)  # Forward pass
                     outputs.append(loss)
-                    scheduler.step()
                     global_step += 1
+                scheduler.step()
                     # Accumulate gradient batches if specified
                     #if (batch_idx + 1) % cfg.accumulate_grad_batches == 0:
                     #    optimizer.step()
