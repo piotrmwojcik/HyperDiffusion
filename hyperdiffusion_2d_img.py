@@ -418,7 +418,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         siren = generate_mlp_from_weights(weights, self.mlp_kwargs)
         #print(self.mlp_kwargs.model_type)
 
-        input = get_grid(self.res, self.res, b=0).unsqueeze(0)
+        input = get_grid(64, 64, b=0).unsqueeze(0)
         result = siren({'coords': input})
         print(result['model_out'].shape)
         # print(img)
