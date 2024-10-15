@@ -127,8 +127,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
         code_optimizer = [
             optimizer_class(mlp.parameters(), **optimizer_cfg) for mlp in mlps]
-        print('in build')
-        print(code_optimizer[0].state_dict())
         return code_optimizer
 
     def load_cache(self, data):
@@ -173,7 +171,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def optimizer_state_to(self, state_dict, device=None, dtype=None):
         assert dtype.is_floating_point
         out = dict(state=dict(),
-                   param_groups=state_dict['param_groups'])
+                   param_groups=None)
         for key_state_single, state_single in state_dict['state'].items():
             state_single_out = dict()
             for key, val in state_single.items():
