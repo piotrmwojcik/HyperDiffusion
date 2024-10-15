@@ -304,8 +304,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                         current_idx += num_params
                         param.grad.copy_(grad)
                         #param -= cfg['code_lr'] * grad
+                print('before step !!!!!!')
+                print(code_optimizer[code_idx].state_dict())
                 code_optimizer[code_idx].step()
-                print('!!!!!!')
+                print('after step !!!!!!')
                 print(code_optimizer[code_idx].state_dict())
                 #print(loss_inner['img_loss'].item())
         for idx, mlp in enumerate(mlps):
