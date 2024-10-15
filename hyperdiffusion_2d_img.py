@@ -130,6 +130,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 optimizer_class([code_single_], **optimizer_cfg) for code_single_ in code_]
         else:
             code_optimizer = optimizer_class([code_], **optimizer_cfg)
+            print(code_optimizer.state_dict())
         return code_optimizer
 
     def load_cache(self, data):
