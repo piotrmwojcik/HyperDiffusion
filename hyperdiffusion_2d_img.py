@@ -333,42 +333,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             code_list_, code_optimizers = self.load_cache(train_batch)
             code = torch.stack(code_list_, dim=0).cuda()
 
-        # At the first step output first element in the dataset as a sanit check
-        if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
-            mlp = generate_mlp_from_weights(code[0], self.mlp_kwargs)
-            #model_input = {'coords': model_input}
-            input = train_batch['coords'][0].unsqueeze(0)
-            inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
-            #print(inr_output.shape)
-
-            images = wandb.Image(input_img, caption="")
-            inr_images = wandb.Image(inr_output, caption="")
-            # wandb.log({"examples": images})
-            self.logger.log({"global_step": global_step / log_interval, "gt": images})
-            self.logger.log({"global_step": global_step / log_interval, "inr": inr_images})
-
-            #sdf_decoder.model = mlp.cuda()
-            # if not self.mlp_kwargs.move:
-            #     sdf_meshing.create_mesh(
-            #         sdf_decoder,
-            #         "meshes/first_mesh",
-            #         N=128,
-            #         level=0.5 if self.mlp_kwargs.output_type == "occ" else 0,
-            #     )
-
-            #print("Input images shape:", input_data.shape)
-
-        # Output statistics every 10 step
-        #if global_step % 10 == 0:
-        #    print(input_data.shape)
-        #    print(
-        #        "Orig weights[0].stats",
-        #        input_data.min().item(),
-        #        input_data.max().item(),
-        #        input_data.mean().item(),
-        #        input_data.std().item(),
-        #    )
-
         optimizer.zero_grad()
         # Sample a diffusion timestep
         t = (
@@ -397,9 +361,20 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print('before inverse code')
         #start = time.time()
         inv_loss = self.inverse_code(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
-        #end = time.time()
-        #print(f"inverse_code took {round(end - start, 2)} seconds")
-        #print('inverse code')
+        # At the first step output first element in the dataset as a sanit check
+        if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
+            mlp = generate_mlp_from_weights(code[0], self.mlp_kwargs)
+            #model_input = {'coords': model_input}
+            input = train_batch['coords'][0].unsqueeze(0)
+            inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
+            #print(inr_output.shape)
+
+            images = wandb.Image(input_img, caption="")
+            inr_images = wandb.Image(inr_output, caption="")
+            # wandb.log({"examples": images})
+            self.logger.log({"global_step": global_step / log_interval, "gt": images})
+            self.logger.log({"global_step": global_step / log_interval, "inr": inr_images})
+
 
         # ==== save cache ====
         self.save_cache(code_list_, code_optimizers, train_batch['scene_id'])
