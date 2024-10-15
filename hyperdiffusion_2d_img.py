@@ -275,7 +275,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
         code_optimizers = self.build_optimizer(code_, cfg)
         for sidx, state in enumerate(code_optimizer_states):
-            code_optimizers[sidx].load_state_dict(state)
+            if state is not None:
+                code_optimizers[sidx].load_state_dict(state)
 
         for code_optimizer in code_optimizers:
             code_optimizer.zero_grad()
