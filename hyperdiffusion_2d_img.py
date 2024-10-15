@@ -277,6 +277,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for sidx, state in enumerate(code_optimizer_states):
             code_optimizers[sidx].load_state_dict(state)
 
+        for code_optimizer in code_optimizers:
+            code_optimizer.zero_grad()
+
         mse_loss = []
         for inverse_step_id in range(n_inverse_steps):
 
@@ -366,8 +369,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #    )
 
         optimizer.zero_grad()
-        for code_optimizer in code_optimizers:
-            code_optimizer.zero_grad()
         # Sample a diffusion timestep
         t = (
             torch.randint(0, high=self.diff.num_timesteps, size=(code.shape[0],))
