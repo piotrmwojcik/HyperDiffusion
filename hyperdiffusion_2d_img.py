@@ -271,10 +271,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         n_inverse_steps = cfg['inverse_steps']
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
-        #for code_idx, _ in enumerate(code_optimizer):
-            #print('first')
-            #print(code_optimizer[code_idx].state_dict())
-            #code_optimizer[code_idx].param_groups[0]['params'] = mlps[code_idx].parameters()
+        for code_idx, _ in enumerate(code_optimizer):
+            print('first')
+            print(code_optimizer[code_idx].state_dict())
+            code_optimizer[code_idx].param_groups[0]['params'] = mlps[code_idx].parameters()
         mse_loss = []
         for inverse_step_id in range(n_inverse_steps):
 
@@ -302,11 +302,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     current_idx += num_params
                     param.grad.copy_(grad)
                     #param -= cfg['code_lr'] * grad
-                print('before step !!!!!!')
-                print(code_optimizer[code_idx].state_dict())
+                #print('before step !!!!!!')
+                #print(code_optimizer[code_idx].state_dict())
                 code_optimizer[code_idx].step()
-                print('after step !!!!!!')
-                print(code_optimizer[code_idx].state_dict())
+                #print('after step !!!!!!')
+                #print(code_optimizer[code_idx].state_dict())
                 #print(loss_inner['img_loss'].item())
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
