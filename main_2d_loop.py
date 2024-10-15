@@ -152,7 +152,7 @@ def main(cfg: DictConfig):
             model.dims,
             mlp_kwargs,
             cfg,
-            #None,
+            # None,
         )
         train_dl = DataLoader(
             train_dt,
@@ -167,7 +167,7 @@ def main(cfg: DictConfig):
             model.dims,
             mlp_kwargs,
             cfg,
-            #None,
+            # None,
         )
         test_dt = WeightDataset(
             mlps_folder_train,
@@ -175,7 +175,7 @@ def main(cfg: DictConfig):
             model.dims,
             mlp_kwargs,
             cfg,
-            #None,
+            # None,
         )
 
     # These two dl's are just placeholders, during val and test evaluation we are looking at test_split.lst,
@@ -238,7 +238,7 @@ def main(cfg: DictConfig):
     #     save_on_train_epoch_end=True,
     # )
 
-    #lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval="epoch")
+    # lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval="epoch")
     optimizer = torch.optim.AdamW(diffuser.parameters(), lr=Config.get("lr"))
 
     if config["scheduler"]:
@@ -257,9 +257,9 @@ def main(cfg: DictConfig):
             # Training phase
             outputs = []
             diffuser.train()  # Set model to training mode
-            #total_train_loss = 0.0
+            # total_train_loss = 0.0
             for batch_idx, data in enumerate(train_dl):
-                #data = data.to(device)
+                # data = data.to(device)
 
                 optimizer.zero_grad()  # Zero gradients
                 loss = diffuser.training_step(data, global_step)  # Forward pass
@@ -269,10 +269,10 @@ def main(cfg: DictConfig):
                 outputs.append(loss)
 
             scheduler.step()
-                # Accumulate gradient batches if specified
-                #if (batch_idx + 1) % cfg.accumulate_grad_batches == 0:
-                #    optimizer.step()
-                #   optimizer.zero_grad()
+            # Accumulate gradient batches if specified
+            # if (batch_idx + 1) % cfg.accumulate_grad_batches == 0:
+            #    optimizer.step()
+            #   optimizer.zero_grad()
 
             epoch_loss = sum(output for output in outputs) / len(outputs)
             run.log({"epoch": epoch, "epoch_loss": epoch_loss})
@@ -282,17 +282,16 @@ def main(cfg: DictConfig):
                 run.log({"global_step": global_step / log_interval, "lr-AdamW": optimizer.param_groups[0]['lr']})
             # Learning rate step (if using a scheduler)
 
-
             # Validation phase
             if epoch % Config.get("val_fid_calculation_period") == 0:
                 diffuser.eval()  # Set model to evaluation mode
                 with torch.no_grad():
                     diffuser.validation_step(epoch)
 
-
             # Optionally save the model after certain epochs
-            #if epoch % 10 == 0:  # Save every 10 epochs as an example
-            #    torch.save(diffuser.state_dict(), f"{checkpoint_path}/model_epoch_{epoch}.pt")
+            # Saving phase
+            if (epoch + 1) % Config.get("model_save_period") == 0:
+                torch.save(diffuser.state_dict(), f'{Config.get("model_save_path")}/model_epoch_{epoch}.pt')
 
     wandb_logger.finalize("Success")
 

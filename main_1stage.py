@@ -265,7 +265,6 @@ def main(cfg: DictConfig):
                     run.log({"global_step": global_step / log_interval, "epoch": epoch})
                     run.log({"global_step": global_step / log_interval, "lr-AdamW": optimizer.param_groups[0]['lr']})
                 # Learning rate step (if using a scheduler)
-
                 # Validation phase
                 if epoch % Config.get("val_fid_calculation_period") == 0:
                     diffuser.eval()  # Set model to evaluation mode
@@ -273,8 +272,9 @@ def main(cfg: DictConfig):
                         diffuser.validation_step(epoch)
 
                 # Optionally save the model after certain epochs
-                #if epoch % 10 == 0:  # Save every 10 epochs as an example
-                #    torch.save(diffuser.state_dict(), f"{checkpoint_path}/model_epoch_{epoch}.pt")
+                # Saving phase
+                if (epoch + 1) % Config.get("model_save_period") == 0:
+                    torch.save(diffuser.state_dict(), f'{Config.get("model_save_path")}/model_epoch_{epoch}.pt')
 
     wandb_logger.finalize("Success")
 
