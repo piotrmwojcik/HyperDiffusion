@@ -297,12 +297,17 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             joint_parameters = []
             for model in mlps:
                 joint_parameters += list(model.parameters())
+                num_parameters = len(model.parameters())
 
             grad_inner = torch.autograd.grad(mse_loss,
                                              joint_parameters,
                                              create_graph=False)
             current_idx = 0
-            for grad, param in zip(grad_inner, joint_parameters):
+            code_idx = 0
+            for ii, grad, param in enumerate(zip(grad_inner, joint_parameters)):
+                if ((ii + 1) % num_parameters) == 0:
+                    code_idx += 1
+                    current_idx = 0
                 grad_shape = grad.shape
                 num_params = np.product(list(grad.shape))
                 grad = grad.view(-1)
