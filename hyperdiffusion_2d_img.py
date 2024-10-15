@@ -296,8 +296,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mse_loss = torch.mean(torch.hstack(mse_loss))
             joint_parameters = []
             for model in mlps:
-                joint_parameters += list(model.parameters())
-                num_parameters = len(model.parameters())
+                ps = list(model.parameters())
+                joint_parameters += ps
+                num_parameters = len(ps)
 
             grad_inner = torch.autograd.grad(mse_loss,
                                              joint_parameters,
@@ -305,9 +306,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             current_idx = 0
             code_idx = 0
             for ii, grad, param in enumerate(zip(grad_inner, joint_parameters)):
-                if ((ii + 1) % num_parameters) == 0:
-                    code_idx += 1
-                    current_idx = 0
                 grad_shape = grad.shape
                 num_params = np.product(list(grad.shape))
                 grad = grad.view(-1)
@@ -316,6 +314,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 param.grad = torch.zeros_like(param)
                 current_idx += num_params
                 param.grad.copy_(grad)
+
+                if ((ii + 1) % num_parameters) == 0:
+                    code_idx += 1
+                    current_idx = 0
                 #param -= cfg['code_lr'] * grad
             #print('before step !!!!!!')
             #print(code_optimizer[code_idx].state_dict())
