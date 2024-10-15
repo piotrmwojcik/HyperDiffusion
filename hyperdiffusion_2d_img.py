@@ -324,12 +324,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mlp = generate_mlp_from_weights(code[0], self.mlp_kwargs)
             #model_input = {'coords': model_input}
             input = train_batch['coords'][0].unsqueeze(0)
-            inr_output = mlp({'coords': input})['model_out']
-            print(inr_output.shape)
+            inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
+            #print(inr_output.shape)
 
             images = wandb.Image(input_img, caption="")
+            inr_images = wandb.Image(inr_output, caption="")
             # wandb.log({"examples": images})
             self.logger.log({"global_step": global_step / log_interval, "gt": images})
+            self.logger.log({"global_step": global_step / log_interval, "inr": inr_images})
 
             #sdf_decoder.model = mlp.cuda()
             # if not self.mlp_kwargs.move:
