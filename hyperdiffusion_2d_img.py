@@ -314,7 +314,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
-            code_optimizer[idx].param_groups[0]['params'] = code_[idx].parameters()
+            code_optimizer[idx].param_groups[0]['params'] = code_[idx]
         return torch.mean(torch.hstack(mse_loss))
 
     def training_step(self, train_batch, optimizer, global_step):
