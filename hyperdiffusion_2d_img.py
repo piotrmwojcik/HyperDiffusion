@@ -359,14 +359,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #mlp_params = [param for name, param in mlp.named_parameters()]
                 input = grids[code_idx].unsqueeze(0)
                 output = mlp({'coords': input})
-                start = time.time()
+                #start = time.time()
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))['img_loss']
                 grad_inner = torch.autograd.grad(loss_inner,
                                                  list(mlp.parameters()),
                                                  create_graph=False)
 
-                end_grad = time.time()
-                print(f"grad inner step took {round(end_grad - start, 3)} seconds")
+                #end_grad = time.time()
+                #print(f"grad inner step took {round(end_grad - start, 3)} seconds")
                 mse_loss.append(loss_inner)
                 prior_grad[code_idx] = prior_grad[code_idx].cuda()
                 current_idx = 0
@@ -382,8 +382,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 for code_optim in code_optimizers:
                     code_optim.step()
-                end = time.time()
-                print(f"one step took {round(end - start, 3)} seconds")
+                #end = time.time()
+                #print(f"one step took {round(end - start, 3)} seconds")
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
             weights = []
@@ -433,8 +433,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
 
         #print('before inverse code')
-        #start = time.time()
+        start = time.time()
         inv_loss = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
+        end = time.time()
+        print(f"inner step took {round(end - start, 3)} seconds")
         # At the first step output first element in the dataset as a sanit check
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
             mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs)
