@@ -409,7 +409,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         if 'code_optimizer' in self.cfg:
             code_list_, code_optimizers = self.load_cache(train_batch)
-            code = torch.stack(code_list_, dim=0)
+            code = torch.stack(code_list_, dim=0).cuda()
 
         optimizer.zero_grad()
         # Sample a diffusion timestep
