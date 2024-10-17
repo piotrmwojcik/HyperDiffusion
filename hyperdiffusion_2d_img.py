@@ -156,7 +156,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer_states = []
         for scene_state_single in cache_list:
             if scene_state_single is None:
-                init_code = self.get_init_code_().requires_grad_(True)
+                init_code = self.get_init_code_()
                 code_list_.append(init_code.cuda())
                 optimizer_states.append(None)
             else:
