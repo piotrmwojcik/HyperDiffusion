@@ -109,14 +109,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         optimizer.__setstate__({'state': state})
 
-    def get_init_code_(self):
+    def get_init_code_(self, device=None):
         model = ImplicitMLP(B_path=self.mlp_kwargs['B_path'])
         state_dict = model.state_dict()
         weights = []
         shapes = []
         for weight in state_dict:
             shapes.append(np.prod(state_dict[weight].shape))
-            weights.append(state_dict[weight].flatten())
+            weights.append(state_dict[weight].flatten().cpu())
         weights = torch.hstack(weights).requires_grad_()
 
         return weights
@@ -156,12 +156,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer_states = []
         for scene_state_single in cache_list:
             if scene_state_single is None:
-                init_code = self.get_init_code_()
-                code_list_.append(init_code.cuda())
+                code_list_.append(self.get_init_code_(None))
                 optimizer_states.append(None)
             else:
                 assert 'code_' in scene_state_single['param']
-                code_ = scene_state_single['param']['code_'].to(dtype=torch.float32).cuda()
+                code_ = scene_state_single['param']['code_'].to(dtype=torch.float32)
                 code_list_.append(code_.requires_grad_(True))
                 if 'optimizer' in scene_state_single:
                     optimizer_states.append(scene_state_single['optimizer'])
@@ -408,7 +407,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         if 'code_optimizer' in self.cfg:
             code_list_, code_optimizers = self.load_cache(train_batch)
-            code = torch.stack(code_list_, dim=0)
+            code = torch.stack(code_list_, dim=0).cuda()
 
         optimizer.zero_grad()
         # Sample a diffusion timestep
