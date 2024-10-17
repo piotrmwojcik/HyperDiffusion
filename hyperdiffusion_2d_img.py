@@ -338,7 +338,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def inverse_code_1b1(self, gt_imgs, grids, code_, code_optimizer_states, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
-        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
+        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs).cuda() for code_single in code_]
         code_optimizers = self.build_optimizer(mlps, cfg)
         for sidx, state in enumerate(code_optimizer_states):
             if state is not None:
@@ -356,8 +356,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #   print(code_single)
                 mlp = mlps[code_idx]
                 #mlp_params = [param for name, param in mlp.named_parameters()]
-                input = grids[code_idx].unsqueeze(0)
-                print(input.device)
+                input = grids[code_idx].unsqueeze(0).cuda()
                 output = mlp({'coords': input})
                 start = time.time()
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))['img_loss']
