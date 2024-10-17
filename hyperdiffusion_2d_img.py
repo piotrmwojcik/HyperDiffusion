@@ -437,7 +437,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #start = time.time()
         inv_loss = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
         #end = time.time()
-        print(f"inner step took {round(end - start, 3)} seconds")
+        #print(f"inner step took {round(end - start, 3)} seconds")
         # At the first step output first element in the dataset as a sanit check
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
             mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs)
