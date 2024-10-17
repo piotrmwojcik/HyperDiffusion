@@ -364,6 +364,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                                  list(mlp.parameters()),
                                                  create_graph=False)
 
+                end_grad = time.time()
+                print(f"grad inner step took {round(end_grad - start, 3)} seconds")
                 mse_loss.append(loss_inner)
 
                 current_idx = 0
