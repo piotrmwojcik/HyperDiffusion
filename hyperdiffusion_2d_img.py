@@ -116,7 +116,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         shapes = []
         for weight in state_dict:
             shapes.append(np.prod(state_dict[weight].shape))
-            weights.append(state_dict[weight].flatten().cpu())
+            weights.append(state_dict[weight].flatten())
         weights = torch.hstack(weights).requires_grad_()
 
         return weights
@@ -156,7 +156,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer_states = []
         for scene_state_single in cache_list:
             if scene_state_single is None:
-                code_list_.append(self.get_init_code_(None).cuda())
+                init_code = self.get_init_code_(None)
+                init_code.cuda()
+                code_list_.append(init_code)
                 optimizer_states.append(None)
             else:
                 assert 'code_' in scene_state_single['param']
