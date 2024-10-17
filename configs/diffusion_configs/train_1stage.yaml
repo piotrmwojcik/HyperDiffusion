@@ -24,7 +24,7 @@ data_folder_train: /data/pwojcik/
 image_resolution: 64
 cache_size: 5000
 code_optimizer: Adam
-code_lr: 1e-3
+code_lr: 5e-4
 inverse_steps: 15
 model_resume_path:
 sampling: ddim
