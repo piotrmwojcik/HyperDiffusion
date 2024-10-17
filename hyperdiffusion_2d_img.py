@@ -381,8 +381,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     current_idx += num_params
                     param.grad.copy_(grad)
 
-                for code_optim in code_optimizers:
-                    code_optim.step()
+                code_optimizers[code_idx].step()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
         for idx, mlp in enumerate(mlps):
