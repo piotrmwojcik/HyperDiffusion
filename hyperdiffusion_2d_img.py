@@ -168,7 +168,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     optimizer_states.append(None)
         return code_list_, optimizer_states
 
-
     def optimizer_state_to(self, state_dict, device=None, dtype=None):
         assert dtype.is_floating_point
         out = dict(state=dict())
@@ -398,7 +397,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         mse_loss = torch.mean(torch.hstack(mse_loss))
         return mse_loss
 
-
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_img = train_batch['gt_img'][0].view(64, 64, 3).permute(2, 0, 1).cuda()
@@ -407,7 +405,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         if 'code_optimizer' in self.cfg:
             code_list_, code_optimizers = self.load_cache(train_batch)
-            code = torch.stack(code_list_, dim=0).cuda()
+            code_list_ = [code_.cuda() for code_ in code_list_]
+            code = torch.stack(code_list_, dim=0)
 
         optimizer.zero_grad()
         # Sample a diffusion timestep
