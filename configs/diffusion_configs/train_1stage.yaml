@@ -15,7 +15,7 @@ normalization_factor: 1.0
 timesteps: 500
 epochs: 6000
 scheduler: True
-scheduler_step: 200
+scheduler_step: 40
 best_model_save_path:
 model_save_path: /data/pwojcik/saved_models/
 model_save_period: 100
@@ -25,13 +25,13 @@ image_resolution: 64
 cache_size: 5000
 code_optimizer: Adam
 code_lr: 1e-3
-inverse_steps: 15
+inverse_steps: 30
 model_resume_path:
 sampling: ddim
 val_fid_calculation_period: 1
 lr: 0.0001
 log_interval: 10
-batch_size: 8
+batch_size: 16
 accumulate_grad_batches: 1
 val:
   num_points: 2048

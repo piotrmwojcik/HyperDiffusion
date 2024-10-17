@@ -351,7 +351,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             code_optimizer.zero_grad()
 
         mse_loss = []
-        start = time.time()
+        #start = time.time()
         for inverse_step_id in range(n_inverse_steps):
             for code_idx, code_single in enumerate(code_):
                 #if code_idx == 2:
@@ -383,8 +383,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 for code_optim in code_optimizers:
                     code_optim.step()
-        end = time.time()
-        print(f"grad and optim {round(end - start, 3)} seconds")
+        #end = time.time()
+        #print(f"grad and optim {round(end - start, 3)} seconds")
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
             weights = []
