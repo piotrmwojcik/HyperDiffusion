@@ -368,7 +368,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 end_grad = time.time()
                 print(f"grad inner step took {round(end_grad - start, 3)} seconds")
                 mse_loss.append(loss_inner)
-
+                prior_grad[code_idx] = prior_grad[code_idx].cuda()
                 current_idx = 0
                 for grad, param in zip(grad_inner, mlp.parameters()):
                     grad_shape = grad.shape
