@@ -276,8 +276,8 @@ def main(cfg: DictConfig):
 
                 # Optionally save the model after certain epochs
                 # Saving phase
-                if (epoch + 1) % Config.get("model_save_period") == 0:
-                    torch.save(diffuser.state_dict(), f'{Config.get("model_save_path")}/model_epoch_{epoch}.pt')
+                #if (epoch + 1) % Config.get("model_save_period") == 0:
+                #    torch.save(diffuser.state_dict(), f'{Config.get("model_save_path")}/model_epoch_{epoch}.pt')
 
     wandb_logger.finalize("Success")
 

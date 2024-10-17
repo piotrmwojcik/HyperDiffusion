@@ -299,7 +299,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 ps = list(model.parameters())
                 joint_parameters += ps
                 num_parameters = len(ps)
-
+            start = time.time()
             grad_inner = torch.autograd.grad(mse_loss,
                                              joint_parameters,
                                              create_graph=False)
@@ -321,6 +321,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
             for code_optim in code_optimizers:
                 code_optim.step()
+            end = time.time()
+            print(f"one step took {round(end - start, 3)} seconds")
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
             weights = []
