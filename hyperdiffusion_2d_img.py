@@ -409,7 +409,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         if 'code_optimizer' in self.cfg:
             code_list_, code_optimizers = self.load_cache(train_batch)
-            code = torch.stack(code_list_, dim=0).cuda()
+            code = torch.stack(code_list_, dim=0)
 
         optimizer.zero_grad()
         # Sample a diffusion timestep
@@ -434,8 +434,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         loss_mse.backward()  # Backpropagation
         optimizer.step()
         #print(code)
-        for code in code_list_:
-            print(code.device)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
 
         #print('before inverse code')
