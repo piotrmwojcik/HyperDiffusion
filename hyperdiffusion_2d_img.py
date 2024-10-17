@@ -433,7 +433,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer.step()
         #print(code)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
-        for p in prior_grad:
+        for p in code_list_:
             print(p.device)
 
         #print('before inverse code')
