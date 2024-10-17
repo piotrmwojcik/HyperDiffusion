@@ -156,7 +156,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer_states = []
         for scene_state_single in cache_list:
             if scene_state_single is None:
-                code_list_.append(self.get_init_code_(None).cuda())
+                code_list_.append(self.get_init_code_(None))
                 optimizer_states.append(None)
             else:
                 assert 'code_' in scene_state_single['param']
@@ -308,7 +308,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 grad_shape = grad.shape
                 num_params = np.product(list(grad.shape))
                 grad = grad.view(-1)
-                grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
+                grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params].cuda()
                 grad = grad.view(grad_shape)
                 param.grad = torch.zeros_like(param)
                 current_idx += num_params
