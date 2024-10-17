@@ -160,7 +160,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 optimizer_states.append(None)
             else:
                 assert 'code_' in scene_state_single['param']
-                code_ = scene_state_single['param']['code_'].to(dtype=torch.float32)
+                code_ = scene_state_single['param']['code_'].to(dtype=torch.float32).cuda()
                 code_list_.append(code_.requires_grad_(True))
                 if 'optimizer' in scene_state_single:
                     optimizer_states.append(scene_state_single['optimizer'])
