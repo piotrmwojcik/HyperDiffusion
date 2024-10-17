@@ -156,7 +156,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer_states = []
         for scene_state_single in cache_list:
             if scene_state_single is None:
-                code_list_.append(self.get_init_code_(None))
+                code_list_.append(self.get_init_code_(None).cuda())
                 optimizer_states.append(None)
             else:
                 assert 'code_' in scene_state_single['param']
@@ -433,8 +433,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer.step()
         #print(code)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
-        for p in code_list_:
-            print(p.device)
 
         #print('before inverse code')
         #start = time.time()
