@@ -351,6 +351,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             code_optimizer.zero_grad()
 
         mse_loss = []
+        start = time.time()
         for inverse_step_id in range(n_inverse_steps):
             for code_idx, code_single in enumerate(code_):
                 #if code_idx == 2:
@@ -382,8 +383,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 for code_optim in code_optimizers:
                     code_optim.step()
-                #end = time.time()
-                #print(f"one step took {round(end - start, 3)} seconds")
+        end = time.time()
+        print(f"grad and optim {round(end - start, 3)} seconds")
         for idx, mlp in enumerate(mlps):
             state_dict = mlp.state_dict()
             weights = []
@@ -433,9 +434,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
 
         #print('before inverse code')
-        start = time.time()
+        #start = time.time()
         inv_loss = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
-        end = time.time()
+        #end = time.time()
         print(f"inner step took {round(end - start, 3)} seconds")
         # At the first step output first element in the dataset as a sanit check
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
