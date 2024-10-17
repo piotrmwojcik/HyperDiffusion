@@ -434,6 +434,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         loss_mse.backward()  # Backpropagation
         optimizer.step()
         #print(code)
+        for code in code_list_:
+            print(code.device)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
 
         #print('before inverse code')
