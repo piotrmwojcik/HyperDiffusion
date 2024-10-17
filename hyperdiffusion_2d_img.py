@@ -116,7 +116,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         shapes = []
         for weight in state_dict:
             shapes.append(np.prod(state_dict[weight].shape))
-            weights.append(state_dict[weight].flatten().cpu())
+            weights.append(state_dict[weight].flatten())
         weights = torch.hstack(weights).requires_grad_()
 
         return weights
