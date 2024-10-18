@@ -113,7 +113,7 @@ def image_psnr(pred_img, gt_img):
 
         psnr = measure.compare_psnr(p, trgt, data_range=1)
 
-        psnrs.append(psnr)
+        psnrs.append(torch.tensor(psnr))
 
     return {'img_psnr': np.mean(psnrs)}
 
