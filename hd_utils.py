@@ -103,7 +103,7 @@ def image_psnr(pred_img, gt_img):
     pred_img = pred_img.detach().cpu()
     gt_img = gt_img.detach().cpu()
 
-    psnrs, ssims = list(), list()
+    psnrs = list()
     for i in range(batch_size):
         p = pred_img[i].view(len, len, 3).numpy()
         trgt = gt_img[i].view(len, len, 3).numpy()
