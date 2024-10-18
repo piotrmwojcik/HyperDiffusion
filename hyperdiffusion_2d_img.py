@@ -18,7 +18,7 @@ import wandb
 from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
-                      render_mesh, render_meshes, image_mse, generate_mlp_from_weights_trainable)
+                      render_mesh, render_meshes, image_mse, generate_mlp_from_weights_trainable, image_psnr)
 from mlp_models import ImplicitMLP
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
@@ -282,6 +282,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         for inverse_step_id in range(n_inverse_steps):
             mse_loss = []
+            psnr_loss
             for code_idx, code_single in enumerate(code_):
                 #if code_idx == 2:
                 #   print(code_single)
@@ -293,6 +294,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))
                 mse_loss.append(loss_inner['img_loss'])
             mse_loss = torch.mean(torch.hstack(mse_loss))
+
             joint_parameters = []
             for model in mlps:
                 ps = list(model.parameters())
@@ -350,9 +352,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for code_optimizer in code_optimizers:
             code_optimizer.zero_grad()
 
-        mse_loss = []
         #start = time.time()
         for inverse_step_id in range(n_inverse_steps):
+            mse_loss = []
+            psnr = []
             for code_idx, code_single in enumerate(code_):
                 #if code_idx == 2:
                 #   print(code_single)
@@ -362,6 +365,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 output = mlp({'coords': input})
                 #start = time.time()
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))['img_loss']
+                psnr_inner = image_psnr(output['model_out'], gt_imgs[code_idx].unsqueeze(0))
                 grad_inner = torch.autograd.grad(loss_inner,
                                                  list(mlp.parameters()),
                                                  create_graph=False)
@@ -369,6 +373,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #end_grad = time.time()
                 #print(f"grad inner step took {round(end_grad - start, 3)} seconds")
                 mse_loss.append(loss_inner)
+                psnr.append(psnr_inner)
                 prior_grad[code_idx] = prior_grad[code_idx].cuda()
                 current_idx = 0
                 for grad, param in zip(grad_inner, mlp.parameters()):
@@ -395,7 +400,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             code_optimizer_states[idx] = code_optimizers[idx].state_dict()
 
         mse_loss = torch.mean(torch.hstack(mse_loss))
-        return mse_loss
+        psnr = torch.mean(torch.hstack(psnr))
+        return mse_loss, psnr
 
     def training_step(self, train_batch, optimizer, global_step):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
@@ -434,7 +440,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         #print('before inverse code')
         #start = time.time()
-        inv_loss = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
+        inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
         #end = time.time()
         #print(f"inner step took {round(end - start, 3)} seconds")
         # At the first step output first element in the dataset as a sanit check
@@ -455,6 +461,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         # ==== save cache ====
         self.save_cache(code_list_, code_optimizers, train_batch['scene_id'])
         self.logger.log({"global_step": global_step, "diff_train_loss": loss_mse})
+        self.logger.log({"global_step": global_step, "psnr": psnr})
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
 
         return loss_mse

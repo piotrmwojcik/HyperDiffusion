@@ -4,6 +4,7 @@ import numpy as np
 import pyrender
 import torch
 import trimesh
+import skimage.measure as measure
 #from implicit_kan.implicit_kan import ImplicitEKAN
 
 from mlp_models import MLP, MLP3D, SingleBVPNet, ImplicitMLP
@@ -90,6 +91,29 @@ def image_mse(mask, model_output, gt):
         return {'img_loss': ((model_output['model_out'] - gt) ** 2).mean()}
     else:
         return {'img_loss': (mask * (model_output['model_out'] - gt) ** 2).mean()}
+
+
+def image_psnr(pred_img, gt_img):
+    batch_size = pred_img.shape[0]
+
+    pred_img = pred_img.detach().cpu().numpy()
+    gt_img = gt_img.detach().cpu().numpy()
+
+    psnrs, ssims = list(), list()
+    for i in range(batch_size):
+        p = pred_img[i].transpose(1, 2, 0)
+        trgt = gt_img[i].transpose(1, 2, 0)
+
+        p = (p / 2.) + 0.5
+        p = np.clip(p, a_min=0., a_max=1.)
+
+        trgt = (trgt / 2.) + 0.5
+
+        psnr = measure.compare_psnr(p, trgt, data_range=1)
+
+        psnrs.append(psnr)
+
+    return {'img_psnr': np.mean(psnrs)}
 
 
 def get_mlp(mlp_kwargs):
