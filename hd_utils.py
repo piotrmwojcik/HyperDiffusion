@@ -94,6 +94,8 @@ def image_mse(mask, model_output, gt):
 
 
 def image_psnr(pred_img, gt_img):
+    print(pred_img.shape)
+    print(gt_img.shape)
     batch_size = pred_img.shape[0]
 
     pred_img = pred_img.detach().cpu().numpy()
