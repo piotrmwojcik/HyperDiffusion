@@ -115,7 +115,7 @@ def image_psnr(pred_img, gt_img):
 
         psnrs.append(torch.tensor(psnr))
 
-    return {'img_psnr': torch.mean(psnrs)}
+    return {'img_psnr': torch.mean(torch.hstack(psnrs))}
 
 
 def get_mlp(mlp_kwargs):
