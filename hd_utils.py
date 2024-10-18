@@ -1,3 +1,4 @@
+import math
 from math import ceil
 
 import numpy as np
@@ -97,14 +98,15 @@ def image_psnr(pred_img, gt_img):
     print(pred_img.shape)
     print(gt_img.shape)
     batch_size = pred_img.shape[0]
+    len = int(math.sqrt(pred_img.shape[1]))
 
     pred_img = pred_img.detach().cpu().numpy()
     gt_img = gt_img.detach().cpu().numpy()
 
     psnrs, ssims = list(), list()
     for i in range(batch_size):
-        p = pred_img[i].transpose(1, 2, 0)
-        trgt = gt_img[i].transpose(1, 2, 0)
+        p = pred_img[i].view(len, len, 0)
+        trgt = gt_img[i].view(len, len, 0)
 
         p = (p / 2.) + 0.5
         p = np.clip(p, a_min=0., a_max=1.)
