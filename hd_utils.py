@@ -105,8 +105,8 @@ def image_psnr(pred_img, gt_img):
 
     psnrs, ssims = list(), list()
     for i in range(batch_size):
-        p = pred_img[i].view(len, len, 0).numpy()
-        trgt = gt_img[i].view(len, len, 0).numpy()
+        p = pred_img[i].view(len, len, 3).numpy()
+        trgt = gt_img[i].view(len, len, 3).numpy()
 
         p = (p / 2.) + 0.5
         p = np.clip(p, a_min=0., a_max=1.)
