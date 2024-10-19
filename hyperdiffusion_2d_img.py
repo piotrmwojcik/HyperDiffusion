@@ -115,6 +115,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         model = ImplicitMLP(B_path=self.mlp_kwargs['B_path'])
         checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
         checkpoint = torch.load(checkpoint_path, map_location=device)
+        print(checkpoint.keys())
         model.load_state_dict(checkpoint['model_state_dict'])
 
         state_dict = model.state_dict()
