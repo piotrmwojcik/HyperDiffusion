@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import torch
 
 
@@ -27,8 +29,8 @@ class ExponentialMovingAverage:
 
     def _initialize_ema_model(self):
         """Clones the model and initializes the EMA parameters."""
-        ema_model = type(self.model)(**self.model.__dict__)  # Create a clone of the model
-        ema_model.load_state_dict(self.model.state_dict())  # Copy the initial parameters
+        ema_model = deepcopy(self.model)  # Create a clone of the model
+        #ema_model.load_state_dict(self.model.state_dict())  # Copy the initial parameters
         for param in ema_model.parameters():
             param.requires_grad = False  # EMA parameters should not require gradients
         return ema_model
