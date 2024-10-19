@@ -249,8 +249,8 @@ def main(cfg: DictConfig):
 
                     optimizer.zero_grad()  # Zero gradients
 
-                    if epoch >= 10:
-                        diffuser.cfg['inverse_steps'] = 3
+                    if epoch >= 5:
+                        diffuser.cfg['inverse_steps'] = 1
                     if epoch >= 300:
                         diffuser.cfg['inverse_steps'] = 1
 
