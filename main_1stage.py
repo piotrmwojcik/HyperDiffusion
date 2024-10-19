@@ -7,6 +7,7 @@ from hyperdiffusion import HyperDiffusion
 # Using it to make pyrender work on clusters
 from hyperdiffusion_2d_img import HyperDiffusion_2d_img
 from mlp_models import ImplicitMLP
+from scheduler import PrefixStepLRScheduler
 
 os.environ["PYOPENGL_PLATFORM"] = "egl"
 import sys
@@ -223,8 +224,9 @@ def main(cfg: DictConfig):
     optimizer = torch.optim.AdamW(diffuser.parameters(), lr=Config.get("lr"))
 
     if config["scheduler"]:
-        scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, step_size=config["scheduler_step"], gamma=0.9
+        scheduler = PrefixStepLRScheduler(
+            optimizer, step_size=config["scheduler_step"], initial_lr=6e-5,
+            new_lr=Config.get("lr"), gamma=0.9
         )
 
     # Check if GPU is available
@@ -249,10 +251,10 @@ def main(cfg: DictConfig):
 
                     optimizer.zero_grad()  # Zero gradients
 
-                    if epoch >= 5:
+                    if epoch >= 3:
                         diffuser.cfg['inverse_steps'] = 2
-                    #if epoch >= 300:
-                    #    diffuser.cfg['inverse_steps'] = 1
+                    if epoch >= 650:
+                        diffuser.cfg['inverse_steps'] = 1
 
                     loss = diffuser.training_step(data, optimizer, global_step)  # Forward pass
                     outputs.append(loss)
