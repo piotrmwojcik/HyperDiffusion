@@ -456,7 +456,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             #model_input = {'coords': model_input}
             input = train_batch['coords'][0].unsqueeze(0)
             inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
-            inr_output= (inr_output + 1) / 2
             #print(inr_output.shape)
 
             images = wandb.Image(input_img, caption="")
