@@ -257,7 +257,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         x_t, e = self.diff.q_sample(images, t)
         x_t = x_t.float()
         e = e.float()
-        return self.ema_model(x_t, t), e
+        return self.model(x_t, t), e
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=Config.get("lr"))
@@ -425,7 +425,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
-            self.ema_model,
+            self.model,
             code * self.cfg.normalization_factor,
             t,
             self.mlp_kwargs,
@@ -472,7 +472,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def validation_step(self, epoch):
 
         x_0s = self.diff.ddim_sample_loop(
-            self.ema_model, (16, *self.image_size[1:]), clip_denoised=False
+            self.model, (16, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = (x_0s / self.cfg.normalization_factor)
 
