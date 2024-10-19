@@ -251,6 +251,8 @@ def main(cfg: DictConfig):
 
                     if epoch >= 3:
                         diffuser.cfg['inverse_steps'] = 3
+                    if epoch >= 300:
+                        diffuser.cfg['inverse_steps'] = 1
 
                     loss = diffuser.training_step(data, optimizer, global_step)  # Forward pass
                     outputs.append(loss)
