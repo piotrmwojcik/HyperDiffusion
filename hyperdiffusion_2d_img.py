@@ -472,7 +472,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def validation_step(self, epoch):
 
         x_0s = self.diff.ddim_sample_loop(
-            self.ema_model, (16, *self.image_size[1:]), clip_denoised=False
+            self.ema_model.ema_model, (16, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = (x_0s / self.cfg.normalization_factor)
 
