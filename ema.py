@@ -40,10 +40,11 @@ class ExponentialMovingAverage:
         Returns the current EMA momentum based on ramp-up.
         Uses ramp-up over a certain number of iterations as specified in the config.
         """
-        rampup_steps = self.rampup_kimg * 1000 / (self.batch_size + self.eps)
-        if self.current_iter < rampup_steps:
-            return min(self.decay, 1 - (1 - self.decay) * (self.current_iter / rampup_steps))
-        return self.decay
+        return 0.9
+        # rampup_steps = self.rampup_kimg * 1000 / (self.batch_size + self.eps)
+        # if self.current_iter < rampup_steps:
+        #     return min(self.decay, 1 - (1 - self.decay) * (self.current_iter / rampup_steps))
+        # return self.decay
 
     def update(self):
         """Updates the EMA parameters using the model's current parameters."""
