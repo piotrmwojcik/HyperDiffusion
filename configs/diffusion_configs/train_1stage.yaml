@@ -25,7 +25,7 @@ image_resolution: 64
 cache_size: 5000
 code_optimizer: Adam
 code_lr: 1e-3
-inverse_steps: 15
+inverse_steps: 1
 model_resume_path:
 sampling: ddim
 val_fid_calculation_period: 1
