@@ -250,9 +250,9 @@ def main(cfg: DictConfig):
                     optimizer.zero_grad()  # Zero gradients
 
                     if epoch >= 5:
-                        diffuser.cfg['inverse_steps'] = 1
-                    if epoch >= 300:
-                        diffuser.cfg['inverse_steps'] = 1
+                        diffuser.cfg['inverse_steps'] = 2
+                    #if epoch >= 300:
+                    #    diffuser.cfg['inverse_steps'] = 1
 
                     loss = diffuser.training_step(data, optimizer, global_step)  # Forward pass
                     outputs.append(loss)
