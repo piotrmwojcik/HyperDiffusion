@@ -31,6 +31,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self, model, train_dt, val_dt, test_dt, mlp_kwargs, image_shape, method, cache_size, cfg
     ):
         super().__init__()
+        self.model = model
         self.ema_model = ExponentialMovingAverage(model, decay=0.999, rampup_rate=0.05, rampup_kimg=4, batch_size=16, eps=1e-8)
         self.cfg = cfg
         self.method = method
