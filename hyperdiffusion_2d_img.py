@@ -464,6 +464,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         # ==== save cache ====
         self.save_cache(code_list_, code_optimizers, train_batch['scene_id'])
         self.logger.log({"global_step": global_step, "diff_train_loss": loss_mse})
+        self.logger.log({"global_step": global_step, "diff_momentum": self.ema_model._get_momentum()})
         self.logger.log({"global_step": global_step, "psnr": psnr})
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
 
