@@ -21,7 +21,7 @@ class PrefixStepLRScheduler(torch.optim.lr_scheduler._LRScheduler):
         self.gamma = gamma  # Decay factor for LR
         self.initial_lr = initial_lr  # Initial LR for the first `constant_epochs`
         self.new_lr = new_lr  # LR to switch to after `constant_epochs`
-        super(PrefixStepLRSchedule, self).__init__(optimizer, last_epoch)
+        super(PrefixStepLRScheduler, self).__init__(optimizer, last_epoch)
 
         # Initialize learning rate to `initial_lr`
         for param_group in self.optimizer.param_groups:
