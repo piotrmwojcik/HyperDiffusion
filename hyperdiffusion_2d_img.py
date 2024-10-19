@@ -17,6 +17,7 @@ from six.moves import map, zip
 import wandb
 from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
+from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes, image_mse, generate_mlp_from_weights_trainable, image_psnr)
 from mlp_models import ImplicitMLP
@@ -30,7 +31,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self, model, train_dt, val_dt, test_dt, mlp_kwargs, image_shape, method, cache_size, cfg
     ):
         super().__init__()
-        self.model = model
+        self.ema_model = ExponentialMovingAverage(model, decay=0.999, rampup_rate=0.05, rampup_kimg=4, batch_size=16, eps=1e-8)
         self.cfg = cfg
         self.method = method
         self.mlp_kwargs = mlp_kwargs
@@ -255,7 +256,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         x_t, e = self.diff.q_sample(images, t)
         x_t = x_t.float()
         e = e.float()
-        return self.model(x_t, t), e
+        return self.ema_model(x_t, t), e
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=Config.get("lr"))
@@ -423,7 +424,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
-            self.model,
+            self.ema_model,
             code * self.cfg.normalization_factor,
             t,
             self.mlp_kwargs,
@@ -435,6 +436,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
+        self.ema_model.update()
         #print(code)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
 
@@ -469,7 +471,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def validation_step(self, epoch):
 
         x_0s = self.diff.ddim_sample_loop(
-            self.model, (16, *self.image_size[1:]), clip_denoised=False
+            self.ema_model, (16, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = (x_0s / self.cfg.normalization_factor)
 
@@ -531,7 +533,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def test_step(self, *args, **kwargs):
         # Then, sampling some new shapes -> outputting and rendering them
         x_0s = self.diff.ddim_sample_loop(
-            self.model, (16, *self.image_size[1:]), clip_denoised=False
+            self.ema_model, (16, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = x_0s / self.cfg.normalization_factor
 
