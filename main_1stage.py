@@ -224,9 +224,8 @@ def main(cfg: DictConfig):
     optimizer = torch.optim.AdamW(diffuser.parameters(), lr=Config.get("lr"))
 
     if config["scheduler"]:
-        scheduler = PrefixStepLRScheduler(
-            optimizer, step_size=config["scheduler_step"], initial_lr=5e-5,
-            new_lr=Config.get("lr"), gamma=0.9
+        scheduler = torch.optim.lr_scheduler.StepLR(
+            optimizer, step_size=config["scheduler_step"], gamma=0.9
         )
 
     # Check if GPU is available
