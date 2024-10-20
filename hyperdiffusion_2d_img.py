@@ -188,9 +188,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 else:
                     state_single_out[key] = val
             out['state'][key_state_single] = state_single_out
-            print('!!!')
-            print(key_state_single)
-            print(out['state'].keys())
         print(out['state']['step'])
         return out
 
@@ -362,7 +359,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for code_optimizer in code_optimizers:
             code_optimizer.zero_grad()
             if 'step' in code_optimizer.state_dict()['state']:
-                print(code_optimizer.state_dict()['state']['step'])
+                print(code_optimizer.state_dict()['state'][0]['step'],
+                      code_optimizer.state_dict()['state'][1]['step'])
             else:
                 print(code_optimizer.state_dict()['state'].keys())
 
@@ -401,8 +399,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     param.grad.copy_(grad)
 
                 code_optimizers[code_idx].step()
-                print('!!!!!!')
-                print(code_optimizers[code_idx].state_dict()['state'].keys())
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
         for idx, mlp in enumerate(mlps):
