@@ -358,7 +358,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         for code_optimizer in code_optimizers:
             code_optimizer.zero_grad()
-            if 'step' in code_optimizer.state_dict()['state']:
+            if 'step' in code_optimizer.state_dict()['state'][0]:
                 print(code_optimizer.state_dict()['state'][0]['step'],
                       code_optimizer.state_dict()['state'][1]['step'])
             else:
