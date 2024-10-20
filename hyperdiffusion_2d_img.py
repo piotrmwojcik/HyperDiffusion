@@ -188,6 +188,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 else:
                     state_single_out[key] = val
             out['state'][key_state_single] = state_single_out
+        print(out['state']['step'])
         return out
 
     def out_dict_to(self, d, device=None, code_dtype=torch.float32, optimizer_dtype=torch.float32):
