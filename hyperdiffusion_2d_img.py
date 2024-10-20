@@ -180,6 +180,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for key_state_single, state_single in state_dict['state'].items():
             state_single_out = dict()
             for key, val in state_single.items():
+                print(key. val)
                 if isinstance(val, torch.Tensor):
                     if key != 'step' and val.dtype != dtype:
                         val = val.clamp(min=torch.finfo(dtype).min, max=torch.finfo(dtype).max)
