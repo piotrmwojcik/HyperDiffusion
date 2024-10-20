@@ -359,14 +359,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for code_optimizer in code_optimizers:
             code_optimizer.zero_grad()
 
-            if 0 in code_optimizer.state_dict()['state']:
-                print(code_optimizer.state_dict()['state'][0]['step'],
-                      code_optimizer.state_dict()['state'][1]['step'])
-            else:
-                print(code_optimizer.state_dict()['state'].keys())
-                if 'state' in code_optimizer.state_dict()['state']:
-                    print('dupa')
-
         #start = time.time()
         for inverse_step_id in range(n_inverse_steps):
             mse_loss = []
@@ -395,7 +387,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     grad_shape = grad.shape
                     num_params = np.product(list(grad.shape))
                     grad = grad.view(-1)
-                    #grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
+                    grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
                     grad = grad.view(grad_shape)
                     param.grad = torch.zeros_like(param).cuda()
                     current_idx += num_params
