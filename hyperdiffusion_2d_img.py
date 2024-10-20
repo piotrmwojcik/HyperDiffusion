@@ -189,6 +189,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     state_single_out[key] = val
             out['state'][key_state_single] = state_single_out
             print('!!!')
+            print(key_state_single)
             print(out['state'].keys())
         print(out['state']['step'])
         return out
