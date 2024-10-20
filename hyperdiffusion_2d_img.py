@@ -188,6 +188,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 else:
                     state_single_out[key] = val
             out['state'][key_state_single] = state_single_out
+            print('!!!')
+            print(state_single_out.keys())
         print(out['state']['step'])
         return out
 
@@ -199,7 +201,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 code_=d['param']['code_'].clamp(
                     min=torch.finfo(code_dtype).min, max=torch.finfo(code_dtype).max
                 ).to(device=device, dtype=code_dtype)),
-            optimizer=self.optimizer_state_to(d['optimizer']['state'], device=device, dtype=optimizer_dtype))
+            optimizer=self.optimizer_state_to(d['optimizer'], device=device, dtype=optimizer_dtype))
 
     def load_tensor_to_dict(self, d, key, value, device=None, dtype=None):
         assert dtype.is_floating_point
