@@ -64,6 +64,10 @@ def main(cfg: DictConfig):
 
     # Although it says train, it includes all the shapes but we only extract training ones in WeightDataset
     data_folder_train = Config.get("data_folder_train")
+    experiment_name = Config.get("experiment_name")
+    current_path = os.getcwd()
+    cache_path = os.path.join(current_path, "work_dir", experiment_name)
+    Config['cache_dir'] = cache_path
 
     # Initialize Transformer for HyperDiffusion
     if "hyper" in method:
