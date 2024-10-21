@@ -148,6 +148,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     cache_dir = Config.get('cache_dir')
                     cache_files = os.listdir(cache_dir)
                     cache_files.sort()
+                    print('!!!')
+                    print(len(cache_files), cache_dir)
                     if len(cache_files) > 0:
                         assert len(cache_files) == self.cache_size
                         for ind in self.cache.keys():
