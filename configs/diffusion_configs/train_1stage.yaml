@@ -1,6 +1,7 @@
 method: hyper_3d
 experiment_name: celebhq5k
 num_file_writers: 4
+cache_dir: None
 calculate_metric_on_test: True
 dedup: False
 test_sample_mult: 1.1
