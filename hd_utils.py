@@ -60,6 +60,10 @@ class Config:
     def get(param):
         return Config.config[param] if param in Config.config else None
 
+    @staticmethod
+    def set(param, val):
+        Config.config[param] = val
+
 
 def state_dict_to_weights(state_dict):
     weights = []
