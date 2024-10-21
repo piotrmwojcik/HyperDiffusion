@@ -149,7 +149,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 cache_files.sort(key=lambda x: int(x.replace('code_', '').split('.')[0]))
                 if len(cache_files) > 0:
                     print('!!!')
-                    print(len(cache_files), len(self.cache_size))
+                    print(len(cache_files), self.cache_size)
                     assert len(cache_files) == self.cache_size
                     for ind in self.cache.keys():
                         self.cache[ind] = torch.load(
