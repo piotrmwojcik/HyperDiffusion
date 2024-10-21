@@ -258,16 +258,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     else:
                         self.cache[scene_name_single]['optimizer'] = self.optimizer_state_to(
                             out['optimizer'], device='cpu', dtype=optimizer_dtype)
-            if save_dir is not None:
-                if self.file_queues is not None:
-                    self.file_queues[ind // self.num_file_writers].put(
-                        self.out_dict_to(out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype))
-                else:
-                    print('!!!')
-                    print(save_dir)
-                    torch.save(
-                        self.out_dict_to(out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype),
-                        os.path.join(save_dir, scene_name + '.pth'))
+                if save_dir is not None:
+                    if self.file_queues is not None:
+                        self.file_queues[ind // self.num_file_writers].put(
+                            self.out_dict_to(out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype))
+                    else:
+                        torch.save(
+                            self.out_dict_to(out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype),
+                            os.path.join(save_dir, scene_name + '.pth'))
 
     def forward(self, images):
         t = (
