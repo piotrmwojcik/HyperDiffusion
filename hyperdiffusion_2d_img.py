@@ -145,6 +145,17 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 cache_load_from = self.cfg.get('cache_load_from', None)
                 loaded = False
                 if cache_load_from is not None:
+                    cache_dir = Config.get('cache_dir')
+                    cache_files = os.listdir(cache_dir)
+                    cache_files.sort()
+                    if len(cache_files) > 0:
+                        assert len(cache_files) == self.cache_size
+                        for ind in self.cache.keys():
+                            self.cache[ind] = torch.load(
+                                os.path.join(cache_dir, cache_files[ind]), map_location='cpu')
+                        loaded = True
+                        print('Loaded cache files from ' + cache_dir + '.')
+
                     cache_files = os.listdir(cache_load_from)
                     cache_files.sort()
                     if len(cache_files) > 0:
