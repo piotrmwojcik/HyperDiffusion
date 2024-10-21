@@ -225,8 +225,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def save_cache(self, code_list_, code_optimizers, scene_name):
         code_dtype = code_list_[0].dtype
         optimizer_dtype = torch.float32
-        if Config.get('save_dir') is not None:
-            save_dir = Config.get('save_dir')
+        if Config.get('cache_dir') is not None:
+            save_dir = Config.get('cache_dir')
             os.makedirs(save_dir, exist_ok=True)
         else:
             save_dir = None

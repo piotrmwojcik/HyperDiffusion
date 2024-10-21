@@ -69,8 +69,6 @@ def main(cfg: DictConfig):
     cache_path = os.path.join(current_path, "work_dirs", experiment_name)
     Config.set('cache_dir', cache_path)
 
-    print('!!!')
-    print(cache_path)
 
     # Initialize Transformer for HyperDiffusion
     if "hyper" in method:
