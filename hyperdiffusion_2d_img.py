@@ -39,7 +39,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.train_dt = train_dt
         self.test_dt = test_dt
         self.cache_size = cache_size
-        self.file_queue = None
+        self.file_queues = None
         self.ae_model = None
         self.sample_count = min(
             8, Config.get("batch_size")
