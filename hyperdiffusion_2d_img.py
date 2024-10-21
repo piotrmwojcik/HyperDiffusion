@@ -148,8 +148,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 cache_files = os.listdir(cache_dir)
                 cache_files.sort(key=lambda x: int(x.replace('code_', '').split('.')[0]))
                 if len(cache_files) > 0:
-                    print('!!!')
-                    print(len(cache_files), self.cache_size)
                     assert len(cache_files) == self.cache_size
                     for ind in self.cache.keys():
                         self.cache[ind] = torch.load(
@@ -157,15 +155,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     loaded = True
                     print('Loaded cache files from ' + cache_dir + '.')
 
-                    cache_files = os.listdir(cache_load_from)
-                    cache_files.sort()
-                    if len(cache_files) > 0:
-                        assert len(cache_files) == self.cache_size
-                        for ind in self.cache.keys():
-                            self.cache[ind] = torch.load(
-                                os.path.join(cache_load_from, cache_files[ind]), map_location='cpu')
-                        loaded = True
-                        print('Loaded cache files from ' + cache_load_from)
                 if not loaded:
                     print('Initialize codes from scratch.')
                 self.cache_loaded = True
