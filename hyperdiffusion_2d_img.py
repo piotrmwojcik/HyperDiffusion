@@ -263,9 +263,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     self.file_queues[ind // self.num_file_writers].put(
                         self.out_dict_to(out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype))
                 else:
+                    print('!!!')
+                    print(save_dir)
                     torch.save(
                         self.out_dict_to(out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype),
-                        os.path.join(Path(save_dir), scene_name + '.pth'))
+                        os.path.join(save_dir, scene_name + '.pth'))
 
     def forward(self, images):
         t = (
