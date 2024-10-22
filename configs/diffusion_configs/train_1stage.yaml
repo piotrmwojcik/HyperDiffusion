@@ -1,5 +1,5 @@
 method: hyper_3d
-experiment_name: celebhq5k_test_s1
+experiment_name: celebhq5k_test_s2
 num_file_writers: 4
 cache_dir: None
 calculate_metric_on_test: True
@@ -22,7 +22,7 @@ scheduler_step: 200
 best_model_save_path:
 model_save_path: None
 use_ema: False
-model_save_period: 1
+model_save_period: 10
 mode: train
 data_folder_train: /data/pwojcik/
 image_resolution: 64
