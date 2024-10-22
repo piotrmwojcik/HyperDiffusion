@@ -22,14 +22,21 @@ scheduler_step: 200
 best_model_save_path:
 model_save_path: None
 use_ema: False
-model_save_period: 12
+model_save_period: 10
 mode: train
 data_folder_train: /data/pwojcik/
 image_resolution: 64
 cache_size: 5000
 code_optimizer: Adam
-code_lr: 1e-3
-inverse_steps: 15
+code_lr:
+inverse_steps:
+code_lr_schedule:
+  - 0: 1e-3
+  - 1000: 1e-4
+inverse_steps_schedule:
+  - 0: 15
+  - 10: 3
+  - 650: 1
 model_resume_path:
 sampling: ddim
 val_fid_calculation_period: 1

@@ -259,6 +259,9 @@ def main(cfg: DictConfig):
                     #data = data.to(device)
                     optimizer.zero_grad()  # Zero gradients
 
+                    print('!!!!')
+                    print(diffuser.cfg['inverse_steps_schedule'])
+
                     if epoch >= 3:
                         diffuser.cfg['inverse_steps'] = 3
                     if epoch >= 650:
