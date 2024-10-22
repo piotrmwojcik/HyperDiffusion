@@ -255,6 +255,7 @@ def main(cfg: DictConfig):
                 outputs = []
                 diffuser.train()  # Set model to training mode
                 #total_train_loss = 0.0
+                save_to_disk = (((epoch + 1) % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1))
                 for batch_idx, data in enumerate(train_dl):
                     #data = data.to(device)
                     optimizer.zero_grad()  # Zero gradients
@@ -263,12 +264,10 @@ def main(cfg: DictConfig):
                     for p in inverse_steps_schedule:
                         if epoch >= p[0]:
                             diffuser.cfg['inverse_steps'] = p[1]
-
                     code_lr_schedule = [(k, v) for d in diffuser.cfg['code_lr_schedule'] for k, v in d.items()]
                     for p in code_lr_schedule:
                         if epoch >= p[0]:
                             diffuser.cfg['code_lr'] = p[1]
-                    save_to_disk = ((epoch % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1))
                     loss = diffuser.training_step(data, optimizer, global_step, save_to_disk)  # Forward pass
                     outputs.append(loss)
                     global_step += 1
@@ -291,7 +290,7 @@ def main(cfg: DictConfig):
                     with torch.no_grad():
                         diffuser.validation_step(epoch)
 
-                if ((epoch % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1)):
+                if save_to_disk:
                     checkpoint = {
                         'diffuser': diffuser.state_dict(),
                         'optimizer': optimizer.state_dict(),
