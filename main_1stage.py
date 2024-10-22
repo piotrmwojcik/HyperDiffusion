@@ -242,14 +242,14 @@ def main(cfg: DictConfig):
         global_step = checkpoint.get('global_step', 0)
         epoch_start = checkpoint.get('epoch', 0)
 
-        model_msg = model.load_state_dict(checkpoint['model_state_dict'])
+        model_msg = model.load_state_dict(checkpoint['diffuser'])
         print('Loaded model ',  model_msg)
-        optim_msg = optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        optim_msg = optimizer.load_state_dict(checkpoint['optimizer'])
         print('Loaded optimizer ',  optim_msg)
 
         # Only load the scheduler if you're using one in your config
         if config["scheduler"]:
-            scheduler_msg = scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+            scheduler_msg = scheduler.load_state_dict(checkpoint['scheduler'])
             print('Loaded scheduler ', scheduler_msg)
 
 
