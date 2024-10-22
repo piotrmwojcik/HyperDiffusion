@@ -269,7 +269,7 @@ def main(cfg: DictConfig):
                         if epoch >= p[0]:
                             diffuser.cfg['code_lr'] = p[1]
 
-                    loss = diffuser.training_step(data, optimizer, global_step)  # Forward pass
+                    loss = diffuser.training_step(data, optimizer, global_step, epoch)  # Forward pass
                     outputs.append(loss)
                     global_step += 1
                 scheduler.step()

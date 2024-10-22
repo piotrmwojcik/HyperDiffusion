@@ -228,7 +228,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 self.load_tensor_to_dict(d_dst['state'][key_state_single], key, val,
                                          device=device, dtype=dtype)
 
-    def save_cache(self, code_list_, code_optimizers, scene_name):
+    def save_cache(self, code_list_, code_optimizers, scene_name, epoch):
         code_dtype = code_list_[0].dtype
         optimizer_dtype = torch.float32
         if Config.get('cache_dir') is not None:
@@ -262,7 +262,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     else:
                         self.cache[scene_name_single]['optimizer'] = self.optimizer_state_to(
                             out['optimizer'], device='cpu', dtype=optimizer_dtype)
-                if save_dir is not None:
+                if save_dir is not None and ((epoch % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1)):
                     if self.file_queues is not None:
                         self.file_queues[ind // self.num_file_writers].put(
                             self.out_dict_to(out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype))
@@ -429,7 +429,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         psnr = torch.mean(torch.hstack(psnr))
         return mse_loss, psnr
 
-    def training_step(self, train_batch, optimizer, global_step):
+    def training_step(self, train_batch, optimizer, global_step, epoch):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_img = train_batch['gt_img'][0].view(64, 64, 3).permute(2, 0, 1).cuda()
 
@@ -468,7 +468,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         #print('before inverse code')
         #start = time.time()
-        inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers, prior_grad, self.cfg)
+        inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers,
+                                               prior_grad, self.cfg)
         #end = time.time()
         #print(f"inner step took {round(end - start, 3)} seconds")
         # At the first step output first element in the dataset as a sanit check
@@ -489,7 +490,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
 
         # ==== save cache ====
-        self.save_cache(code_list_, code_optimizers, train_batch['scene_id'])
+        self.save_cache(code_list_, code_optimizers, train_batch['scene_id'], epoch)
         self.logger.log({"global_step": global_step, "diff_train_loss": loss_mse})
         self.logger.log({"global_step": global_step, "psnr": psnr})
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
