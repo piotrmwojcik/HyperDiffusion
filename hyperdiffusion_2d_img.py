@@ -33,7 +33,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     ):
         super().__init__()
         self.model = model
-        self.ema_model = ExponentialMovingAverage(model, decay=0.999, rampup_rate=0.05, rampup_kimg=4, batch_size=16, eps=1e-8)
+        if Config.get('use_ema'):
+            self.ema_model = ExponentialMovingAverage(model, decay=0.999, rampup_rate=0.05, rampup_kimg=4, batch_size=16, eps=1e-8)
+        else:
+            self.ema_model = None
         self.cfg = cfg
         self.method = method
         self.mlp_kwargs = mlp_kwargs
@@ -458,7 +461,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
-        self.ema_model.update()
+        if self.ema_model is not None:
+            self.ema_model.update()
         #print(code)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
 
@@ -487,16 +491,19 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         # ==== save cache ====
         self.save_cache(code_list_, code_optimizers, train_batch['scene_id'])
         self.logger.log({"global_step": global_step, "diff_train_loss": loss_mse})
-        self.logger.log({"global_step": global_step, "diff_momentum": self.ema_model._get_momentum()})
         self.logger.log({"global_step": global_step, "psnr": psnr})
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
 
         return loss_mse
 
     def validation_step(self, epoch):
+        if Config.get("use_ema"):
+            model = self.ema_model.ema_model
+        else:
+            model = self.model
 
         x_0s = self.diff.ddim_sample_loop(
-            self.ema_model.ema_model, (16, *self.image_size[1:]), clip_denoised=False
+            model, (16, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = (x_0s / self.cfg.normalization_factor)
 

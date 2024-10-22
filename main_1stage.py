@@ -66,11 +66,15 @@ def main(cfg: DictConfig):
     data_folder_train = Config.get("data_folder_train")
     experiment_name = Config.get("experiment_name")
     current_path = os.getcwd()
-    cache_path = os.path.join(current_path, "work_dirs", experiment_name)
+    cache_path = os.path.join(current_path, "work_dirs", "cache", experiment_name)
+    model_save_path = os.path.join(current_path, "work_dirs", "checkpoint", experiment_name)
     Config.set('cache_dir', cache_path)
+    Config.set('model_save_path', model_save_path)
 
     if not os.path.exists(cache_path):
         os.makedirs(cache_path)
+    if not os.path.exists(cache_path):
+        os.makedirs(model_save_path)
 
     # Initialize Transformer for HyperDiffusion
     if "hyper" in method:
@@ -255,10 +259,7 @@ def main(cfg: DictConfig):
                     #data = data.to(device)
                     optimizer.zero_grad()  # Zero gradients
 
-                    if epoch >= 6:
-                        exit(1)
-
-                    if epoch >= 10:
+                    if epoch >= 3:
                         diffuser.cfg['inverse_steps'] = 3
                     if epoch >= 650:
                         diffuser.cfg['inverse_steps'] = 1
@@ -284,6 +285,9 @@ def main(cfg: DictConfig):
                     diffuser.eval()  # Set model to evaluation mode
                     with torch.no_grad():
                         diffuser.validation_step(epoch)
+
+                if ((epoch % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1)):
+                    torch.save(diffuser.state_dict(), f'{Config.get("model_save_path")}/model_epoch_{epoch}.pth')
 
                 # Optionally save the model after certain epochs
                 # Saving phase
