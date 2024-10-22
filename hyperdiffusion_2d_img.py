@@ -118,7 +118,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def get_init_code_(self, device=None):
         model = ImplicitMLP(B_path=self.mlp_kwargs['B_path'])
-        checkpoint_path = "/data/pwojcik/siren/logs/058462.jpg/checkpoints/model_epoch_14500.pth"
+        #checkpoint_path = "/data/pwojcik/siren/logs/058462.jpg/checkpoints/model_epoch_14500.pth"
         #checkpoint = torch.load(checkpoint_path, map_location=device)
         #model.load_state_dict(checkpoint)
 
@@ -245,6 +245,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 optimizer=code_optimizers[ind])
             if self.cache is not None:
                 scene_name_single = scene_name[ind]
+                print('!!!')
+                print(ind, scene_name[ind])
                 if self.cache[scene_name_single] is None:
                     self.cache[scene_name_single] = self.out_dict_to(
                         out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype)

@@ -22,7 +22,7 @@ scheduler_step: 200
 best_model_save_path:
 model_save_path: None
 use_ema: False
-model_save_period: 2
+model_save_period: 1
 mode: train
 data_folder_train: /data/pwojcik/
 image_resolution: 64
