@@ -24,7 +24,7 @@ model_save_path: None
 use_ema: False
 model_save_period: 10
 mode: train
-data_folder_train: /data/pwojcik/
+data_folder_train:
 image_resolution: 64
 cache_size: 5000
 code_optimizer: Adam
@@ -37,7 +37,7 @@ inverse_steps_schedule:
   - 0: 4
   - 2: 3
   - 650: 1
-model_resume_path:
+model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_test_s1/checkpoint/model_epoch_4.pth
 sampling: ddim
 val_fid_calculation_period: 1
 lr: 0.0001
