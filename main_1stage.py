@@ -73,7 +73,7 @@ def main(cfg: DictConfig):
 
     if not os.path.exists(cache_path):
         os.makedirs(cache_path)
-    if not os.path.exists(cache_path):
+    if not os.path.exists(model_save_path):
         os.makedirs(model_save_path)
 
     # Initialize Transformer for HyperDiffusion
