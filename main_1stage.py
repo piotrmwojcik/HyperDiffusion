@@ -259,13 +259,15 @@ def main(cfg: DictConfig):
                     #data = data.to(device)
                     optimizer.zero_grad()  # Zero gradients
 
-                    print('!!!!')
-                    print(diffuser.cfg['inverse_steps_schedule'])
+                    inverse_steps_schedule = [(k, v) for d in diffuser.cfg['inverse_steps_schedule'] for k, v in d.items()]
+                    for p in inverse_steps_schedule:
+                        if epoch >= p[0]:
+                            diffuser.cfg['inverse_steps'] = p[1]
 
-                    if epoch >= 3:
-                        diffuser.cfg['inverse_steps'] = 3
-                    if epoch >= 650:
-                        diffuser.cfg['inverse_steps'] = 1
+                    code_lr_schedule = [(k, v) for d in diffuser.cfg['code_lr_schedule'] for k, v in d.items()]
+                    for p in code_lr_schedule:
+                        if epoch >= p[0]:
+                            diffuser.cfg['code_lr'] = p[1]
 
                     loss = diffuser.training_step(data, optimizer, global_step)  # Forward pass
                     outputs.append(loss)
