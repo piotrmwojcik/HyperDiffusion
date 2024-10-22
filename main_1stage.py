@@ -242,7 +242,7 @@ def main(cfg: DictConfig):
         global_step = checkpoint.get('global_step', 0)
         epoch_start = checkpoint.get('epoch', 0)
 
-        model_msg = model.load_state_dict(checkpoint['diffuser'])
+        model_msg = diffuser.load_state_dict(checkpoint['diffuser'])
         print('Loaded model ',  model_msg)
         optim_msg = optimizer.load_state_dict(checkpoint['optimizer'])
         print('Loaded optimizer ',  optim_msg)
