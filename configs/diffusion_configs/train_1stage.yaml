@@ -24,7 +24,7 @@ model_save_path: None
 use_ema: False
 model_save_period: 10
 mode: train
-data_folder_train:
+data_folder_train: /data/pwojcik/
 image_resolution: 64
 cache_size: 5000
 code_optimizer: Adam
