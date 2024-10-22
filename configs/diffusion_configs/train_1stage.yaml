@@ -1,5 +1,5 @@
 method: hyper_3d
-experiment_name: celebhq5k
+experiment_name: celebhq5k_test
 num_file_writers: 4
 cache_dir: None
 calculate_metric_on_test: True
@@ -16,7 +16,7 @@ augment_amount: 0
 jitter_augment: False
 normalization_factor: 1.0
 timesteps: 500
-epochs: 15
+epochs: 20
 scheduler: True
 scheduler_step: 200
 best_model_save_path:

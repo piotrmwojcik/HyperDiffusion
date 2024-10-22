@@ -203,12 +203,7 @@ def main(cfg: DictConfig):
 
     diffuser.logger = run
 
-    # Specify where to save checkpoints
-    checkpoint_path = join(
-        config["tensorboard_log_dir"],
-        "lightning_checkpoints",
-        f"{str(datetime.now()).replace(':', '-') + '-' + wandb.run.name + '-' + wandb.run.id}",
-    )
+
     # best_acc_checkpoint = ModelCheckpoint(
     #     save_top_k=1,
     #     monitor="val/1-NN-CD-acc",
@@ -239,16 +234,36 @@ def main(cfg: DictConfig):
             optimizer, step_size=config["scheduler_step"], gamma=0.9
         )
 
+    global_step = 0
+    epoch_start = 0
+
+    if Config.get('model_resume_path') is not None:
+        checkpoint = torch.load(Config.get('model_resume_path'))
+        global_step = checkpoint.get('global_step', 0)
+        epoch_start = checkpoint.get('epoch', 0)
+
+        model_msg = model.load_state_dict(checkpoint['model_state_dict'])
+        print('Loaded model ',  model_msg)
+        optim_msg = optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        print('Loaded optimizer ',  optim_msg)
+
+        # Only load the scheduler if you're using one in your config
+        if config["scheduler"]:
+            scheduler_msg = scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
+            print('Loaded scheduler ', scheduler_msg)
+
+
+
     # Check if GPU is available
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     diffuser.to(device)
 
-    global_step = 0
+
     num_epochs = Config.get("epochs")
 
     if Config.get("mode") == "train":
         with tqdm(total=len(train_dl) * num_epochs) as pbar:
-            for epoch in range(num_epochs):
+            for epoch in range(epoch_start, num_epochs):
                 print(f"epoch: {epoch}")
 
                 # Training phase
