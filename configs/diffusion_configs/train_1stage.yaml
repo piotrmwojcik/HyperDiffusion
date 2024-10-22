@@ -35,7 +35,7 @@ code_lr_schedule:
   - 1000: 1e-4
 inverse_steps_schedule:
   - 0: 4
-  - 3: 3
+  - 2: 3
   - 650: 1
 model_resume_path:
 sampling: ddim

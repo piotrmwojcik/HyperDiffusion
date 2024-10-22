@@ -257,6 +257,7 @@ def main(cfg: DictConfig):
                 #total_train_loss = 0.0
                 save_to_disk = (((epoch + 1) % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1))
                 for batch_idx, data in enumerate(train_dl):
+                    print((batch_idx, global_step))
                     #data = data.to(device)
                     optimizer.zero_grad()  # Zero gradients
 
