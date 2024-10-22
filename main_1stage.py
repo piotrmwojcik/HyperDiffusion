@@ -268,8 +268,8 @@ def main(cfg: DictConfig):
                     for p in code_lr_schedule:
                         if epoch >= p[0]:
                             diffuser.cfg['code_lr'] = p[1]
-
-                    loss = diffuser.training_step(data, optimizer, global_step, epoch)  # Forward pass
+                    save_to_disk = ((epoch % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1))
+                    loss = diffuser.training_step(data, optimizer, global_step, save_to_disk)  # Forward pass
                     outputs.append(loss)
                     global_step += 1
                 scheduler.step()
@@ -292,7 +292,15 @@ def main(cfg: DictConfig):
                         diffuser.validation_step(epoch)
 
                 if ((epoch % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1)):
-                    torch.save(diffuser.state_dict(), f'{Config.get("model_save_path")}/model_epoch_{epoch}.pth')
+                    checkpoint = {
+                        'diffuser': diffuser.state_dict(),
+                        'optimizer': optimizer.state_dict(),
+                        'scheduler': scheduler.state_dict(),  # Save the scheduler's state
+                        'epoch': epoch,
+                        'global_step': global_step
+                    }
+
+                    torch.save(checkpoint, f'{Config.get("model_save_path")}/model_epoch_{epoch}.pth')
 
                 # Optionally save the model after certain epochs
                 # Saving phase
