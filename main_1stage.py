@@ -66,8 +66,8 @@ def main(cfg: DictConfig):
     data_folder_train = Config.get("data_folder_train")
     experiment_name = Config.get("experiment_name")
     current_path = os.getcwd()
-    cache_path = os.path.join(current_path, "work_dirs", "cache", experiment_name)
-    model_save_path = os.path.join(current_path, "work_dirs", "checkpoint", experiment_name)
+    cache_path = os.path.join(current_path, "work_dirs",  experiment_name, "cache")
+    model_save_path = os.path.join(current_path, "work_dirs", experiment_name, "checkpoint")
     Config.set('cache_dir', cache_path)
     Config.set('model_save_path', model_save_path)
 
