@@ -16,7 +16,7 @@ augment_amount: 0
 jitter_augment: False
 normalization_factor: 1.0
 timesteps: 500
-epochs: 10000
+epochs: 15
 scheduler: True
 scheduler_step: 200
 best_model_save_path:
