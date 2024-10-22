@@ -153,6 +153,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 if len(cache_files) > 0:
                     assert len(cache_files) == self.cache_size
                     for ind in self.cache.keys():
+                        print('!!!!')
+                        print(ind, cache_files[ind])
                         self.cache[ind] = torch.load(
                             os.path.join(cache_dir, cache_files[ind]), map_location='cpu')
                     loaded = True
@@ -245,8 +247,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 optimizer=code_optimizers[ind])
             if self.cache is not None:
                 scene_name_single = scene_name[ind]
-                print('!!!')
-                print(ind, scene_name[ind])
                 if self.cache[scene_name_single] is None:
                     self.cache[scene_name_single] = self.out_dict_to(
                         out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype)
