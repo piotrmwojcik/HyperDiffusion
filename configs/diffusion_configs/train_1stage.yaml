@@ -1,5 +1,5 @@
 method: hyper_3d
-experiment_name: celebhq5k_test_s2
+experiment_name: celebhq5k_drop
 num_file_writers: 4
 cache_dir: None
 calculate_metric_on_test: True
@@ -16,7 +16,7 @@ augment_amount: 0
 jitter_augment: False
 normalization_factor: 1.0
 timesteps: 500
-epochs: 5
+epochs: 2500
 scheduler: True
 scheduler_step: 200
 best_model_save_path:
@@ -33,11 +33,12 @@ inverse_steps:
 code_lr_schedule:
   - 0: 1e-3
   - 1000: 1e-4
+  - 1500: 0
 inverse_steps_schedule:
-  - 0: 4
-  - 2: 3
+  - 0: 15
+  - 10: 3
   - 650: 1
-model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_test_s1/checkpoint/model_epoch_4.pth
+model_resume_path:
 sampling: ddim
 val_fid_calculation_period: 1
 lr: 0.0001
