@@ -468,7 +468,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             model_kwargs=None,
         )
 
-        loss_mse = loss_terms["loss"].mean()
+        loss_mse = 1.4 * loss_terms["loss"].mean()
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
