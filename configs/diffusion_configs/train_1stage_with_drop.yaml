@@ -37,8 +37,8 @@ code_lr_schedule:
 inverse_steps_schedule:
   - 0: 15
   - 25: 3
-  - 650: 1
-model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_drop/model_epoch_549.pth
+  - 750: 1
+model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_drop/checkpoint/model_epoch_549.pth
 sampling: ddim
 val_fid_calculation_period: 1
 lr: 0.0001
