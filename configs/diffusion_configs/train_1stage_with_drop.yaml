@@ -1,0 +1,67 @@
+method: hyper_3d
+experiment_name: celebhq5k_drop
+num_file_writers: 4
+cache_dir: None
+calculate_metric_on_test: True
+dedup: False
+test_sample_mult: 1.1
+filter_bad: True
+filter_bad_path: ./data/car_problematic_shapes.txt
+disable_wandb: False
+dataset_dir: ./data
+dataset: 02958343
+tensorboard_log_dir: .
+augment: False
+augment_amount: 0
+jitter_augment: False
+normalization_factor: 1.0
+timesteps: 500
+epochs: 2500
+scheduler: True
+scheduler_step: 200
+best_model_save_path:
+model_save_path: None
+use_ema: False
+model_save_period: 200
+mode: train
+data_folder_train: /data/pwojcik/
+image_resolution: 64
+cache_size: 5000
+code_optimizer: Adam
+code_lr:
+inverse_steps:
+code_lr_schedule:
+  - 0: 1e-3
+  - 1000: 1e-4
+  - 1500: 0
+inverse_steps_schedule:
+  - 0: 15
+  - 25: 3
+  - 650: 1
+model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_drop/model_epoch_549.pth
+sampling: ddim
+val_fid_calculation_period: 1
+lr: 0.0001
+log_interval: 50
+batch_size: 16
+accumulate_grad_batches: 1
+val:
+  num_points: 2048
+  num_samples: 60
+mlp_config:
+  params:
+    model_type: ImplicitMLP
+    B_path: /data/pwojcik/siren/random_mod/B.pth
+diff_config:
+  params:
+    model_mean_type: START_X
+    model_var_type: FIXED_LARGE
+    loss_type: MSE
+transformer_config:
+  params:
+    n_embd: 1440
+    n_layer: 12
+    n_head: 16
+    split_policy: layer_by_layer
+    use_global_residual: False
+    condition: 'no'
