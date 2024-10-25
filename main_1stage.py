@@ -313,7 +313,7 @@ def main(cfg: DictConfig):
                     checkpoint = {
                         'diffuser': diffuser.state_dict(),
                         'optimizer': optimizer.state_dict(),
-                        'scheduler': scheduler.state_dict(),  # Save the scheduler's state
+                        'scheduler': scheduler.state_dict() if scheduler is not None else None,  # Save the scheduler's state
                         'epoch': epoch,
                         'global_step': global_step
                     }
