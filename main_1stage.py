@@ -229,6 +229,8 @@ def main(cfg: DictConfig):
     #lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval="epoch")
     optimizer = torch.optim.AdamW(diffuser.parameters(), lr=Config.get("lr"))
 
+    scheduler = None
+
     if config["scheduler"]:
         scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer, step_size=config["scheduler_step"], gamma=0.9
@@ -287,7 +289,8 @@ def main(cfg: DictConfig):
                     loss = diffuser.training_step(data, optimizer, global_step, save_to_disk)  # Forward pass
                     outputs.append(loss)
                     global_step += 1
-                scheduler.step()
+                if scheduler is not None:
+                    scheduler.step()
                     # Accumulate gradient batches if specified
                     #if (batch_idx + 1) % cfg.accumulate_grad_batches == 0:
                     #    optimizer.step()
