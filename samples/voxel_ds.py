@@ -21,86 +21,51 @@ from torchvision.transforms import Resize, Compose, ToTensor, Normalize
 
 
 class ShapeNetVoxel(Dataset):
-    def __init__(self, split='train', sampling=None, dataset_root='datasets'):
-        """
-        Initialize the ShapeNetVoxel dataset.
-
-        Args:
-            split (str): Specify the dataset split ('train' or 'test').
-            sampling (int or None): Number of points to sample per voxel grid.
-            dataset_root (str): Path to the dataset directory.
-        """
+    def __init__(self, split='train', sampling=None, dataset_root='datasets', simple_output=False, random_scale=False):
         self.dataset_root = dataset_root
-        self.data_path = os.path.join(dataset_root, 'shapenet', 'all_vox256_img', 'all_vox256_img_' + split + '.pth')
-        self.data_voxels = torch.load(self.data_path).byte()  # Load the voxel data
-        self.sampling = sampling  # Number of points to sample
-        self.split = split  # Dataset split (train/test)
-        self.grid = self.get_mgrid_voxel(64)  # Create a grid of voxel coordinates
-        self.affine = (None, None)  # Can be used for future transformations
+        self.sampling = sampling
+        self.init_model_bool = False
+        self.split = split
+        self.simple_output = simple_output
+        self.random_scale = random_scale
+        self.init_model()
+        self.data_type = 'voxel'
 
     def __len__(self):
-        """
-        Returns the total number of samples in the dataset.
-        """
         if self.split == "train":
             return 35019
         else:
             return 8762
 
-    def dec2bin(self, x, bits):
-        """
-        Convert decimal to binary.
+    def init_model(self):
+        split = self.split
+        points_path = os.path.join(self.dataset_root, 'shapenet', 'all_vox256_img', 'data_points_int_' + split + '.pth')
+        values_path = os.path.join(self.dataset_root, 'shapenet', 'all_vox256_img', 'data_values_' + split + '.pth')
 
-        Args:
-            x (Tensor): Input tensor.
-            bits (int): Number of bits for conversion.
-
-        Returns:
-            Tensor: Binary representation of the input tensor.
-        """
-        mask = 2 ** torch.arange(bits - 1, -1, -1).to(x.device, x.dtype)
-        return x.unsqueeze(-1).bitwise_and(mask).ne(0).byte().flip(-1)
-
-    def get_mgrid_voxel(self, dim):
-        """
-        Generate a voxel grid of shape (dim x dim x dim).
-
-        Args:
-            dim (int): Dimension of the grid.
-
-        Returns:
-            Tensor: Generated grid coordinates.
-        """
-        ranges = [torch.linspace(-1, 1, steps=dim) for _ in range(3)]
-        grid = torch.stack(torch.meshgrid(*ranges), dim=-1).reshape(-1, 3)  # Flatten the grid into (N, 3)
-        return grid
+        self.data_points_int = torch.load(points_path).byte()
+        self.data_values = torch.load(values_path).byte()
 
     def __getitem__(self, idx):
-        """
-        Returns the input and target data for a single voxel grid.
-
-        Args:
-            idx (int): Index of the voxel grid.
-
-        Returns:
-            dict: A dictionary containing the input coordinates and the ground truth voxel values.
-        """
-        points = self.grid.float()  # Coordinates in the grid
-
-        encoded_voxels = self.data_voxels[idx]  # Get the voxel grid at index `idx`
-        occs = self.dec2bin(encoded_voxels, 8).view(-1, 1).float()  # Convert voxel values to binary
+        #points = (self.data_points_int[idx].float() + 1) / 128 - 1
+        points = self.data_points_int[idx].float()
+        occs = self.data_values[idx].float() * 2 -1
 
         if self.sampling is not None:
-            # Randomly sample points and corresponding occupancy values
             idcs = np.random.randint(0, len(points), size=self.sampling)
             points = points[idcs]
             occs = occs[idcs]
 
-        # Return a dictionary of input coordinates and ground truth occupancy values
-        in_dict = {'idx': idx, 'coords': points}
-        gt_dict = {'img': occs}
+        if self.random_scale:
+            points = random.uniform(0.75, 1.25) * points
 
-        return in_dict, gt_dict
+        if self.simple_output:
+            return occs
+
+        else:
+            in_dict = {'idx': idx, 'coords': points}
+            gt_dict = {'img': occs}
+
+            return in_dict, gt_dict
 
 root_path = '/Users/piotrwojcik/Downloads/'
 shapenet = ShapeNetVoxel(dataset_root=root_path)
@@ -108,7 +73,11 @@ shapenet = ShapeNetVoxel(dataset_root=root_path)
 for sample_idx, sample in enumerate(shapenet):
     in_dict, gt_dict = sample
     img = gt_dict['img']
-    tensor_reshaped = img.view(64, 64, 64)
+    #print(img)
+    print(in_dict['coords'].shape)
+    #print(in_dict['coords'].view(128, 128, 3))
+    #print(in_dict['coords'].view(64, 64, 3))
+    #tensor_reshaped = img.view(64, 64, 64)
 
     # Create a figure for 3D plotting
     fig = plt.figure(figsize=(10, 10))
