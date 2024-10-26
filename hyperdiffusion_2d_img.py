@@ -481,23 +481,19 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #start = time.time()
         inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers,
                                                prior_grad, self.cfg)
-        #end = time.time()
-        #print(f"inner step took {round(end - start, 3)} seconds")
-        # At the first step output first element in the dataset as a sanit check
-        if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
-            mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs)
-            #model_input = {'coords': model_input}
-            input = train_batch['coords'][0].unsqueeze(0)
-            inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
-            #print(inr_output)
-            #print(input_img)
-            #print()
 
-            images = wandb.Image(input_img, caption="")
-            inr_images = wandb.Image(inr_output, caption="")
-            # wandb.log({"examples": images})
-            self.logger.log({"global_step": global_step / log_interval, "gt": images})
-            self.logger.log({"global_step": global_step / log_interval, "inr": inr_images})
+        # if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
+        #     mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs)
+        #     #model_input = {'coords': model_input}
+        #     input = train_batch['coords'][0].unsqueeze(0)
+        #     inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
+        #
+        #
+        #     images = wandb.Image(input_img, caption="")
+        #     inr_images = wandb.Image(inr_output, caption="")
+        #     # wandb.log({"examples": images})
+        #     self.logger.log({"global_step": global_step / log_interval, "gt": images})
+        #     self.logger.log({"global_step": global_step / log_interval, "inr": inr_images})
 
 
         # ==== save cache ====

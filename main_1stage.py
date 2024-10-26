@@ -260,7 +260,6 @@ def main(cfg: DictConfig):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     diffuser.to(device)
 
-
     num_epochs = Config.get("epochs")
 
     if Config.get("mode") == "train":
