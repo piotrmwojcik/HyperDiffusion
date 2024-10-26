@@ -492,8 +492,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             checkpoint = torch.load(checkpoint_path)
             mlp_init.load_state_dict(checkpoint)
             input_init = train_batch['coords'][0].unsqueeze(0)
-            inr_output_init =  mlp_init({'coords': input_init})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
+            inr_output_init = mlp_init({'coords': input_init})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
 
+            print(inr_output)
+            print(inr_output_init)
+            print()
 
             images = wandb.Image(input_img, caption="")
             inr_images = wandb.Image(inr_output, caption="")
