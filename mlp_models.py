@@ -84,7 +84,6 @@ class FMMLinear(nn.Module):
         # Standard initialization (usually Xavier or Kaiming)
         nn.init.kaiming_uniform_(self.left_matrix, a=math.sqrt(5))
         nn.init.kaiming_uniform_(self.right_matrix, a=math.sqrt(5))
-r
         W = (self.left_matrix @ self.right_matrix) / np.sqrt(self.rank)
 
         if self.bias is not None:
