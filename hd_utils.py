@@ -122,21 +122,21 @@ def image_psnr(pred_img, gt_img):
     return {'img_psnr': torch.mean(torch.hstack(psnrs))}
 
 
-def get_mlp(mlp_kwargs):
+def get_mlp(mlp_kwargs, B=None):
     if "model_type" in mlp_kwargs:
         if mlp_kwargs.model_type == "mlp_3d":
             mlp = MLP3D(**mlp_kwargs)
         elif mlp_kwargs.model_type == "SingleBVPNet":
             mlp = SingleBVPNet(**mlp_kwargs)
         elif mlp_kwargs.model_type == "ImplicitMLP":
-            mlp = ImplicitMLP(B_path=mlp_kwargs['B_path'])
+            mlp = ImplicitMLP(B=B)
     else:
         mlp = MLP(**mlp_kwargs)
     return mlp
 
 
-def generate_mlp_from_weights(weights, mlp_kwargs):
-    mlp = get_mlp(mlp_kwargs)
+def generate_mlp_from_weights(weights, mlp_kwargs, B=None):
+    mlp = get_mlp(mlp_kwargs, B=B)
     state_dict = mlp.state_dict()
     weight_names = list(state_dict.keys())
     for layer in weight_names:

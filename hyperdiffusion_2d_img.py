@@ -42,6 +42,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.mlp_kwargs = mlp_kwargs
         self.train_dt = train_dt
         self.test_dt = test_dt
+        self.loaded_B = torch.load(Config.get("B_path"))
         self.cache_size = cache_size
         self.file_queues = None
         self.ae_model = None
@@ -297,7 +298,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def inverse_code(self, gt_imgs, grids, code_, code_optimizer_states, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
-        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs) for code_single in code_]
+        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
         code_optimizers = self.build_optimizer(mlps, cfg)
         for sidx, state in enumerate(code_optimizer_states):
             if state is not None:
@@ -367,7 +368,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def inverse_code_1b1(self, gt_imgs, grids, code_, code_optimizer_states, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
-        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs).cuda() for code_single in code_]
+        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B).cuda() for code_single in code_]
         grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
         code_optimizers = self.build_optimizer(mlps, cfg)
@@ -527,7 +528,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         weights = x_0s[0].view(-1)
         print(weights)
         print(weights.shape)
-        siren = generate_mlp_from_weights(weights, self.mlp_kwargs)
+        siren = generate_mlp_from_weights(weights, self.mlp_kwargs, self.loaded_B)
         #print(self.mlp_kwargs.model_type)
 
         input = get_grid(64, 64, b=0).unsqueeze(0)
