@@ -482,7 +482,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                                prior_grad, self.cfg)
 
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
-            mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs)
+            mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs, self.loaded_B)
             #model_input = {'coords': model_input}
             input = train_batch['coords'][0].unsqueeze(0)
             inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
