@@ -119,9 +119,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def get_init_code_(self, device=None):
         model = ImplicitMLP(B=self.loaded_B)
-        #checkpoint_path = "/data/pwojcik/siren/logs/058462.jpg/checkpoints/model_epoch_14500.pth"
-        #checkpoint = torch.load(checkpoint_path, map_location=device)
-        #model.load_state_dict(checkpoint)
+        checkpoint_path = "/data/pwojcik/siren/logs/058462.jpg/checkpoints/model_epoch_14500.pth"
+        checkpoint = torch.load(checkpoint_path, map_location=device)
+        model.load_state_dict(checkpoint)
 
         state_dict = model.state_dict()
         weights = []
@@ -156,8 +156,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     for ind in self.cache.keys():
                         self.cache[ind] = torch.load(
                             os.path.join(cache_dir, cache_files[ind]), map_location='cpu')
-                        print('!!!')
-                        print(self.cache[ind]['optimizer']['state'][0]['step'])
                     loaded = True
                     print('Loaded cache files from ' + cache_dir + '.')
 
@@ -483,18 +481,18 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers,
                                                prior_grad, self.cfg)
 
-        # if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
-        #     mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs)
-        #     #model_input = {'coords': model_input}
-        #     input = train_batch['coords'][0].unsqueeze(0)
-        #     inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
-        #
-        #
-        #     images = wandb.Image(input_img, caption="")
-        #     inr_images = wandb.Image(inr_output, caption="")
-        #     # wandb.log({"examples": images})
-        #     self.logger.log({"global_step": global_step / log_interval, "gt": images})
-        #     self.logger.log({"global_step": global_step / log_interval, "inr": inr_images})
+        if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
+            mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs)
+            #model_input = {'coords': model_input}
+            input = train_batch['coords'][0].unsqueeze(0)
+            inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
+
+
+            images = wandb.Image(input_img, caption="")
+            inr_images = wandb.Image(inr_output, caption="")
+            # wandb.log({"examples": images})
+            self.logger.log({"global_step": global_step / log_interval, "gt": images})
+            self.logger.log({"global_step": global_step / log_interval, "inr": inr_images})
 
 
         # ==== save cache ====
