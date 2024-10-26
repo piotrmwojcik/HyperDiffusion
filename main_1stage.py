@@ -177,7 +177,7 @@ def main(cfg: DictConfig):
     print(
         "Train dataset length: {}".format(len(train_dt))
     )
-    inr_model = ImplicitMLP(B_path=mlp_kwargs['B_path'])
+    inr_model = ImplicitMLP(B=mlp_kwargs['B_path'])
     state_dict = inr_model.state_dict()
     weights = []
     shapes = []
@@ -264,17 +264,17 @@ def main(cfg: DictConfig):
     num_epochs = Config.get("epochs")
 
     if Config.get("mode") == "train":
-        with tqdm(total=len(train_dl) * num_epochs) as pbar:
-            for epoch in range(epoch_start, num_epochs):
-                print(f"epoch: {epoch}")
+        for epoch in range(epoch_start, num_epochs):
+            print(f"epoch: {epoch}")
 
-                # Training phase
-                outputs = []
-                diffuser.train()  # Set model to training mode
-                #total_train_loss = 0.0
-                save_to_disk = ((epoch + 1) % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1)
-                for batch_idx, data in enumerate(train_dl):
-                    print((batch_idx, global_step))
+            # Training phase
+            outputs = []
+            diffuser.train()  # Set model to training mode
+            #total_train_loss = 0.0
+            save_to_disk = ((epoch + 1) % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1)
+            with tqdm(train_dl, desc=f"Epoch {epoch + 1}/{num_epochs}", unit="batch") as pbar:
+                for batch_idx, data in enumerate(pbar):
+                    #print((batch_idx, global_step))
                     #data = data.to(device)
                     optimizer.zero_grad()  # Zero gradients
 
@@ -289,12 +289,9 @@ def main(cfg: DictConfig):
                     loss = diffuser.training_step(data, optimizer, global_step, save_to_disk)  # Forward pass
                     outputs.append(loss)
                     global_step += 1
+                    pbar.set_postfix({"diff_loss": loss.item()})
                 if scheduler is not None:
                     scheduler.step()
-                    # Accumulate gradient batches if specified
-                    #if (batch_idx + 1) % cfg.accumulate_grad_batches == 0:
-                    #    optimizer.step()
-                    #   optimizer.zero_grad()
 
                 epoch_loss = sum(output for output in outputs) / len(outputs)
                 run.log({"epoch": epoch, "epoch_loss": epoch_loss})
@@ -320,10 +317,10 @@ def main(cfg: DictConfig):
 
                     torch.save(checkpoint, f'{Config.get("model_save_path")}/model_epoch_{epoch}.pth')
 
-                # Optionally save the model after certain epochs
-                # Saving phase
-                #if (epoch + 1) % Config.get("model_save_period") == 0:
-                #    torch.save(diffuser.state_dict(), f'{Config.get("model_save_path")}/model_epoch_{epoch}.pt')
+            # Optionally save the model after certain epochs
+            # Saving phase
+            #if (epoch + 1) % Config.get("model_save_period") == 0:
+            #    torch.save(diffuser.state_dict(), f'{Config.get("model_save_path")}/model_epoch_{epoch}.pt')
 
     wandb_logger.finalize("Success")
 
