@@ -27,7 +27,7 @@ model_save_period: 40
 mode: train
 data_folder_train: /data/pwojcik/
 image_resolution: 64
-cache_size: 5000
+cache_size: 27000
 code_optimizer: Adam
 code_lr:
 inverse_steps:

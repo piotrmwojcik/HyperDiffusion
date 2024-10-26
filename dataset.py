@@ -266,22 +266,24 @@ def CelebAHQ_collate_fn(batch):
     }
 
 
-class CelebAHQ(DataLoader):
+class CelebAHQ(Dataset):
     def __init__(self, downsampled=False, resolution=64, dataset_root='datasets'):
-        # SIZE (128 x 128)
-        # super().__init__(self)
-        # assert split in ['train', 'test'], "Unknown split"
-
         self.dataset_root = dataset_root
-        self.root = os.path.join(self.dataset_root, 'CelebAHQ_small')
+        self.root = os.path.join(self.dataset_root, 'CelebAHQ')
         self.img_channels = 3
-        all_files = os.listdir(self.root)  # Ensure we list files from the correct folder
-        self.fnames = [f for f in all_files if f.endswith('.png') or f.endswith('.jpg')]
-        self.fnames.sort()
-
         self.downsampled = downsampled
         self.res = resolution
 
+        # Filter files to include only those with numeric names within the specified range
+        all_files = os.listdir(self.root)
+        self.fnames = [
+            f for f in all_files
+            if (f.endswith('.jpg') or f.endswith('.png')) and f.split('.')[0].isdigit() and 0 <= int(
+                f.split('.')[0]) <= 26999
+        ]
+        self.fnames.sort()
+
+        # Define transformations
         if downsampled:
             self.transform = Compose([
                 Resize(self.res),
@@ -294,18 +296,21 @@ class CelebAHQ(DataLoader):
                 Normalize(torch.Tensor([0.5]), torch.Tensor([0.5]), torch.Tensor([0.5]))
             ])
 
+        # Create a grid for coordinates, assuming get_grid is defined elsewhere
         self.mgrid = get_grid(self.res, self.res, b=0)
 
     def __len__(self):
         return len(self.fnames)
 
     def __getitem__(self, idx):
+        # Load image and apply transformations
         filename = self.fnames[idx]
-        scene_id = os.path.splitext(filename)[0]
+        scene_id = os.path.splitext(filename)[0]  # Extract numeric part of filename as scene ID
         path = os.path.join(self.root, filename)
-        img = Image.open(path)
+        img = Image.open(path).convert('RGB')
         img = self.transform(img)
         img = img.permute(1, 2, 0).view(-1, self.img_channels)
+
         return {
             'gt_img': img,
             'coords': self.mgrid,
