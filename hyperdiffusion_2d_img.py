@@ -501,7 +501,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             # wandb.log({"examples": images})
             self.logger.log({"global_step": global_step / log_interval, "gt": images})
             self.logger.log({"global_step": global_step / log_interval, "inr": inr_images})
-            self.logger.log({"global_step": global_step / log_interval, "inr": inr_init_img})
+            self.logger.log({"global_step": global_step / log_interval, "inr_init": inr_init_img})
 
 
         # ==== save cache ====
