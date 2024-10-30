@@ -40,7 +40,7 @@ inverse_steps_schedule:
   - 0: 15
   - 20: 3
   - 400: 1
-model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_3s_big/checkpoint/model_epoch_399.pth
+model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_3s_big_4001s/checkpoint/model_epoch_479.pth
 sampling: ddimr
 val_fid_calculation_period: 1
 lr: 0.0001

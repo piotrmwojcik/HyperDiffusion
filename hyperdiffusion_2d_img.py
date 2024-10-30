@@ -398,6 +398,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 output = mlp({'coords': input})
                 #start = time.time()
                 loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))['img_loss']
+                loss_inner = loss_inner * Config.get('code_loss_weight')
                 psnr_inner = image_psnr(output['model_out'], gt_imgs[code_idx].unsqueeze(0))['img_psnr']
                 mse_loss.append(loss_inner)
                 psnr.append(psnr_inner)
@@ -468,7 +469,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             model_kwargs=None,
         )
 
-        loss_mse = loss_terms["loss"].mean() * Config.get('code_loss_weight')
+        loss_mse = loss_terms["loss"].mean()
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
