@@ -449,6 +449,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             code_list_, code_optimizers = self.load_cache(train_batch)
             code = torch.stack(code_list_, dim=0).cuda()
 
+
         optimizer.zero_grad()
         # Sample a diffusion timestep
         t = (
@@ -467,7 +468,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             model_kwargs=None,
         )
 
-        loss_mse = loss_terms["loss"].mean()
+        loss_mse = loss_terms["loss"].mean() * Config.get('code_loss_weight')
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
@@ -509,6 +510,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.logger.log({"global_step": global_step, "diff_train_loss": loss_mse})
         self.logger.log({"global_step": global_step, "psnr": psnr})
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
+        self.logger.log({"global_step": global_step, "code_norm": code.square().mean()})
 
         return loss_mse
 
