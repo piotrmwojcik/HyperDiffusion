@@ -507,6 +507,7 @@ class PointCloud(Dataset):
         on_surface_points,
         keep_aspect_ratio=True,
         is_mesh=True,
+
         output_type="occ",
         out_act="sigmoid",
         n_points=200000,
@@ -1210,3 +1211,53 @@ class CompositeGradients(Dataset):
         }
 
         return in_dict, gt_dict
+
+
+class MockConfig:
+    class MLPConfig:
+        move = False  # Set to True if testing with animation, False otherwise
+
+    mlp_config = MLPConfig()
+    strategy = "save_pc"
+    n_points = 100000
+    in_out = False
+    shape_modify = None
+
+
+def main():
+    # Define a simple mock path and other necessary parameters
+    path = "/Users/piotrwojcik/Downloads/04530566/ee09bd0664e0a02292b9fcc49a614e2b/models/model_normalized.obj"  # Use a real path for actual testing
+    on_surface_points = 1000  # Adjust as needed for testing
+
+    # Create the configuration object
+    cfg = MockConfig()
+
+    # Create the PointCloud instance
+    point_cloud = PointCloud(
+        path=path,
+        on_surface_points=on_surface_points,
+        keep_aspect_ratio=True,
+        is_mesh=True,
+        output_type="occ",
+        out_act="sigmoid",
+        n_points=200000,
+        cfg=cfg,
+    )
+
+    # Print the length of the dataset
+    print(f"Number of samples in PointCloud dataset: {len(point_cloud)}")
+
+    # Create a DataLoader to sample from the dataset
+    #data_loader = DataLoader(point_cloud, batch_size=4, shuffle=True)
+
+    # Sample a batch from the dataset and print the shapes of data
+    for batch in point_cloud:
+        coords, sdf = batch
+        print("Coords shape:", coords["coords"].shape)
+        print("SDF shape:", sdf["sdf"].shape)
+        break  # Only test one batch for verification
+
+
+# Run the main function when this script is executed
+if __name__ == "__main__":
+    main()
