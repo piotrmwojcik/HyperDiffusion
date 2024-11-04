@@ -247,9 +247,9 @@ def main(cfg: DictConfig):
             # multiply
             current_lr = scheduler.get_last_lr()[0]
 
-            for param_group in optimizer.param_groups:
-                param_group['lr'] = 2 * current_lr
-                print(f"Learning rate set first time to: {param_group['lr']}")
+            # for param_group in optimizer.param_groups:
+            #     param_group['lr'] = 2 * current_lr
+            #     print(f"Learning rate set first time to: {param_group['lr']}")
 
     # Check if GPU is available
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
