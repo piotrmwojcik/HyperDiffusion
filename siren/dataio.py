@@ -510,7 +510,7 @@ class PointCloud(Dataset):
 
         output_type="occ",
         out_act="sigmoid",
-        n_points=200000,
+        n_points=100000,
         cfg=None,
     ):
         super().__init__()
@@ -1227,7 +1227,7 @@ class MockConfig:
 def main():
     # Define a simple mock path and other necessary parameters
     path = "/Users/piotrwojcik/Downloads/04530566/ee09bd0664e0a02292b9fcc49a614e2b/models/model_normalized.obj"  # Use a real path for actual testing
-    on_surface_points = 1000  # Adjust as needed for testing
+    on_surface_points = 2048  # Adjust as needed for testing
 
     # Create the configuration object
     cfg = MockConfig()
