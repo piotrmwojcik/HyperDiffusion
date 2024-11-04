@@ -40,10 +40,10 @@ inverse_steps_schedule:
   - 0: 15
   - 20: 3
   - 400: 1
-model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_3s_big_4001s/checkpoint/model_epoch_999.pth
+model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_3s_big_4001s_2000_2lr/checkpoint/model_epoch_1079.pth
 sampling: ddimr
 val_fid_calculation_period: 1
-lr: 0.0002
+lr: 0.0001
 log_interval: 150
 batch_size: 32
 accumulate_grad_batches: 1
