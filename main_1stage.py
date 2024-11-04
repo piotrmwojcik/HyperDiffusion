@@ -245,7 +245,7 @@ def main(cfg: DictConfig):
             print('Loaded scheduler ', scheduler_msg)
 
             # multiply
-            current_lr = scheduler.get_last_lr()[0]
+            #current_lr = scheduler.get_last_lr()[0]
 
             # for param_group in optimizer.param_groups:
             #     param_group['lr'] = 2 * current_lr
