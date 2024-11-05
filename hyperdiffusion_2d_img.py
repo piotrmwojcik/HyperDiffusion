@@ -57,6 +57,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         betas = torch.tensor(np.linspace(1e-4, 2e-2, timesteps))
         self.image_size = encoded_outs[:1].shape
 
+        self.register_buffer('norm_factor', torch.ones(1, dtype=torch.float))
+        self.momentum = Config.config["norm_momentum"]
+
         # Initialize diffusion utiities
         self.diff = GaussianDiffusion(
             betas=betas,
@@ -470,6 +473,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         )
 
         loss_mse = loss_terms["loss"].mean()
+
+        norm_factor = code.detach().square().mean()
+        self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
+                              + self.momentum * norm_factor
+        loss_mse = 52.63 * loss_mse / self.norm_factor
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
