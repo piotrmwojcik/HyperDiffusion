@@ -17,7 +17,12 @@ import trimesh
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision.transforms import Compose, Normalize, Resize, ToTensor
+import trimesh
+import matplotlib.pyplot as plt
 
+import sys
+sys.path.append("..")
+import binvox_rw
 
 def anime_read(filename):
     f = open(filename, "rb")
@@ -538,8 +543,10 @@ class PointCloud(Dataset):
                 points_uniform = np.random.uniform(
                     -0.5, 0.5, size=(n_points_uniform, 3)
                 )
+
                 points_surface = obj.sample(n_points_surface)
-                points_surface += 0.01 * np.random.randn(n_points_surface, 3)
+                # points_surface += 0.01 * np.random.randn(n_points_surface, 3)
+
                 points = np.concatenate([points_surface, points_uniform], axis=0)
 
                 inside_surface_values = igl.fast_winding_number_for_meshes(
@@ -551,6 +558,7 @@ class PointCloud(Dataset):
                     [inside_surface_values < thresh, inside_surface_values >= thresh],
                     [0, 1],
                 )
+
                 occupancies = occupancies_winding[..., None]
                 print(points.shape, occupancies.shape, occupancies.sum())
                 point_cloud = points
@@ -653,6 +661,7 @@ class PointCloud(Dataset):
             point_cloud = np.load(
                 os.path.join(pc_folder, os.path.basename(path) + ".npy")
             )
+            # point_cloud = np.load(path)
             self.coords = point_cloud[:, :3]
             self.occupancies = point_cloud[:, 3]
 
@@ -660,7 +669,6 @@ class PointCloud(Dataset):
             included_points = self.coords[:, 0] < 0
             self.coords = self.coords[included_points]
             self.normals = self.normals[included_points]
-
         self.on_surface_points = on_surface_points
 
     def __len__(self):
@@ -1226,13 +1234,20 @@ class MockConfig:
 
 def main():
     # Define a simple mock path and other necessary parameters
-    path = "/Users/piotrwojcik/Downloads/04530566/ee09bd0664e0a02292b9fcc49a614e2b/models/model_normalized.obj"  # Use a real path for actual testing
-    on_surface_points = 1000  # Adjust as needed for testing
+    path = '/Users/kacpermarzol/PycharmProjects/hyperdiffusionproject/HyperDiffusion/data/02958343/58f447ce8de6b9794c40f34de8f3bdb8/models/model_normalized.obj'
+    path2 = '/Users/kacpermarzol/PycharmProjects/hyperdiffusionproject/HyperDiffusion/data/02958343/58f447ce8de6b9794c40f34de8f3bdb8/models_100000_pc/model_normalized.obj.npy'
+    on_surface_points = 2048  # Adjust as needed for testing
 
-    # Create the configuration object
+    obj = trimesh.load(path, force='mesh')
+    vertices = obj.vertices
+    faces = obj.faces
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_trisurf(vertices[:, 0], vertices[:, 1], vertices[:, 2], triangles=faces, edgecolor='k', linewidth=0.5)
+    plt.show()
+
+
     cfg = MockConfig()
-
-    # Create the PointCloud instance
     point_cloud = PointCloud(
         path=path,
         on_surface_points=on_surface_points,
@@ -1244,6 +1259,32 @@ def main():
         cfg=cfg,
     )
 
+    x = np.load(path2)
+    occupied_points = x[x[:, 3] == 1, :3]
+
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(occupied_points[:, 0], occupied_points[:, 1], occupied_points[:, 2], s=1, c='blue', alpha=0.5)
+    ax.set_title("3D Scatter Plot of Points with Occupancy Value 1")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Z")
+    ax.set_xlim(-0.5, 0.5)
+    ax.set_ylim(-0.5, 0.5)
+    ax.set_zlim(-0.5, 0.5)
+    ax.view_init(elev=30, azim=60)  # Change these values to your desired elevation and azimuth
+
+    plt.show()
+
+
+    print(x.shape)
+    print(x[:,3])
+    print(x[3])
+    unique_values, counts = np.unique(x[:,3], return_counts=True)
+    for value, count in zip(unique_values, counts):
+        print(f"Value: {value}, Count: {count}")
+
+
     # Print the length of the dataset
     print(f"Number of samples in PointCloud dataset: {len(point_cloud)}")
 
@@ -1251,13 +1292,102 @@ def main():
     #data_loader = DataLoader(point_cloud, batch_size=4, shuffle=True)
 
     # Sample a batch from the dataset and print the shapes of data
+
     for batch in point_cloud:
         coords, sdf = batch
-        print("Coords shape:", coords["coords"].shape)
-        print("SDF shape:", sdf["sdf"].shape)
-        break  # Only test one batch for verification
+        # unique_values, counts = np.unique(sdf["sdf"], return_counts=True)
+        # for value, count in zip(unique_values, counts):
+        #     print(f"Value: {value}, Count: {count}")
+        # print("_")
 
+def load_binvox(filename):
+    with open(filename, 'rb') as f:
+        model = binvox_rw.read_as_3d_array(f)
+    return model
+
+
+def plot_voxel_data(voxel_data):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Find the coordinates of the voxels that are 'on'
+    x, y, z = np.where(voxel_data)
+    perm = np.random.permutation(len(x))
+
+    x = x[perm]
+    y = y[perm]
+    z = z[perm]
+    n=10000
+
+    ax.scatter(x[:n], y[:n], z[:n], zdir='z', c='blue', s=1)
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+
+    print(x.min(), x.max())
+    print(y.min(), y.max())
+    print(z.min(), z.max())
+
+    ax.set_xlim(0, 128)
+    ax.set_ylim(0, 128)
+    ax.set_zlim(0, 128)
+    plt.show()
+
+
+def voxel_to_pointcloud_with_occupancies(voxel_data):
+    data = voxel_data.data
+
+    i, j, k = np.indices(data.shape)
+
+    dims = voxel_data.dims
+    translate =voxel_data.translate
+    scale = voxel_data.scale
+
+    x = (i + .5) / dims[0]
+    y = (j + .5) / dims[1]
+    z = (k + .5) / dims[2]
+    x = scale * x + translate[0]
+    y = scale * y + translate[1]
+    z = scale * z + translate[2]
+
+    points = np.stack((x, y, z), axis=-1).reshape(-1, 3).astype(np.float32)
+    occupancies = data.reshape(-1, 1).astype(np.int32)
+    return points, occupancies
+
+
+def plot_occupied_pointcloud(points, occupancies):
+    occupied_points = points[occupancies.flatten() == 1]
+
+    # perm = np.random.permutation(len(occupied_points))
+    # occupied_points = occupied_points[perm]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    n = len(occupied_points)
+    # n = 100000
+    ax.scatter(occupied_points[:n, 0], occupied_points[:n, 1],occupied_points[:n, 2],
+               s=1, c=occupied_points[:n, 0], cmap='Blues', alpha=0.04)
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_xlim([-0.5, 0.5])
+    ax.set_ylim([-0.5, 0.5])
+    ax.set_zlim([-0.5, 0.5])
+    plt.show()
+
+def main2():
+    path = '/Users/kacpermarzol/PycharmProjects/hyperdiffusionproject/HyperDiffusion/data/02958343/1a0bc9ab92c915167ae33d942430658c/models/model_normalized.surface.binvox'
+    voxel_data = load_binvox(path)
+    # data = voxel_data.data
+
+    points, occ = voxel_to_pointcloud_with_occupancies(voxel_data)
+    unique_values, counts = np.unique(occ, return_counts=True)
+    for value, count in zip(unique_values, counts):
+        print(f"Value: {value}, Count: {count}")
+    plot_occupied_pointcloud(points, occ)
 
 # Run the main function when this script is executed
 if __name__ == "__main__":
-    main()
+    # main()
+    main2()
