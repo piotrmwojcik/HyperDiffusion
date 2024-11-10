@@ -77,9 +77,16 @@ class FMMLinear(nn.Module):
         self.left_matrix = nn.Parameter(torch.randn(out_channel, factorization_rank))
         self.right_matrix = nn.Parameter(torch.randn(factorization_rank, in_channel))
         self.bias = nn.Parameter(torch.zeros(out_channel).fill_(0))
-        self.W = None
+        self.W = self.left_matrix @ self.right_matrix
+        self.W = self.W / np.sqrt(self.rank)
 
         self.reset_parameters()
+
+    def load_state_dict(self, state_dict, strict=True):
+
+        print('dupa')
+        super(FMMLinear, self).load_state_dict(state_dict, strict=strict)
+
 
     def reset_parameters(self):
         # Standard initialization (usually Xavier or Kaiming)
@@ -94,9 +101,8 @@ class FMMLinear(nn.Module):
             nn.init.uniform_(self.bias, -bound, bound)
 
     def forward(self, input):
-        if self.W is None:
-            self.W = self.left_matrix @ self.right_matrix # [batch_size, out_channel, in_channel]
-            self.W = self.W / np.sqrt(self.rank)
+        #self.W = self.left_matrix @ self.right_matrix # [batch_size, out_channel, in_channel]
+        #self.W = self.W / np.sqrt(self.rank)
         out = F.linear(input, self.W, self.bias)
 
         return out
