@@ -6,7 +6,7 @@ from hyperdiffusion import HyperDiffusion
 
 # Using it to make pyrender work on clusters
 from hyperdiffusion_2d_img import HyperDiffusion_2d_img
-from mlp_models import ImplicitMLP
+from mlp_models import ImplicitMLP, ParallelImplicitMLP
 from scheduler import PrefixStepLRScheduler
 
 os.environ["PYOPENGL_PLATFORM"] = "egl"
@@ -187,6 +187,8 @@ def main(cfg: DictConfig):
     model_resume_path = Config.get("model_resume_path")
 
     # Initialize HyperDiffusion
+    MLP = ParallelImplicitMLP(B=torch.load(Config.get("B_path")), batch_size=Config.get("batch_size"))
+
     diffuser = HyperDiffusion_2d_img(
         model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, Config.get("cache_size"), cfg
     )
