@@ -77,16 +77,8 @@ class FMMLinear(nn.Module):
         self.left_matrix = nn.Parameter(torch.randn(out_channel, factorization_rank))
         self.right_matrix = nn.Parameter(torch.randn(factorization_rank, in_channel))
         self.bias = nn.Parameter(torch.zeros(out_channel).fill_(0))
-        self.W = self.left_matrix @ self.right_matrix
-        self.W = self.W / np.sqrt(self.rank)
 
         self.reset_parameters()
-
-    def load_state_dict(self, state_dict, strict=True):
-
-        print('dupa')
-        super(FMMLinear, self).load_state_dict(state_dict, strict=strict)
-
 
     def reset_parameters(self):
         # Standard initialization (usually Xavier or Kaiming)
@@ -101,9 +93,9 @@ class FMMLinear(nn.Module):
             nn.init.uniform_(self.bias, -bound, bound)
 
     def forward(self, input):
-        #self.W = self.left_matrix @ self.right_matrix # [batch_size, out_channel, in_channel]
-        #self.W = self.W / np.sqrt(self.rank)
-        out = F.linear(input, self.W, self.bias)
+        W = self.left_matrix @ self.right_matrix # [batch_size, out_channel, in_channel]
+        W = W / np.sqrt(self.rank)
+        out = F.linear(input, W, self.bias)
 
         return out
 
@@ -169,6 +161,8 @@ class ImplicitMLP(nn.Module):
         coords = coords_org
 
         x = self.gff(coords)
+        print('!!!')
+        print(x.shape)
         x = rearrange(x, "b c h w -> (b h w) c")  # Flatten the images
         x = self.linear1(x)
         x = F.relu(x)
@@ -182,6 +176,38 @@ class ImplicitMLP(nn.Module):
 
         return {'model_in': coords_org, 'model_out': output}
 
+
+class ParallelImplicitMLP(nn.Module):
+    def __init__(self, batch_size, B):
+        super(ParallelImplicitMLP, self).__init__()
+        self.gff = GaussianFourierFeatureTransform(B=B, mapping_dim=128)
+        self.linear1 = FMMLinear(128 * 2 * batch_size, 256 * batch_size, 70)
+        self.linear2 = FMMLinear(256 * batch_size, 128 * batch_size, 10)
+        self.linear3 = nn.Linear(128 * batch_size, 32 * batch_size)
+        self.linear4 = nn.Linear(32 * batch_size, 16 * batch_size)
+        self.linear5 = nn.Linear(16 * batch_size, 3 * batch_size)
+
+    def forward(self, model_input):
+        h = 64
+        w = 64
+
+        coords_org = model_input['coords'].clone().detach().requires_grad_(True)
+        coords = coords_org
+
+        x = self.gff(coords)
+
+        x = rearrange(x, "b c h w -> (b h w) c")  # Flatten the images
+        x = self.linear1(x)
+        x = F.relu(x)
+        x = self.linear2(x)
+        x = F.relu(x)
+        x = self.linear3(x)
+        x = F.relu(x)
+        x = self.linear4(x)
+        x = F.relu(x)
+        output = self.linear5(x).unsqueeze(0)
+
+        return {'model_in': coords_org, 'model_out': output}
 
 class MLP3D(nn.Module):
     def __init__(
