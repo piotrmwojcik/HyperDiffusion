@@ -497,14 +497,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             input = train_batch['coords'][0].unsqueeze(0)
             inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
 
-            #mlp_init = ImplicitMLP(B=self.loaded_B)
-            #checkpoint_path = "/data/pwojcik/siren/logs/058462.jpg/checkpoints/model_epoch_14500.pth"
-            #checkpoint = torch.load(checkpoint_path)
-            #mlp_init.load_state_dict(checkpoint)
-            #input_init = train_batch['coords'][0].unsqueeze(0)
-            #inr_output_init = mlp_init({'coords': input_init})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
-
-
             images = wandb.Image(input_img, caption="")
             inr_images = wandb.Image(inr_output, caption="")
             #inr_init_img = wandb.Image(inr_output_init, caption="")
