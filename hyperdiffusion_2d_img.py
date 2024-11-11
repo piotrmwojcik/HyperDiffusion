@@ -462,6 +462,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             .cuda()
         )
 
+        start_time = time.time()
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
             self.model,
@@ -471,6 +472,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             self.logger,
             model_kwargs=None,
         )
+        end_time = time.time()
+        print(f"Time taken: {end_time - start_time:.4f} seconds")
+
 
         loss_mse = loss_terms["loss"].mean()
 
