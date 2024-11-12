@@ -525,10 +525,10 @@ class PointCloud(Dataset):
             if cfg.strategy == "save_pc":
                 obj: trimesh.Trimesh = trimesh.load(path, force='mesh')
                 vertices = obj.vertices
-                vertices -= np.mean(vertices, axis=0, keepdims=True)
-                v_max = np.amax(vertices)
-                v_min = np.amin(vertices)
-                vertices *= 0.5 * 0.95 / (max(abs(v_min), abs(v_max)))
+                #vertices -= np.mean(vertices, axis=0, keepdims=True)
+                #v_max = np.amax(vertices)
+                #v_min = np.amin(vertices)
+                #vertices *= 0.5 * 0.95 / (max(abs(v_min), abs(v_max)))
                 print(vertices)
                 obj.vertices = vertices
                 self.obj = obj
