@@ -1,6 +1,7 @@
 import copy
 import os
 import time
+import glob
 from pathlib import Path
 
 import numpy as np
@@ -121,6 +122,23 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer.__setstate__({'state': state})
 
     def get_init_code_(self, device=None):
+        def select_random_jpg_folder(base_path):
+            # Find all directories with a .jpg extension in the base path
+            jpg_folders = glob.glob(os.path.join(base_path, "*.jpg"))
+            if not jpg_folders:
+                raise FileNotFoundError("No folders with .jpg extension found in the specified path.")
+
+            # Randomly select one of the .jpg folders
+            selected_folder = random.choice(jpg_folders)
+            return selected_folder
+
+        # Path to the base directory containing .jpg folders
+        base_path = "/data/pwojcik/siren/logs"
+
+        # Randomly select a folder and set the checkpoint path
+        selected_folder = select_random_jpg_folder(base_path)
+        checkpoint_path = os.path.join(selected_folder, "checkpoints", "model_epoch_14500.pth")
+
         model = ImplicitMLP(B=self.loaded_B)
         checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
         checkpoint = torch.load(checkpoint_path, map_location=device)
