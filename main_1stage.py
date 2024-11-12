@@ -91,7 +91,7 @@ def main(cfg: DictConfig):
         )
         if torch.cuda.device_count() >= 2:
             print("Using", torch.cuda.device_count(), "GPUs!")
-            model = torch.nn.DataParallel(model, device_ids=[0])  # Specify GPUs to use
+            model = torch.nn.DataParallel(model, device_ids=[0, 1])  # Specify GPUs to use
         else:
             print("Not enough GPUs available.")
         model = model.cuda()
@@ -292,7 +292,7 @@ def main(cfg: DictConfig):
                     for p in code_loss_weight_schedule:
                         if epoch >= p[0]:
                             diffuser.cfg['code_loss_weight'] = p[1]
-                    loss = diffuser.training_step(data, optimizer, global_step, save_to_disk)  # Forward pass
+                    loss = diffuser.training_step(data, optimizer, code_optimizer, global_step, save_to_disk)  # Forward pass
                     outputs.append(loss)
                     global_step += 1
                     pbar.set_postfix({"diff_loss": loss.item()})

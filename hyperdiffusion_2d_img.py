@@ -21,7 +21,7 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
 from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes, image_mse, generate_mlp_from_weights_trainable, image_psnr)
-from mlp_models import ImplicitMLP
+from mlp_models import ImplicitMLP, ParallelImplicitMLP
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
 from siren.experiment_scripts.test_sdf import SDFDecoder
@@ -149,10 +149,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         if self.cache is not None:
             if not self.cache_loaded:
-                cache_load_from = self.cfg.get('cache_load_from', None)
+                #cache_load_from = self.cfg.get('cache_load_from', None)
                 loaded = False
                 cache_dir = Config.get('cache_dir')
-                cache_files = os.listdir(cache_dir)
+                cache_files = [f for f in os.listdir(cache_dir) if 'code' in f]
                 cache_files.sort(key=lambda x: int(x.replace('code_', '').split('.')[0]))
                 if len(cache_files) > 0:
                     assert len(cache_files) == self.cache_size
@@ -169,20 +169,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         else:
             cache_list = [None for _ in range(num_scenes)]
         code_list_ = []
-        optimizer_states = []
         for scene_state_single in cache_list:
             if scene_state_single is None:
                 code_list_.append(self.get_init_code_(None))
-                optimizer_states.append(None)
             else:
                 assert 'code_' in scene_state_single['param']
                 code_ = scene_state_single['param']['code_'].to(dtype=torch.float32)
                 code_list_.append(code_.requires_grad_(True))
-                if 'optimizer' in scene_state_single:
-                    optimizer_states.append(scene_state_single['optimizer'])
-                else:
-                    optimizer_states.append(None)
-        return code_list_, optimizer_states
+        return code_list_
 
     def optimizer_state_to(self, state_dict, device=None, dtype=None):
         assert dtype.is_floating_point
@@ -260,12 +254,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     for key, val in out['param'].items():
                         self.load_tensor_to_dict(self.cache[scene_name_single]['param'], key, val,
                                                  device='cpu', dtype=code_dtype)
-                    if 'optimizer' in self.cache[scene_name_single]:
-                        self.optimizer_state_copy(out['optimizer'], self.cache[scene_name_single]['optimizer'],
-                                                 device='cpu', dtype=optimizer_dtype)
-                    else:
-                        self.cache[scene_name_single]['optimizer'] = self.optimizer_state_to(
-                            out['optimizer'], device='cpu', dtype=optimizer_dtype)
+                    # if 'optimizer' in self.cache[scene_name_single]:
+                    #     self.optimizer_state_copy(out['optimizer'], self.cache[scene_name_single]['optimizer'],
+                    #                              device='cpu', dtype=optimizer_dtype)
+                    # else:
+                    # #     self.cache[scene_name_single]['optimizer'] = self.optimizer_state_to(
+                    #         out['optimizer'], device='cpu', dtype=optimizer_dtype)
                 if save_dir is not None and save_to_disk:
                     if self.file_queues is not None:
                         self.file_queues[ind // self.num_file_writers].put(
@@ -366,21 +360,21 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         return mse_loss
 
-    def inverse_code_1b1(self, gt_imgs, grids, code_, code_optimizer_states, prior_grad, cfg):
+    def inverse_code_1b1(self, gt_imgs, grids, code_, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
-        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B).cuda() for code_single in code_]
+        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
+        mlp = ParallelImplicitMLP(mlps)
         grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
-        code_optimizers = self.build_optimizer(mlps, cfg)
-        for sidx, state in enumerate(code_optimizer_states):
-            if state is not None:
-                optim = code_optimizers[sidx].state_dict()
-                optim['state'] = state['state']
-                code_optimizers[sidx].load_state_dict(optim)
+        code_optimizer = self.build_optimizer(mlp, cfg)
+        #for sidx, state in enumerate(code_optimizer_states):
+        #    if state is not None:
+        #        optim = code_optimizers[sidx].state_dict()
+        #        optim['state'] = state['state']
+        #        code_optimizers[sidx].load_state_dict(optim)
 
-        for code_optimizer in code_optimizers:
-            code_optimizer.zero_grad()
+        code_optimizer.zero_grad()
 
         if n_inverse_steps == 0:
             n_inverse_steps = 1
@@ -395,7 +389,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             for code_idx, code_single in enumerate(code_):
                 #if code_idx == 2:
                 #   print(code_single)
-                mlp = mlps[code_idx]
+                mlp = mlp[code_idx]
                 #mlp_params = [param for name, param in mlp.named_parameters()]
                 input = grids[code_idx].unsqueeze(0)
                 output = mlp({'coords': input})
@@ -429,7 +423,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     code_optimizers[code_idx].step()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
-        for idx, mlp in enumerate(mlps):
+        for idx, mlp in enumerate(mlp):
             state_dict = mlp.state_dict()
             weights = []
             for weight in state_dict:
@@ -443,16 +437,15 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         psnr = torch.mean(torch.hstack(psnr))
         return mse_loss, psnr
 
-    def training_step(self, train_batch, optimizer, global_step, save_to_disk):
+    def training_step(self, train_batch, optimizer, code_optimizer, global_step, save_to_disk):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_img = train_batch['gt_img'][0].view(64, 64, 3).permute(2, 0, 1).cuda()
 
         log_interval = int(Config.get("log_interval"))
 
         if 'code_optimizer' in self.cfg:
-            code_list_, code_optimizers = self.load_cache(train_batch)
+            code_list_ = self.load_cache(train_batch)
             code = torch.stack(code_list_, dim=0).cuda()
-
 
         optimizer.zero_grad()
         # Sample a diffusion timestep
@@ -462,7 +455,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             .cuda()
         )
 
-        start_time = time.time()
+        #start_time = time.time()
         # Execute a diffusion forward pass
         loss_terms = self.diff.training_losses(
             self.model,
@@ -472,9 +465,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             self.logger,
             model_kwargs=None,
         )
-        end_time = time.time()
-        print(f"Time taken: {end_time - start_time:.4f} seconds")
-
+        #end_time = time.time()
+        #print(f"Time taken: {end_time - start_time:.4f} seconds")
 
         loss_mse = loss_terms["loss"].mean()
 
@@ -492,7 +484,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         #print('before inverse code')
         #start = time.time()
-        inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizers,
+        inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
                                                prior_grad, self.cfg)
 
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:

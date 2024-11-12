@@ -151,27 +151,19 @@ def generate_mlp_from_weights(weights, mlp_kwargs, B=None):
     return mlp
 
 
-def generate_mlp_from_weights_trainable(weights, mlp_kwargs):
-    # Define a new MLP model based on the mlp_kwargs
-    mlp = get_mlp(mlp_kwargs)
-    current_idx = 0
-    new_params = []
-
-    for param in mlp.parameters():
-        num_params = param.numel()  # Equivalent to np.product(list(val.shape))
-
-        w = weights[current_idx:current_idx + num_params].view(param.shape)
-
-        # Replace the parameter with the new weight tensor
-        new_params.append(w)  # Collect weights as parameters
-        current_idx += num_params
-
-    assert current_idx == len(weights), f"len(weights) = {len(weights)}"
-
-    for new_param, (_, param) in zip(new_params, mlp.named_parameters()):
-        param = new_param.clone()
-
-    return mlp, weights   # Return the model and weights for optimization
+def load_mlp_from_weights(weights, mlp):
+    state_dict = mlp.state_dict()
+    weight_names = list(state_dict.keys())
+    for layer in weight_names:
+        val = state_dict[layer]
+        num_params = np.product(list(val.shape))
+        w = weights[:num_params]
+        w = w.view(*val.shape)
+        state_dict[layer] = w
+        weights = weights[num_params:]
+    assert len(weights) == 0, f"len(weights) = {len(weights)}"
+    mlp.load_state_dict(state_dict)
+    return mlp
 
 
 def render_meshes(meshes):

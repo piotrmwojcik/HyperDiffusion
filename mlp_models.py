@@ -176,34 +176,24 @@ class ImplicitMLP(nn.Module):
 
 
 class ParallelImplicitMLP(nn.Module):
-    def __init__(self, batch_size, B):
+    def __init__(self, models):
         super(ParallelImplicitMLP, self).__init__()
-        self.gff = GaussianFourierFeatureTransform(B=B, mapping_dim=128)
-        self.linear1 = FMMLinear(256 * batch_size, 256 * batch_size, 70)
-        self.linear2 = FMMLinear(256 * batch_size, 128 * batch_size, 10)
-        self.linear3 = nn.Linear(128 * batch_size, 32 * batch_size)
-        self.linear4 = nn.Linear(32 * batch_size, 16 * batch_size)
-        self.linear5 = nn.Linear(16 * batch_size, 3 * batch_size)
 
-    def forward(self, model_input):
+        # Ensure models is a list of ImplicitMLP instances
+        assert all(isinstance(model, ImplicitMLP) for model in models), \
+            "All elements in `models` must be instances of ImplicitMLP"
 
-        coords_org = model_input['coords'].clone().detach().requires_grad_(True)
-        coords = coords_org
+        self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
-        x = self.gff(coords)
+    def forward(self, model_inputs):
+        # model_inputs should be a list of inputs for each of the N models
+        outputs = [self.models[i](model_inputs[i]) for i in range(len(self.models))]
 
-        x = rearrange(x, "b c h w -> (b h w) c")  # Flatten the images
-        x = self.linear1(x)
-        x = F.relu(x)
-        x = self.linear2(x)
-        x = F.relu(x)
-        x = self.linear3(x)
-        x = F.relu(x)
-        x = self.linear4(x)
-        x = F.relu(x)
-        output = self.linear5(x).unsqueeze(0)
+        # Stack outputs along the N dimension to consolidate them
+        model_outs = torch.stack([out['model_out'] for out in outputs], dim=0)
+        model_ins = torch.stack([out['model_in'] for out in outputs], dim=0)
 
-        return {'model_in': coords_org, 'model_out': output}
+        return {'model_in': model_ins, 'model_out': model_outs}
 
 
 class MLP3D(nn.Module):
