@@ -546,6 +546,7 @@ class PointCloud(Dataset):
                     obj.vertices, obj.faces, points
                 )
                 thresh = 0.5
+                print(inside_surface_values)
                 occupancies_winding = np.piecewise(
                     inside_surface_values,
                     [inside_surface_values < thresh, inside_surface_values >= thresh],
