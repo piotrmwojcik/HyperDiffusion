@@ -529,7 +529,7 @@ class PointCloud(Dataset):
                 #v_max = np.amax(vertices)
                 #v_min = np.amin(vertices)
                 #vertices *= 0.5 * 0.95 / (max(abs(v_min), abs(v_max)))
-                print(np.min(vertices), np.max(vertices))
+                #print(np.min(vertices), np.max(vertices))
                 obj.vertices = vertices
                 self.obj = obj
                 total_points = cfg.n_points  # 100000
@@ -548,7 +548,7 @@ class PointCloud(Dataset):
                 )
                 thresh = 0.5
                 #print(inside_surface_values)
-                #print(np.max(inside_surface_values), np.min(inside_surface_values), np.median(inside_surface_values))
+                print(np.max(inside_surface_values), np.min(inside_surface_values), np.median(inside_surface_values))
                 occupancies_winding = np.piecewise(
                     inside_surface_values,
                     [inside_surface_values < thresh, inside_surface_values >= thresh],
