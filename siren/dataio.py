@@ -529,6 +529,7 @@ class PointCloud(Dataset):
                 v_max = np.amax(vertices)
                 v_min = np.amin(vertices)
                 vertices *= 0.5 * 0.95 / (max(abs(v_min), abs(v_max)))
+                print(vertices)
                 obj.vertices = vertices
                 self.obj = obj
                 total_points = cfg.n_points  # 100000
@@ -545,7 +546,7 @@ class PointCloud(Dataset):
                 inside_surface_values = igl.fast_winding_number_for_meshes(
                     obj.vertices, obj.faces, points
                 )
-                thresh = 0.0
+                thresh = 0.5
                 #print(inside_surface_values)
                 #print(np.max(inside_surface_values), np.min(inside_surface_values), np.median(inside_surface_values))
                 occupancies_winding = np.piecewise(
