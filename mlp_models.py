@@ -221,7 +221,7 @@ class ImplicitMLP3D(nn.Module):
     def forward(self, model_input):
 
         coords_org = model_input['coords'].clone().detach().requires_grad_(True)
-        coords = coords_org.permute(0, 2, 1).view(1, 3, 64, 64)
+        coords = coords_org.permute(0, 2, 1).view(1, 3, 1, 2048)
 
         x = self.gff(coords)
         x = rearrange(x, "b c h w -> (b h w) c")
