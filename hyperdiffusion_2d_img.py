@@ -123,25 +123,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer.__setstate__({'state': state})
 
     def get_init_code_(self, device=None):
-        def select_random_jpg_folder(base_path):
-            # Find all directories with a .jpg extension in the base path
-            jpg_folders = glob.glob(os.path.join(base_path, "*.jpg"))
-            if not jpg_folders:
-                raise FileNotFoundError("No folders with .jpg extension found in the specified path.")
-
-            # Randomly select one of the .jpg folders
-            selected_folder = random.choice(jpg_folders)
-            return selected_folder
-
-        # Path to the base directory containing .jpg folders
-        base_path = "/data/pwojcik/siren/logs"
-
-        # Randomly select a folder and set the checkpoint path
-        selected_folder = select_random_jpg_folder(base_path)
-        checkpoint_path = os.path.join(selected_folder, "checkpoints", "model_epoch_14500.pth")
-
         model = ImplicitMLP(B=self.loaded_B)
-        #checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
+        checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
         checkpoint = torch.load(checkpoint_path, map_location=device)
         model.load_state_dict(checkpoint)
 
@@ -462,7 +445,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         psnr = torch.mean(torch.hstack(psnr))
         return mse_loss, psnr
 
-    def training_step(self, train_batch, optimizer, global_step, save_to_disk):
+    def training_step(self, train_batch, optimizer, global_step, save_to_disk, epoch):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_img = train_batch['gt_img'][0].view(64, 64, 3).permute(2, 0, 1).cuda()
 
@@ -497,6 +480,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
                               + self.momentum * norm_factor
         loss_mse = 52.63 * loss_mse / self.norm_factor
+
+        if global_step <= 6:
+            loss_mse = 0.0
+        else:
+            loss_mse = loss_mse * (epoch - 6) / (20 - epoch)
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
