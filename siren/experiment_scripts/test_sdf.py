@@ -33,8 +33,8 @@ class SDFDecoder(torch.nn.Module):
         self.model.cuda()
 
     def forward(self, coords):
-        model_in = {"coords": coords}
-        return self.model(model_in.unsqueeze(0))["model_out"].squeeze()
+        model_in = {"coords": coords.unsqueeze(0)}
+        return self.model(model_in)["model_out"].squeeze()
 
 
 def main():
