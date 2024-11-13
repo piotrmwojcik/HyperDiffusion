@@ -136,7 +136,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             weights.append(state_dict[weight].flatten().cpu())
         weights = torch.hstack(weights).requires_grad_()
 
-        return torch.tanh(weights)
+        return 3.0 * weights
 
     def build_optimizer(self, mlps, cfg):
         optimizer_cfg = dict(type=cfg['code_optimizer'], lr=cfg['code_lr'])
