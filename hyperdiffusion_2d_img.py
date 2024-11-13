@@ -482,9 +482,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         loss_mse = 52.63 * loss_mse / self.norm_factor
 
         if epoch <= 6:
-            loss_mse = 0.0
-        elif epoch < 20:
-            loss_mse = loss_mse * (epoch - 6) / (20 - epoch)
+            loss_mse = 0.0 * loss_mse
+        elif epoch <= 20:
+            loss_mse = loss_mse * epoch / (21 - epoch)
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
