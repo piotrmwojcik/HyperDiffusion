@@ -158,6 +158,7 @@ class ImplicitMLP(nn.Module):
         w = 64
 
         coords_org = model_input['coords'].clone().detach().requires_grad_(True)
+        coords_org = coords_org.permute(2, 1).view(1, 3, 64, 64)
         coords = coords_org
 
         x = self.gff(coords)
@@ -222,8 +223,6 @@ class ImplicitMLP3D(nn.Module):
         coords_org = model_input['coords'].clone().detach().requires_grad_(True)
         coords = coords_org
 
-        print('!!!')
-        print(coords.shape)
         x = self.gff(coords)
         x = rearrange(x, "b c h w -> (b h w) c")
         x = self.linear1(x)
