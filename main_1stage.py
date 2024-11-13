@@ -19,6 +19,7 @@ import multiprocessing as mp
 import numpy as np
 import pytorch_lightning as pl
 import torch
+from torch.optim.lr_scheduler import LambdaLR, StepLR
 from tqdm.autonotebook import tqdm
 from omegaconf import DictConfig
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -220,13 +221,23 @@ def main(cfg: DictConfig):
 
     #lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval="epoch")
     optimizer = torch.optim.AdamW(diffuser.parameters(), lr=Config.get("lr"))
+    warmup_epochs = 15
+    warmup_ratio = 0.001
+
+    def lr_lambda(epoch):
+        if epoch < warmup_epochs:
+            # Linear warm-up: start from warmup_ratio * base_lr and gradually increase to base_lr
+            return warmup_ratio + (1 - warmup_ratio) * (epoch / warmup_epochs)
+        else:
+            # After warm-up, switch to a StepLR-like decay by returning 1 (base_lr)
+            return 1
 
     scheduler = None
 
-    if config["scheduler"]:
-        scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, step_size=config["scheduler_step"], gamma=0.9
-        )
+    warmup_scheduler = LambdaLR(optimizer, lr_lambda=lr_lambda)
+
+    step_scheduler = StepLR(optimizer, step_size=config["scheduler_step"], gamma=0.9)
+    scheduler = (warmup_scheduler, step_scheduler) if config["scheduler"] else None
 
     global_step = 0
     epoch_start = 0

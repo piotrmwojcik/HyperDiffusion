@@ -125,8 +125,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def get_init_code_(self, device=None):
         model = ImplicitMLP(B=self.loaded_B)
         checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
-        checkpoint = torch.load(checkpoint_path, map_location=device)
-        model.load_state_dict(checkpoint)
+        #checkpoint = torch.load(checkpoint_path, map_location=device)
+        #model.load_state_dict(checkpoint)
 
         state_dict = model.state_dict()
         weights = []
@@ -480,11 +480,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
                               + self.momentum * norm_factor
         loss_mse = 52.63 * loss_mse / self.norm_factor
-
-        if epoch <= 6:
-            loss_mse = 0.0 * loss_mse
-        elif epoch <= 20:
-            loss_mse = (epoch / 20) * loss_mse
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
