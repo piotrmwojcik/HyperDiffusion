@@ -254,7 +254,7 @@ def main(cfg: DictConfig):
 
         # Only load the scheduler if you're using one in your config
         if config["scheduler"]:
-            scheduler_msg = scheduler.load_state_dict(checkpoint['scheduler'])
+            scheduler_msg = warmup_scheduler.load_state_dict(checkpoint['scheduler'])
             print('Loaded scheduler ', scheduler_msg)
 
             # multiply
@@ -302,7 +302,11 @@ def main(cfg: DictConfig):
                     global_step += 1
                     pbar.set_postfix({"diff_loss": loss.item()})
                 if scheduler is not None:
-                    scheduler.step()
+                    warmup_scheduler.step()
+
+                    # Once warm-up phase is over, switch to StepLR
+                    if epoch >= warmup_epochs:
+                        step_scheduler.step()
 
                 epoch_loss = sum(output for output in outputs) / len(outputs)
                 run.log({"epoch": epoch, "epoch_loss": epoch_loss})
@@ -321,7 +325,7 @@ def main(cfg: DictConfig):
                     checkpoint = {
                         'diffuser': diffuser.state_dict(),
                         'optimizer': optimizer.state_dict(),
-                        'scheduler': scheduler.state_dict() if scheduler is not None else None,  # Save the scheduler's state
+                        'scheduler': step_scheduler.state_dict() if scheduler is not None else None,  # Save the scheduler's state
                         'epoch': epoch,
                         'global_step': global_step
                     }
