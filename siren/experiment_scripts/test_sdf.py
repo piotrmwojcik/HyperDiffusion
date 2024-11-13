@@ -6,7 +6,7 @@ import os
 import sys
 from pathlib import Path
 
-from mlp_models import MLP3D, SingleBVPNet
+from mlp_models import MLP3D, SingleBVPNet, ImplicitMLP3D
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(
@@ -23,10 +23,8 @@ class SDFDecoder(torch.nn.Module):
         super().__init__()
         # Define the model.
         if model_type == "mlp_3d":
-            if "mlp_config" in cfg:
-                self.model = MLP3D(**cfg.mlp_config)
-            else:
-                self.model = MLP3D(**cfg)
+            B = torch.load('/data/pwojcik/siren/random_mod/B3.pth')
+            self.model = ImplicitMLP3D(B=B)
         elif model_type == "SingleBVPNet":
             self.model = SingleBVPNet(**cfg)
 
