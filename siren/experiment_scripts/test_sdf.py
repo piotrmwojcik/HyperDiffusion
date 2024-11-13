@@ -27,6 +27,8 @@ class SDFDecoder(torch.nn.Module):
             #self.model = ImplicitMLP3D(B=B)
             if "mlp_config" in cfg:
                 self.model = MLP3D(**cfg.mlp_config)
+            else:
+                self.model = MLP3D(**cfg)
         elif model_type == "SingleBVPNet":
             self.model = SingleBVPNet(**cfg)
 
