@@ -33,9 +33,10 @@ from siren.experiment_scripts.test_sdf import SDFDecoder
 
 
 def get_model(cfg):
-    if cfg.model_type == "mlp_3d":
-        B = torch.load('/data/pwojcik/siren/random_mod/B3.pth')
-        model = ImplicitMLP3D(B=B)
+    #if cfg.model_type == "mlp_3d":
+    #    B = torch.load('/data/pwojcik/siren/random_mod/B3.pth')
+    #    model = ImplicitMLP3D(B=B)
+    model = MLP3D(**cfg.mlp_config)
     nparameters = sum(p.numel() for p in model.parameters())
     print(model)
     print("Total number of parameters: %d" % nparameters)

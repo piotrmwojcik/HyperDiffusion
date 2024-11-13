@@ -23,8 +23,10 @@ class SDFDecoder(torch.nn.Module):
         super().__init__()
         # Define the model.
         if model_type == "mlp_3d":
-            B = torch.load('/data/pwojcik/siren/random_mod/B3.pth')
-            self.model = ImplicitMLP3D(B=B)
+            #B = torch.load('/data/pwojcik/siren/random_mod/B3.pth')
+            #self.model = ImplicitMLP3D(B=B)
+            if "mlp_config" in cfg:
+                self.model = MLP3D(**cfg.mlp_config)
         elif model_type == "SingleBVPNet":
             self.model = SingleBVPNet(**cfg)
 
