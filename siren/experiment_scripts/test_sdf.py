@@ -38,7 +38,7 @@ class SDFDecoder(torch.nn.Module):
 
     def forward(self, coords):
 
-        model_in = {"coords": coords.view(128, 2048, 3)}
+        model_in = {"coords": coords}
         return self.model(model_in)["model_out"].squeeze()
 
 
