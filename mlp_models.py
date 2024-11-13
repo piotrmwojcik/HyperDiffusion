@@ -207,6 +207,34 @@ class ParallelImplicitMLP(nn.Module):
 
         return {'model_in': coords_org, 'model_out': output}
 
+class ImplicitMLP3D(nn.Module):
+    def __init__(self, B):
+        super(ImplicitMLP3D, self).__init__()
+        self.gff = GaussianFourierFeatureTransform(mapping_dim=128, num_input_channels=3, B=B)
+        self.linear1 = FMMLinear(128 * 2, 256, 70)
+        self.linear2 = FMMLinear(256, 128, 10)
+        self.linear3 = nn.Linear(128, 32)
+        self.linear4 = nn.Linear(32, 16)
+        self.linear5 = nn.Linear(16, 1)
+
+    def forward(self, model_input):
+
+        coords_org = model_input['coords'].clone().detach().requires_grad_(True)
+        coords = coords_org
+        x = self.gff(coords)
+        x = rearrange(x, "b c h w -> (b h w) c")
+        x = self.linear1(x)
+        x = F.relu(x)
+        x = self.linear2(x)
+        x = F.relu(x)
+        x = self.linear3(x)
+        x = F.relu(x)
+        x = self.linear4(x)
+        x = F.relu(x)
+        output = self.linear5(x).unsqueeze(0)
+
+        return {'model_in': coords_org, 'model_out': output}
+
 
 class MLP3D(nn.Module):
     def __init__(

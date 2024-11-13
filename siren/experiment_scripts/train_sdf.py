@@ -27,14 +27,15 @@ from scipy.spatial.transform import Rotation
 from torch.utils.data import DataLoader
 
 from hd_utils import render_mesh
-from mlp_models import MLP3D
+from mlp_models import MLP3D, ImplicitMLP3D
 from siren import dataio, loss_functions, sdf_meshing, training, utils
 from siren.experiment_scripts.test_sdf import SDFDecoder
 
 
 def get_model(cfg):
     if cfg.model_type == "mlp_3d":
-        model = MLP3D(**cfg.mlp_config)
+        B = torch.load('/data/pwojcik/siren/random_mod/B.pth')
+        model = ImplicitMLP3D(B=B)
     nparameters = sum(p.numel() for p in model.parameters())
     print(model)
     print("Total number of parameters: %d" % nparameters)
