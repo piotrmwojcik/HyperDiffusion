@@ -40,7 +40,7 @@ code_lr_schedule:
   - 0: 1e-3
 inverse_steps_schedule:
   - 0: 15
-  - 20: 3
+  - 5: 3
   - 400: 1
 model_resume_path:
 sampling: ddimr
