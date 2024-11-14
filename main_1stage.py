@@ -226,11 +226,11 @@ def main(cfg: DictConfig):
 
     def lr_lambda(epoch):
         if epoch < warmup_epochs:
-            # Linear warm-up: start from warmup_ratio * base_lr and gradually increase to base_lr
-            return warmup_ratio * Config.get("lr") + (Config.get("lr") - warmup_ratio * Config.get("lr")) * (epoch / warmup_epochs)
+            lr = warmup_ratio + (1.0 - warmup_ratio) * (epoch / warmup_epochs)
+            return lr
         else:
             # After warm-up, switch to a StepLR-like decay by returning 1 (base_lr)
-            return Config.get("lr")
+            return 1.0
 
     scheduler = None
 
