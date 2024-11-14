@@ -39,7 +39,7 @@ code_loss_weight_schedule:
 code_lr_schedule:
   - 0: 1e-3
 inverse_steps_schedule:
-  - 0: 15
+  - 0: 150
   - 5: 3
   - 400: 1
 model_resume_path:
