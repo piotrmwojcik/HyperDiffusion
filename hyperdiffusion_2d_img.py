@@ -475,7 +475,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         #print('before inverse code')
         #start = time.time()
-        inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
+        inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, None,
                                                prior_grad, self.cfg)
 
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
