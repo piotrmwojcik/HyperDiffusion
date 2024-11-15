@@ -124,7 +124,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         model = ImplicitMLP(B=self.loaded_B)
         checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
         checkpoint = torch.load(checkpoint_path, map_location=device)
-        model.load_state_dict(checkpoint)
+        #model.load_state_dict(checkpoint)
 
         state_dict = model.state_dict()
         weights = []
@@ -293,7 +293,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         n_inverse_steps = cfg['inverse_steps']
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
-        code_optimizers = self.build_optimizer(mlps, cfg)
+        code_optimizers = self.mizer(mlps, cfg)
         for sidx, state in enumerate(code_optimizer_states):
             if state is not None:
                 optim = code_optimizers[sidx].state_dict()

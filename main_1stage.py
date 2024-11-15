@@ -238,8 +238,6 @@ def main(cfg: DictConfig):
             # After warm-up, switch to a StepLR-like decay by returning 1 (base_lr)
             return 1.0
 
-    scheduler = None
-
     warmup_scheduler = LambdaLR(optimizer, lr_lambda=lr_lambda)
 
     step_scheduler = StepLR(optimizer, step_size=config["scheduler_step"], gamma=0.9)
