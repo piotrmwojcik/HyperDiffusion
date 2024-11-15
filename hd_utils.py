@@ -95,7 +95,7 @@ def image_mse(mask, model_output, gt):
     if mask is None:
         print(model_output['model_out'].shape, gt.shape)
 
-        return {'img_loss': ((model_output['model_out'] - gt) ** 2).mean()}
+        return {'img_loss': ((model_output['model_out'].squeeze() - gt) ** 2).mean()}
     else:
         return {'img_loss': (mask * (model_output['model_out'] - gt) ** 2).mean()}
 

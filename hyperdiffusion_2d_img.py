@@ -388,7 +388,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             #mlp_params = [param for name, param in mlp.named_parameters()]
             output = mlp({'coords': grids[0].unsqueeze(0)})
             #start = time.time()
-            loss_inner = image_mse(mask=None, model_output=output.squeeze(), gt=gt_imgs)['img_loss']
+            loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
             mse_loss = loss_inner * Config.get('code_loss_weight')
 
             psnr_inner = image_psnr(output['model_out'], gt_imgs)['img_psnr']
