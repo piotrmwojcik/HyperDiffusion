@@ -193,7 +193,7 @@ class ParallelImplicitMLP(nn.Module):
         model_outs = torch.stack([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.stack([out['model_in'] for out in outputs], dim=0)
 
-        return {'model_in': model_ins, 'model_out': model_outs}
+        return {'model_in': model_ins.squeeze(), 'model_out': model_outs.squeeze()}
 
 
 class MLP3D(nn.Module):
