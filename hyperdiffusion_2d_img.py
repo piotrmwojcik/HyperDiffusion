@@ -364,8 +364,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
         mlp = ParallelImplicitMLP(mlps).cuda()
         grids = grids.cuda()
-        print('!!!!!')
-        print(grids.shape)
         gt_imgs = gt_imgs.cuda()
         code_optimizer = self.build_optimizer(mlp, cfg)
         #for sidx, state in enumerate(code_optimizer_states):
@@ -390,7 +388,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             #mlp_params = [param for name, param in mlp.named_parameters()]
             output = mlp({'coords': grids[0].unsqueeze(0)})
             #start = time.time()
-            loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
+            loss_inner = image_mse(mask=None, model_output=output.squeeze(), gt=gt_imgs)['img_loss']
             mse_loss = loss_inner * Config.get('code_loss_weight')
 
             psnr_inner = image_psnr(output['model_out'], gt_imgs)['img_psnr']
