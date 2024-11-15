@@ -20,7 +20,7 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
 from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
-                      render_mesh, render_meshes, image_mse, generate_mlp_from_weights_trainable, image_psnr)
+                      render_mesh, render_meshes, image_mse, image_psnr)
 from mlp_models import ImplicitMLP, ParallelImplicitMLP
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
