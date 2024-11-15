@@ -190,8 +190,8 @@ class ParallelImplicitMLP(nn.Module):
         outputs = [self.models[i](model_input) for i in range(len(self.models))]
 
         # Stack outputs along the N dimension to consolidate them
-        model_outs = torch.stack([out['model_out'].unsqueeze(0) for out in outputs], dim=0)
-        model_ins = torch.stack([out['model_in'].unsqueeze(0) for out in outputs], dim=0)
+        model_outs = torch.stack([out['model_out'] for out in outputs], dim=0)
+        model_ins = torch.stack([out['model_in'] for out in outputs], dim=0)
 
         return {'model_in': model_ins, 'model_out': model_outs}
 
