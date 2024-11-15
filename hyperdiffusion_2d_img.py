@@ -136,11 +136,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         return weights
 
-    def build_optimizer(self, mlps, cfg):
+    def build_optimizer(self, mlp, cfg):
         optimizer_cfg = dict(type=cfg['code_optimizer'], lr=cfg['code_lr'])
         optimizer_class = getattr(torch.optim, optimizer_cfg.pop('type'))
-        code_optimizer = [
-            optimizer_class(mlp.parameters(), **optimizer_cfg) for mlp in mlps]
+        code_optimizer = optimizer_class(mlp.parameters(), **optimizer_cfg)
         return code_optimizer
 
     def load_cache(self, data):
