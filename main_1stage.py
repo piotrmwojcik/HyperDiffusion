@@ -193,7 +193,7 @@ def main(cfg: DictConfig):
     model_resume_path = Config.get("model_resume_path")
 
     # Initialize HyperDiffusion
-    MLP = ParallelImplicitMLP(B=torch.load(Config.get("B_path")), batch_size=Config.get("batch_size"))
+    #MLP = ParallelImplicitMLP(B=torch.load(Config.get("B_path")), batch_size=Config.get("batch_size"))
 
     diffuser = HyperDiffusion_2d_img(
         model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, Config.get("cache_size"), cfg
@@ -292,7 +292,7 @@ def main(cfg: DictConfig):
                     for p in code_loss_weight_schedule:
                         if epoch >= p[0]:
                             diffuser.cfg['code_loss_weight'] = p[1]
-                    loss = diffuser.training_step(data, optimizer, code_optimizer, global_step, save_to_disk)  # Forward pass
+                    loss = diffuser.training_step(data, optimizer, None, global_step, save_to_disk)  # Forward pass
                     outputs.append(loss)
                     global_step += 1
                     pbar.set_postfix({"diff_loss": loss.item()})

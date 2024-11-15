@@ -226,7 +226,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 self.load_tensor_to_dict(d_dst['state'][key_state_single], key, val,
                                          device=device, dtype=dtype)
 
-    def save_cache(self, code_list_, code_optimizers, scene_name, save_to_disk):
+    def save_cache(self, code_list_, scene_name, save_to_disk):
         code_dtype = code_list_[0].dtype
         optimizer_dtype = torch.float32
         if Config.get('cache_dir') is not None:
@@ -239,8 +239,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             out = dict(
                 scene_id=scene_name[ind],
                 param=dict(
-                    code_=code_single_.data),
-                optimizer=code_optimizers[ind])
+                    code_=code_single_.data))
             if self.cache is not None:
                 scene_name_single = scene_name[ind]
                 if self.cache[scene_name_single] is None:
@@ -360,7 +359,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         return mse_loss
 
-    def inverse_code_1b1(self, gt_imgs, grids, code_, prior_grad, cfg):
+    def inverse_code_1b1(self, gt_imgs, grids, code_, optimizer_state, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
@@ -369,10 +368,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         gt_imgs = gt_imgs.cuda()
         code_optimizer = self.build_optimizer(mlp, cfg)
         #for sidx, state in enumerate(code_optimizer_states):
-        #    if state is not None:
-        #        optim = code_optimizers[sidx].state_dict()
-        #        optim['state'] = state['state']
-        #        code_optimizers[sidx].load_state_dict(optim)
+        if optimizer_state is not None:
+            optim = code_optimizer.state_dict()
+            optim['state'] = optimizer_state['state']
+            code_optimizer.load_state_dict(optim)
 
         code_optimizer.zero_grad()
 
@@ -384,30 +383,26 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         #start = time.time()
         for inverse_step_id in range(n_inverse_steps):
-            mse_loss = []
             psnr = []
-            for code_idx, code_single in enumerate(code_):
-                #if code_idx == 2:
-                #   print(code_single)
-                mlp = mlp[code_idx]
-                #mlp_params = [param for name, param in mlp.named_parameters()]
-                input = grids[code_idx].unsqueeze(0)
-                output = mlp({'coords': input})
-                #start = time.time()
-                loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx].unsqueeze(0))['img_loss']
-                loss_inner = loss_inner * Config.get('code_loss_weight')
-                psnr_inner = image_psnr(output['model_out'], gt_imgs[code_idx].unsqueeze(0))['img_psnr']
-                mse_loss.append(loss_inner)
-                psnr.append(psnr_inner)
+            #if code_idx == 2:
+            #   print(code_single)
+            #mlp_params = [param for name, param in mlp.named_parameters()]
+            output = mlp({'coords': grids})
+            #start = time.time()
+            loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
+            mse_loss = loss_inner * Config.get('code_loss_weight')
+            psnr_inner = image_psnr(output['model_out'], gt_imgs)['img_psnr']
+            psnr.append(psnr_inner)
 
-                if update_grad:
-                    grad_inner = torch.autograd.grad(loss_inner,
-                                                     list(mlp.parameters()),
-                                                     create_graph=False)
+            if update_grad:
+                grad_inner = torch.autograd.grad(loss_inner,
+                                                 list(mlp.parameters()),
+                                                 create_graph=False)
 
-                    #end_grad = time.time()
-                    #print(f"grad inner step took {round(end_grad - start, 3)} seconds")
+                #end_grad = time.time()
+                #print(f"grad inner step took {round(end_grad - start, 3)} seconds")
 
+                for code_idx, single_mlp in enumerate(mlp.models):
                     prior_grad[code_idx] = prior_grad[code_idx].cuda()
                     current_idx = 0
                     for grad, param in zip(grad_inner, mlp.parameters()):
@@ -420,20 +415,16 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                         current_idx += num_params
                         param.grad.copy_(grad)
 
-                    code_optimizers[code_idx].step()
+                code_optimizer.step()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
-        for idx, mlp in enumerate(mlp):
+        for idx, mlp in enumerate(mlp.models):
             state_dict = mlp.state_dict()
             weights = []
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
-            optim_state = code_optimizers[idx].state_dict()
-            del optim_state['param_groups']
-            code_optimizer_states[idx] = code_optimizers[idx].state_dict()
 
-        mse_loss = torch.mean(torch.hstack(mse_loss))
         psnr = torch.mean(torch.hstack(psnr))
         return mse_loss, psnr
 
@@ -503,7 +494,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
 
         # ==== save cache ====
-        self.save_cache(code_list_, code_optimizers, train_batch['scene_id'], save_to_disk)
+        self.save_cache(code_list_, train_batch['scene_id'], save_to_disk)
         self.logger.log({"global_step": global_step, "diff_train_loss": loss_mse})
         self.logger.log({"global_step": global_step, "psnr": psnr})
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
