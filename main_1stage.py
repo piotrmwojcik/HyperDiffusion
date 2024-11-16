@@ -266,7 +266,7 @@ def main(cfg: DictConfig):
             scheduler_msg = warmup_scheduler.load_state_dict(checkpoint['scheduler'])
             print('Loaded scheduler ', scheduler_msg)
 
-    code_optimizer_state = diffuser.optimizer_state_to(code_optimizer, device='cpu', dtype=torch.float32)
+    code_optimizer_state = diffuser.optimizer_state_to(code_optimizer.state_dict(), device='cpu', dtype=torch.float32)
 
     # Check if GPU is available
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
