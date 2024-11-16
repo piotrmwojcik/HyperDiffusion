@@ -29,7 +29,7 @@ data_folder_train: /data/pwojcik/
 image_resolution: 64
 cache_size: 27000
 code_optimizer: Adam
-code_lr:
+code_lr: 1e-3
 inverse_steps:
 code_lr_schedule:
   - 0: 1e-3
