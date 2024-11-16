@@ -405,7 +405,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 for code_idx, single_mlp in enumerate(mlp.models):
                     prior_grad[code_idx] = prior_grad[code_idx].cuda()
                     current_idx = 0
-                    for grad, param in zip(grad_inner, mlp.parameters()):
+                    for grad, param in zip(grad_inner, single_mlp.parameters()):
                         grad_shape = grad.shape
                         num_params = np.product(list(grad.shape))
                         grad = grad.view(-1)
