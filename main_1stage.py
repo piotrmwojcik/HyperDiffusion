@@ -175,6 +175,8 @@ def main(cfg: DictConfig):
         "Train dataset length: {}".format(len(train_dt))
     )
     inr_model = ImplicitMLP(B=torch.load(Config.get("B_path")))
+    mlps = [ImplicitMLP(B=torch.load(Config.get("B_path"))) for _ in range(Config.get("batch_size"))]
+    MLP = ParallelImplicitMLP(mlps)
     state_dict = inr_model.state_dict()
     weights = []
     shapes = []
@@ -227,6 +229,7 @@ def main(cfg: DictConfig):
 
     #lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval="epoch")
     optimizer = torch.optim.AdamW(diffuser.parameters(), lr=Config.get("lr"))
+    code_optimizer = diffuser.build_optimizer(MLP, cfg)
     warmup_epochs = 15
     warmup_ratio = 0.001
 
@@ -255,18 +258,15 @@ def main(cfg: DictConfig):
         print('Loaded model ',  model_msg)
         optim_msg = optimizer.load_state_dict(checkpoint['optimizer'])
         print('Loaded optimizer ',  optim_msg)
+        code_optim_msg = optimizer.load_state_dict(checkpoint['code_optimizer'])
+        print('Loaded code optimizer ', code_optim_msg)
 
         # Only load the scheduler if you're using one in your config
         if config["scheduler"]:
             scheduler_msg = warmup_scheduler.load_state_dict(checkpoint['scheduler'])
             print('Loaded scheduler ', scheduler_msg)
 
-            # multiply
-            #current_lr = scheduler.get_last_lr()[0]
-
-            # for param_group in optimizer.param_groups:
-            #     param_group['lr'] = 2 * current_lr
-            #     print(f"Learning rate set first time to: {param_group['lr']}")
+    code_optimizer_state = diffuser.optimizer_state_to(code_optimizer, device='cpu', dtype=torch.float32)
 
     # Check if GPU is available
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -301,7 +301,7 @@ def main(cfg: DictConfig):
                     for p in code_loss_weight_schedule:
                         if epoch >= p[0]:
                             diffuser.cfg['code_loss_weight'] = p[1]
-                    loss = diffuser.training_step(data, optimizer, None, global_step, save_to_disk)  # Forward pass
+                    loss, code_optimizer_state_ = diffuser.training_step(data, optimizer, None, global_step, save_to_disk)  # Forward pass
                     outputs.append(loss)
                     global_step += 1
                     pbar.set_postfix({"diff_loss": loss.item()})
@@ -325,11 +325,14 @@ def main(cfg: DictConfig):
                     with torch.no_grad():
                         diffuser.validation_step(epoch)
 
+                diffuser.optimizer_state_copy(code_optimizer_state, code_optimizer_state_, device='cpu', dtype=torch.float32)
+
                 if save_to_disk:
                     checkpoint = {
                         'diffuser': diffuser.state_dict(),
                         'optimizer': optimizer.state_dict(),
-                        'scheduler': scheduler.state_dict() if scheduler is not None else None,  # Save the scheduler's state
+                        'code_optimizer': code_optimizer_state,
+                        'scheduler': step_scheduler.state_dict() if scheduler is not None else None,  # Save the scheduler's state
                         'epoch': epoch,
                         'global_step': global_step
                     }

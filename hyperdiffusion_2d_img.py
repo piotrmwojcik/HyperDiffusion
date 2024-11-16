@@ -123,7 +123,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def get_init_code_(self, device=None):
         model = ImplicitMLP(B=self.loaded_B)
         checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
-        checkpoint = torch.load(checkpoint_path, map_location=device)
+        #checkpoint = torch.load(checkpoint_path, map_location=device)
         #model.load_state_dict(checkpoint)
 
         state_dict = model.state_dict()
@@ -226,7 +226,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def save_cache(self, code_list_, scene_name, save_to_disk):
         code_dtype = code_list_[0].dtype
-        optimizer_dtype = torch.float32
         if Config.get('cache_dir') is not None:
             save_dir = Config.get('cache_dir')
             os.makedirs(save_dir, exist_ok=True)
@@ -260,10 +259,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 if save_dir is not None and save_to_disk:
                     if self.file_queues is not None:
                         self.file_queues[ind // self.num_file_writers].put(
-                            self.out_dict_to(out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype))
+                            self.out_dict_to(out, device='cpu', code_dtype=code_dtype))
                     else:
                         torch.save(
-                            self.out_dict_to(out, device='cpu', code_dtype=code_dtype, optimizer_dtype=optimizer_dtype),
+                            self.out_dict_to(out, device='cpu', code_dtype=code_dtype),
                             os.path.join(save_dir, f"code_{scene_name[ind]}" + '.pth'))
 
     def forward(self, images):
@@ -427,7 +426,21 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         psnr = torch.mean(torch.hstack(psnr))
         return mse_loss, psnr
 
-    def training_step(self, train_batch, optimizer, code_optimizer, global_step, save_to_disk):
+    def deep_copy_dict(self, input_dict):
+        copied_dict = {}
+        for key, value in input_dict.items():
+            if isinstance(value, torch.Tensor):
+                # For tensors, use .clone() to make an independent copy
+                copied_dict[key] = value.clone()
+            elif isinstance(value, dict):
+                # Recursively copy nested dictionaries
+                copied_dict[key] = self.deep_copy_dict(value)
+            else:
+                # For other types, use copy.deepcopy to handle immutable and mutable types
+                copied_dict[key] = copy.deepcopy(value)
+        return copied_dict
+
+    def training_step(self, train_batch, optimizer, code_optimizer_state, global_step, save_to_disk):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_img = train_batch['gt_img'][0].view(64, 64, 3).permute(2, 0, 1).cuda()
 
@@ -474,7 +487,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         #print('before inverse code')
         #start = time.time()
-        inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, None,
+        code_optimizer_state_ = self.deep_copy_dict(code_optimizer_state)
+        inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizer_state_,
                                                prior_grad, self.cfg)
 
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
@@ -499,7 +513,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
         self.logger.log({"global_step": global_step, "code_norm": code.square().mean()})
 
-        return loss_mse
+        return loss_mse, code_optimizer_state_
 
     def validation_step(self, epoch):
         if Config.get("use_ema"):
