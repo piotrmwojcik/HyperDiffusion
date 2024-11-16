@@ -194,15 +194,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print(out['state']['step'])
         return out
 
-    def out_dict_to(self, d, device=None, code_dtype=torch.float32, optimizer_dtype=torch.float32):
-        assert code_dtype.is_floating_point and optimizer_dtype.is_floating_point
+    def out_dict_to(self, d, device=None, code_dtype=torch.float32):
+        assert code_dtype.is_floating_point
         return dict(
             scene_id=d['scene_id'],
             param=dict(
                 code_=d['param']['code_'].clamp(
                     min=torch.finfo(code_dtype).min, max=torch.finfo(code_dtype).max
-                ).to(device=device, dtype=code_dtype)),
-            optimizer=self.optimizer_state_to(d['optimizer'], device=device, dtype=optimizer_dtype))
+                ).to(device=device, dtype=code_dtype)))
 
     def load_tensor_to_dict(self, d, key, value, device=None, dtype=None):
         assert dtype.is_floating_point
