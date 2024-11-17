@@ -32,13 +32,13 @@ norm_momentum: 0.001
 code_optimizer: Adam
 code_lr: 1e-3
 inverse_steps: 15
-code_loss_weight: 20.0
+code_loss_weight: 10.0
 code_loss_weight_schedule:
   - 500: 10.0
 code_lr_schedule:
   - 0: 1e-3
 inverse_steps_schedule:
-  - 0: 150
+  - 0: 50
   - 1: 3
   - 400: 1
 model_resume_path:

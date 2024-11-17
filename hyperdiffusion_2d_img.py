@@ -423,7 +423,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             code_[idx] = torch.hstack(weights)
 
         psnr = torch.mean(torch.hstack(psnr))
-        print(code_optimizer.state_dict()['state'][0]['step'])
+        #print(code_optimizer.state_dict()['state'][0]['step'])
         optimizer_state_ = self.optimizer_state_to(code_optimizer.state_dict(), device='cpu', dtype=torch.float32)
         return mse_loss, psnr, optimizer_state_
 
