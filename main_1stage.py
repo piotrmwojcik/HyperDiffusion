@@ -302,8 +302,6 @@ def main(cfg: DictConfig):
                         if epoch >= p[0]:
                             diffuser.cfg['code_loss_weight'] = p[1]
                     loss, code_optimizer_state_ = diffuser.training_step(data, optimizer, code_optimizer_state, global_step, save_to_disk)  # Forward pass
-                    print('!!!')
-                    print(code_optimizer_state_['state'][0]['step'])
                     outputs.append(loss)
                     global_step += 1
                     pbar.set_postfix({"diff_loss": loss.item()})
@@ -328,7 +326,8 @@ def main(cfg: DictConfig):
                         diffuser.validation_step(epoch)
 
                 diffuser.optimizer_state_copy(code_optimizer_state, code_optimizer_state_, device='cpu', dtype=torch.float32)
-
+                print('!!!')
+                print(code_optimizer_state_['state'][0]['step'])
                 if save_to_disk:
                     checkpoint = {
                         'diffuser': diffuser.state_dict(),
