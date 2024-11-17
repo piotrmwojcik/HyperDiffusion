@@ -477,7 +477,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         norm_factor = code.detach().square().mean()
         self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
                               + self.momentum * norm_factor
-        loss_mse = 52.63 * loss_mse / self.norm_factor
+        loss_mse = 25 * loss_mse / self.norm_factor
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()

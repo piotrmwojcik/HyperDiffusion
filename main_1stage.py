@@ -325,8 +325,6 @@ def main(cfg: DictConfig):
                         diffuser.validation_step(epoch)
 
                 diffuser.optimizer_state_copy(code_optimizer_state_, code_optimizer_state, device='cpu', dtype=torch.float32)
-                print('!!!')
-                print(code_optimizer_state['state'][0]['step'])
                 if save_to_disk:
                     checkpoint = {
                         'diffuser': diffuser.state_dict(),
