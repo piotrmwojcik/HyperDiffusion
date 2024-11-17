@@ -424,8 +424,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             code_[idx] = torch.hstack(weights)
 
         psnr = torch.mean(torch.hstack(psnr))
-        print(code_optimizer.state_dict()['state'])
-        return mse_loss, psnr
+        optimizer_state_ = self.optimizer_state_to(code_optimizer.state_dict(), device='cpu', dtype=torch.float32)
+        return mse_loss, psnr, optimizer_state_
 
     def deep_copy_dict(self, input_dict):
         copied_dict = {}
@@ -489,8 +489,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print('before inverse code')
         #start = time.time()
         code_optimizer_state_ = self.deep_copy_dict(code_optimizer_state)
-        inv_loss, psnr = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizer_state_,
-                                               prior_grad, self.cfg)
+        inv_loss, psnr, optim_state = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizer_state_,
+                                                            prior_grad, self.cfg)
+        code_optimizer_state_ = self.deep_copy_dict(optim_state)
 
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
             mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs, self.loaded_B)
