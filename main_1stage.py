@@ -277,7 +277,6 @@ def main(cfg: DictConfig):
     if Config.get("mode") == "train":
         for epoch in range(epoch_start, num_epochs):
             print(f"epoch: {epoch}")
-
             # Training phase
             outputs = []
             diffuser.train()  # Set model to training mode
@@ -325,9 +324,7 @@ def main(cfg: DictConfig):
                     with torch.no_grad():
                         diffuser.validation_step(epoch)
 
-                diffuser.optimizer_state_copy(code_optimizer_state, code_optimizer_state_, device='cpu', dtype=torch.float32)
-                print('!!!')
-                print(code_optimizer_state_['state'][0]['step'])
+                diffuser.optimizer_state_copy(code_optimizer_state_, code_optimizer_state, device='cpu', dtype=torch.float32)
                 if save_to_disk:
                     checkpoint = {
                         'diffuser': diffuser.state_dict(),
