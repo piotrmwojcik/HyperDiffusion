@@ -190,6 +190,9 @@ class ParallelImplicitMLP(nn.Module):
         #print(model_input['coords'].shape)
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i]({'coords': model_input[i].unsqueeze(0)}) for i in range(len(self.models))]
+        print('!!!')
+        print(outputs['model_out'].shape)
+
 
         # Stack outputs along the N dimension to consolidate them
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
