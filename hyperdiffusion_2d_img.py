@@ -371,7 +371,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def training_step(self, train_batch, optimizer, code_optimizer_state, global_step, save_to_disk):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
-        input_img = train_batch['gt_img'][0].view(64, 64, 3).permute(2, 0, 1).cuda()
+        input_img = train_batch['gt_img'][16].view(64, 64, 3).permute(2, 0, 1).cuda()
 
         log_interval = int(Config.get("log_interval"))
 
