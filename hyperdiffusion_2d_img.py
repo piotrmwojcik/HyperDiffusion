@@ -325,7 +325,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                                  list(mlp.parameters()),
                                                  create_graph=False)
 
-                for code_idx, single_mlp in enumerate(mlp.models()):
+                for code_idx, single_mlp in enumerate(mlp.models):
                     prior_grad[code_idx] = prior_grad[code_idx].cuda()
                     current_idx = 0
                     for grad, param in zip(grad_inner, single_mlp.parameters()):
@@ -342,7 +342,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         print()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
-        for idx, _mlp in enumerate(mlp.models()):
+        for idx, _mlp in enumerate(mlp.models):
             state_dict = _mlp.state_dict()
             weights = []
             for weight in state_dict:
