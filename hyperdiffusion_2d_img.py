@@ -321,8 +321,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             psnr_inner = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             psnr.append(psnr_inner)
 
-            print(mse_loss)
-
             if update_grad:
                 grad_inner = torch.autograd.grad(mse_loss,
                                                  list(mlp.parameters()),
@@ -348,7 +346,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         print()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
-        for idx, _mlp in enumerate(mlp.models):
+        for idx, _mlp in enumerate(mlps):
             state_dict = _mlp.state_dict()
             weights = []
             for weight in state_dict:
