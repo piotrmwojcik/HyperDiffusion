@@ -415,8 +415,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 code_optimizer.step()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
-        for idx, mlp in enumerate(mlp.models):
-            state_dict = mlp.state_dict()
+        for idx, _mlp in enumerate(mlp.models):
+            state_dict = _mlp.state_dict()
             weights = []
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
@@ -424,8 +424,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         psnr = torch.mean(torch.hstack(psnr))
         #print(code_optimizer.state_dict()['state'][0]['step'])
-        optimizer_state_ = self.optimizer_state_to(code_optimizer.state_dict(), device='cpu', dtype=torch.float32)
-        return mse_loss, psnr, optimizer_state_
+        return mse_loss, psnr, self.optimizer_state_to(code_optimizer.state_dict(), device='cpu', dtype=torch.float32)
 
     def deep_copy_dict(self, input_dict):
         copied_dict = {}
