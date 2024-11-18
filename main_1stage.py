@@ -276,7 +276,7 @@ def main(cfg: DictConfig):
 
     if Config.get("mode") == "train":
         for epoch in range(epoch_start, num_epochs):
-            print(f"epoch: {epoch}")
+            print(f"epoch: {epoch + 1}")
             # Training phase
             outputs = []
             diffuser.train()  # Set model to training mode
