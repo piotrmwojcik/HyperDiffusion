@@ -391,8 +391,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             psnr_inner = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             psnr.append(psnr_inner)
 
+            params = [p for p in mlp.parameters() if p.requires_grad]
+
             print('!!!')
-            print(mse_loss.shape)
+            print(len(params))
             print(mse_loss)
 
             if update_grad:
