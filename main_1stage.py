@@ -203,8 +203,6 @@ def main(cfg: DictConfig):
     )
 
     diffuser.logger = run
-
-
     # best_acc_checkpoint = ModelCheckpoint(
     #     save_top_k=1,
     #     monitor="val/1-NN-CD-acc",
