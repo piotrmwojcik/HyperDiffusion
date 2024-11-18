@@ -370,6 +370,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             optim['state'] = optimizer_state['state']
             code_optimizer.load_state_dict(optim)
         code_optimizer.zero_grad()
+        if 0 in code_optimizer.state_dict()['state'].keys():
+            print('!!!')
+            print(code_optimizer.state_dict()['state'][0]['step'])
+
 
         if n_inverse_steps == 0:
             n_inverse_steps = 1
