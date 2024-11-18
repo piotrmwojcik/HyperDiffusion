@@ -195,7 +195,7 @@ class ParallelImplicitMLP(nn.Module):
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
-        print(model_outs)
+        print(model_ins - model_outs)
 
         return {'model_in': model_ins, 'model_out': model_outs}
 
