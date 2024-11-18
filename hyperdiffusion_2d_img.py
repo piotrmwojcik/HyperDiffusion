@@ -310,15 +310,15 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         #start = time.time()
         for inverse_step_id in range(n_inverse_steps):
-            psnr = []
+            #psnr = []
             output = mlp(grids)
             #start = time.time()
             mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
             #print(mse_loss)
 
-            psnr_inner = image_psnr(output['model_out'], gt_imgs)['img_psnr']
-            psnr.append(psnr_inner)
+            psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
+            #psnr.append(psnr_inner)
 
             if update_grad:
                 grad_inner = torch.autograd.grad(mse_loss,
@@ -349,7 +349,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
 
-        psnr = torch.mean(torch.hstack(psnr))
+        #psnr = torch.mean(torch.hstack(psnr))
         optim_state = code_optimizer.state_dict()
         del optim_state['param_groups']
         #print('state: ', code_optimizer.state_dict()['state'][0]['step'])
