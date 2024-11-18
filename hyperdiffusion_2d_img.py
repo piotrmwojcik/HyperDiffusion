@@ -121,11 +121,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer.__setstate__({'state': state})
 
     def get_init_code_(self, device=None):
-        print('!!!!')
+        #print('!!!!')
         model = ImplicitMLP(B=self.loaded_B)
-        checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
-        checkpoint = torch.load(checkpoint_path, map_location=device)
-        model.load_state_dict(checkpoint)
+        #checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
+        #checkpoint = torch.load(checkpoint_path, map_location=device)
+        #model.load_state_dict(checkpoint)
 
         state_dict = model.state_dict()
         weights = []
@@ -332,18 +332,18 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #end_grad = time.time()
                 #print(f"grad inner step took {round(end_grad - start, 3)} seconds")
 
-                for code_idx, single_mlp in enumerate(mlps):
-                    prior_grad[code_idx] = prior_grad[code_idx].cuda()
-                    current_idx = 0
-                    for grad, param in zip(grad_inner, single_mlp.parameters()):
-                        grad_shape = grad.shape
-                        num_params = np.product(list(grad.shape))
-                        grad = grad.view(-1)
-                        grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
-                        grad = grad.view(grad_shape)
-                        param.grad = torch.zeros_like(param).cuda()
-                        current_idx += num_params
-                        param.grad.copy_(grad)
+                # for code_idx, single_mlp in enumerate(mlps):
+                #     prior_grad[code_idx] = prior_grad[code_idx].cuda()
+                #     current_idx = 0
+                #     for grad, param in zip(grad_inner, single_mlp.parameters()):
+                #         grad_shape = grad.shape
+                #         num_params = np.product(list(grad.shape))
+                #         grad = grad.view(-1)
+                #         grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
+                #         grad = grad.view(grad_shape)
+                #         param.grad = torch.zeros_like(param).cuda()
+                #         current_idx += num_params
+                #         param.grad.copy_(grad)
 
                 code_optimizer.step()
         print()
