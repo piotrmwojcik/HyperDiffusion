@@ -354,7 +354,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
-        for idx in range(code_.shape):
+        for idx in range(len(code_)):
             print(code_[idx] - code_2[idx])
 
         psnr = torch.mean(torch.hstack(psnr))
