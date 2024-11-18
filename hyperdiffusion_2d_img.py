@@ -121,10 +121,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optimizer.__setstate__({'state': state})
 
     def get_init_code_(self, device=None):
+        print('!!!!')
         model = ImplicitMLP(B=self.loaded_B)
         checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
-        #checkpoint = torch.load(checkpoint_path, map_location=device)
-        #model.load_state_dict(checkpoint)
+        checkpoint = torch.load(checkpoint_path, map_location=device)
+        model.load_state_dict(checkpoint)
 
         state_dict = model.state_dict()
         weights = []
@@ -354,8 +355,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
-        for idx in range(len(code_)):
-            print(code_[idx] - code_2[idx])
 
         psnr = torch.mean(torch.hstack(psnr))
         print('state: ', code_optimizer.state_dict()['state'][0]['step'])
