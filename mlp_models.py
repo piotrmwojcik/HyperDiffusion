@@ -186,6 +186,8 @@ class ParallelImplicitMLP(nn.Module):
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
     def forward(self, model_input):
+        print('!!!!')
+        print(model_input.shape)
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i](model_input[i]) for i in range(len(self.models))]
 
