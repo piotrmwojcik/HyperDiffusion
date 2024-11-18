@@ -317,13 +317,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
 
-            print(mse_loss)
             psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             #psnr.append(psnr_inner)
 
             if update_grad:
                 grad_inner = torch.autograd.grad(mse_loss,
-                                                 mlp.parameters(),
+                                                 list(mlp.parameters()),
                                                  create_graph=False)
 
                 for code_idx, single_mlp in enumerate(mlp.models):
@@ -354,8 +353,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optim_state = code_optimizer.state_dict()
         del optim_state['param_groups']
         #print('state: ', code_optimizer.state_dict()['state'][0]['step'])
-        print(psnr)
-        print()
         return mse_loss, psnr, optim_state
 
     def deep_copy_dict(self, input_dict):
@@ -425,10 +422,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #code_optimizer_state_ = self.deep_copy_dict(optim_state)
 
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
-            mlp = generate_mlp_from_weights(code_list_[2], self.mlp_kwargs, self.loaded_B)
+            mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs, self.loaded_B)
             #model_input = {'coords': model_input}
-            input = train_batch['coords'][2].unsqueeze(0)
+            input = train_batch['coords'][0].unsqueeze(0)
             inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
+
+            psnr = image_psnr(mlp({'coords': input})['model_out'], train_batch['gt_img'][0].unsqueeze(0))['img_psnr']
+            print('!!!!')
+            print(psnr)
 
             images = wandb.Image(input_img, caption="")
             inr_images = wandb.Image(inr_output, caption="")
