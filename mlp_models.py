@@ -188,13 +188,12 @@ class ParallelImplicitMLP(nn.Module):
     def forward(self, model_input):
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i](model_input) for i in range(len(self.models))]
-        print([o['model_out'].shape for o in outputs])
 
         # Stack outputs along the N dimension to consolidate them
-        model_outs = torch.stack([out['model_out'] for out in outputs], dim=0)
-        model_ins = torch.stack([out['model_in'] for out in outputs], dim=0)
+        model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
+        model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
-        return {'model_in': model_ins.squeeze(), 'model_out': model_outs.squeeze()}
+        return {'model_in': model_ins, 'model_out': model_outs}
 
 
 class MLP3D(nn.Module):
