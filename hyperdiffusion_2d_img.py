@@ -416,9 +416,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         #print('before inverse code')
         #start = time.time()
-        code_optimizer_state_ = self.deep_copy_dict(code_optimizer_state)
-        inv_loss, psnr, code_optimizer_state_  = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_, code_optimizer_state_,
-                                                            prior_grad, self.cfg)
+        inv_loss, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
+                                                                  self.deep_copy_dict(code_optimizer_state),
+                                                                  prior_grad, self.cfg)
         #code_optimizer_state_ = self.deep_copy_dict(optim_state)
 
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
@@ -443,7 +443,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
         self.logger.log({"global_step": global_step, "code_norm": code.square().mean()})
 
-        return loss_mse, code_optimizer_state_
+        return loss_mse, code_optim_state_
 
     def validation_step(self, epoch):
         if Config.get("use_ema"):
