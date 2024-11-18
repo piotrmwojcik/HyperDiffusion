@@ -286,76 +286,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             return [optimizer], [scheduler]
         return optimizer
 
-    def inverse_code(self, gt_imgs, grids, code_, code_optimizer_states, prior_grad, cfg):
-        n_inverse_steps = cfg['inverse_steps']
-
-        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
-        code_optimizers = self.mizer(mlps, cfg)
-        for sidx, state in enumerate(code_optimizer_states):
-            if state is not None:
-                optim = code_optimizers[sidx].state_dict()
-                optim['state'] = state
-                code_optimizers[sidx].load_state_dict(optim)
-
-        for code_optimizer in code_optimizers:
-            code_optimizer.zero_grad()
-
-        for inverse_step_id in range(n_inverse_steps):
-            mse_loss = []
-            psnr_loss
-            for code_idx, code_single in enumerate(code_):
-                #if code_idx == 2:
-                #   print(code_single)
-                mlp = mlps[code_idx]
-                #mlp_params = [param for name, param in mlp.named_parameters()]
-                input = grids[code_idx].unsqueeze(0)
-                output = mlp({'coords': input})
-
-                loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs[code_idx])
-                mse_loss.append(loss_inner['img_loss'])
-            mse_loss = torch.mean(torch.hstack(mse_loss))
-
-            joint_parameters = []
-            for model in mlps:
-                ps = list(model.parameters())
-                joint_parameters += ps
-                num_parameters = len(ps)
-            start = time.time()
-            grad_inner = torch.autograd.grad(mse_loss,
-                                             joint_parameters,
-                                             create_graph=False)
-            current_idx = 0
-            code_idx = 0
-            for ii, (grad, param) in enumerate(zip(grad_inner, joint_parameters)):
-                grad_shape = grad.shape
-                num_params = np.product(list(grad.shape))
-                grad = grad.view(-1)
-                grad = grad #+ prior_grad[code_idx][current_idx:current_idx + num_params].cuda()
-                grad = grad.view(grad_shape)
-                param.grad = torch.zeros_like(param)
-                current_idx += num_params
-                param.grad.copy_(grad)
-
-                if ((ii + 1) % num_parameters) == 0:
-                    code_idx += 1
-                    current_idx = 0
-
-            for code_optim in code_optimizers:
-                code_optim.step()
-            end = time.time()
-            print(f"one step took {round(end - start, 3)} seconds")
-        for idx, mlp in enumerate(mlps):
-            state_dict = mlp.state_dict()
-            weights = []
-            for weight in state_dict:
-                weights.append(state_dict[weight].flatten())
-            code_[idx] = torch.hstack(weights)
-            optim_state = code_optimizers[idx].state_dict()
-            del optim_state['param_groups']
-            code_optimizer_states[idx] = code_optimizers[idx].state_dict()
-
-        return mse_loss
-
     def inverse_code_1b1(self, gt_imgs, grids, code_, optimizer_state, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
@@ -391,12 +321,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             psnr_inner = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             psnr.append(psnr_inner)
 
-            params = [p for p in mlp.parameters() if p.requires_grad]
-            params0 = [p for p in mlps[0].parameters() if p.requires_grad]
-
-            print('!!!')
-            print(len(params))
-            print(len(params0))
             print(mse_loss)
 
             if update_grad:
