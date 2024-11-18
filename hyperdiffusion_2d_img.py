@@ -424,7 +424,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         if "hyper" in self.method:
             mlp = generate_mlp_from_weights(code_list_[16], self.mlp_kwargs, self.loaded_B)
             #model_input = {'coords': model_input}
-            input = train_batch['coords'][0].unsqueeze(0)
+            input = train_batch['coords'][16].unsqueeze(0)
             inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
 
             psnr_test = image_psnr(mlp({'coords': input})['model_out'], train_batch['gt_img'][16].unsqueeze(0))['img_psnr']
