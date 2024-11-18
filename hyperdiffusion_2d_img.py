@@ -289,7 +289,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def inverse_code_1b1(self, gt_imgs, grids, code_, optimizer_state, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
-        code_2 = [code_single.clone().detach().cuda() for code_single in code_]
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
         mlp = ParallelImplicitMLP(mlps).cuda()
@@ -312,9 +311,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #start = time.time()
         for inverse_step_id in range(n_inverse_steps):
             psnr = []
-            #if code_idx == 2:
-            #   print(code_single)
-            #mlp_params = [param for name, param in mlp.named_parameters()]
             output = mlp(grids)
             #start = time.time()
             mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
@@ -328,29 +324,25 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 grad_inner = torch.autograd.grad(mse_loss,
                                                  list(mlp.parameters()),
                                                  create_graph=False)
-                print(grad_inner)
 
-                #end_grad = time.time()
-                #print(f"grad inner step took {round(end_grad - start, 3)} seconds")
-
-                # for code_idx, single_mlp in enumerate(mlps):
-                #     prior_grad[code_idx] = prior_grad[code_idx].cuda()
-                #     current_idx = 0
-                #     for grad, param in zip(grad_inner, single_mlp.parameters()):
-                #         grad_shape = grad.shape
-                #         num_params = np.product(list(grad.shape))
-                #         grad = grad.view(-1)
-                #         grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
-                #         grad = grad.view(grad_shape)
-                #         param.grad = torch.zeros_like(param).cuda()
-                #         current_idx += num_params
-                #         param.grad.copy_(grad)
+                for code_idx, single_mlp in enumerate(mlp.models()):
+                    prior_grad[code_idx] = prior_grad[code_idx].cuda()
+                    current_idx = 0
+                    for grad, param in zip(grad_inner, single_mlp.parameters()):
+                        grad_shape = grad.shape
+                        num_params = np.product(list(grad.shape))
+                        grad = grad.view(-1)
+                        grad = grad + prior_grad[code_idx][current_idx:current_idx + num_params]
+                        grad = grad.view(grad_shape)
+                        param.grad = torch.zeros_like(param).cuda()
+                        current_idx += num_params
+                        param.grad.copy_(grad)
 
                 code_optimizer.step()
         print()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
-        for idx, _mlp in enumerate(mlps):
+        for idx, _mlp in enumerate(mlp.models()):
             state_dict = _mlp.state_dict()
             weights = []
             for weight in state_dict:
