@@ -392,12 +392,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             loss_inner = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
             mse_loss = loss_inner * Config.get('code_loss_weight')
 
-
             psnr_inner = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             psnr.append(psnr_inner)
 
             if update_grad:
-                grad_inner = torch.autograd.grad(loss_inner,
+                grad_inner = torch.autograd.grad(mse_loss,
                                                  list(mlp.parameters()),
                                                  create_graph=False)
 
