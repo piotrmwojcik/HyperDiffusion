@@ -36,7 +36,7 @@ code_loss_weight: 1.0
 code_loss_weight_schedule:
   - 500: 10.0
 code_lr_schedule:
-  - 0: 5e-4
+  - 0: 1e-3
 inverse_steps_schedule:
   - 5: 50
   - 400: 1
