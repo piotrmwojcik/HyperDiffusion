@@ -312,11 +312,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for inverse_step_id in range(n_inverse_steps):
             #psnr = []
             output = mlp(grids)
+            #print(output['model_out'].shape)
             #start = time.time()
             mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
             #print(mse_loss)
-
             psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             #psnr.append(psnr_inner)
 
@@ -422,9 +422,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #code_optimizer_state_ = self.deep_copy_dict(optim_state)
 
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
-            mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs, self.loaded_B)
+            mlp = generate_mlp_from_weights(code_list_[2], self.mlp_kwargs, self.loaded_B)
             #model_input = {'coords': model_input}
-            input = train_batch['coords'][0].unsqueeze(0)
+            input = train_batch['coords'][2].unsqueeze(0)
             inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
 
             images = wandb.Image(input_img, caption="")
