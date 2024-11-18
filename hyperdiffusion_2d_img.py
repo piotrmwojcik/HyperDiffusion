@@ -288,6 +288,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def inverse_code_1b1(self, gt_imgs, grids, code_, optimizer_state, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
+        code_2 = code_.clone().detach()
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
         mlp = ParallelImplicitMLP(mlps).cuda()
@@ -353,6 +354,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
+        for idx in range(code_.shape):
+            print(code_[idx] - code_2[idx])
 
         psnr = torch.mean(torch.hstack(psnr))
         print('state: ', code_optimizer.state_dict()['state'][0]['step'])
