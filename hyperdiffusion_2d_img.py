@@ -317,6 +317,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
             #print(mse_loss)
+            print(output['model_out'].shape, gt_imgs.shape)
             psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             #psnr.append(psnr_inner)
 
