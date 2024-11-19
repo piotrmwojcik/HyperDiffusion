@@ -430,9 +430,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             input = train_batch['coords'][16].unsqueeze(0)
             inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
 
-            psnr_test = image_psnr(mlp({'coords': input})['model_out'], train_batch['gt_img'][16].unsqueeze(0))['img_psnr']
-            print('!!!!')
-            print(psnr_test)
+            #psnr_test = image_psnr(mlp({'coords': input})['model_out'], train_batch['gt_img'][16].unsqueeze(0))['img_psnr']
+            #print('!!!!')
+            #print(psnr_test)
 
             images = wandb.Image(input_img, caption="")
             inr_images = wandb.Image(inr_output, caption="")
