@@ -325,6 +325,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                                  mlp.parameters(),
                                                  create_graph=False)
 
+                print(prior_grad[0])
                 prior_grad = [item for sublist in prior_grad for item in sublist]
                 print('!!!')
                 print(len(prior_grad))
