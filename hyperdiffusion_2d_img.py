@@ -326,6 +326,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                                  create_graph=False)
 
                 prior_grad = [item for sublist in prior_grad for item in sublist]
+                print('!!!')
+                print(len(prior_grad))
 
                 #for code_idx, single_mlp in enumerate(mlp.models):
                 #    prior_grad[code_idx] = prior_grad[code_idx].cuda()
