@@ -323,9 +323,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             if update_grad:
                 grad_inner = torch.autograd.grad(mse_loss,
                                                  mlp.parameters(),
-                                                 create_graph=False).flatten()
+                                                 create_graph=False)
 
                 print('!!!')
+                print(len(prior_grad))
                 print(len(grad_inner), len(list(mlp.parameters())))
 
                 #for code_idx, single_mlp in enumerate(mlp.models):
