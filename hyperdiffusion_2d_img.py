@@ -424,7 +424,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                                                   prior_grad, self.cfg)
         #code_optimizer_state_ = self.deep_copy_dict(optim_state)
 
-        if "hyper" in self.method:
+        if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
             mlp = generate_mlp_from_weights(code_list_[16], self.mlp_kwargs, self.loaded_B)
             #model_input = {'coords': model_input}
             input = train_batch['coords'][16].unsqueeze(0)
