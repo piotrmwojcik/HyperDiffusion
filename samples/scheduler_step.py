@@ -23,7 +23,6 @@ def main():
 
     def lr_lambda(epoch):
         if epoch < warmup_epochs:
-            print('dupa ', epoch)
             lr = warmup_ratio + (1.0 - warmup_ratio) * (epoch / warmup_epochs)
             return lr
         else:
@@ -60,7 +59,6 @@ def main():
 
             # Once warm-up phase is over, switch to StepLR
             if epoch >= warmup_epochs:
-                print('dupa')
                 step_scheduler.step()
 
 
