@@ -319,9 +319,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             #start = time.time()
             mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
+            code_reg = None
             if self.reg_loss is not None:
-                print(self.reg_loss(mlp))
-                mse_loss = mse_loss + self.reg_loss(mlp)
+                code_reg = self.reg_loss(mlp)
+                #print(self.reg_loss(mlp))
+                mse_loss = mse_loss + code_reg
 
             psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             #psnr.append(psnr_inner)
@@ -362,7 +364,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         optim_state = code_optimizer.state_dict()
         del optim_state['param_groups']
         #print('state: ', code_optimizer.state_dict()['state'][0]['step'])
-        return mse_loss, psnr, optim_state
+        return mse_loss, code_reg, psnr, optim_state
 
     def deep_copy_dict(self, input_dict):
         copied_dict = {}
@@ -425,9 +427,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         #print('before inverse code')
         #start = time.time()
-        inv_loss, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
-                                                                  self.deep_copy_dict(code_optimizer_state),
-                                                                  prior_grad, self.cfg)
+        inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
+                                                                            self.deep_copy_dict(code_optimizer_state),
+                                                                            prior_grad, self.cfg)
         #code_optimizer_state_ = self.deep_copy_dict(optim_state)
 
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
@@ -455,6 +457,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.logger.log({"global_step": global_step, "psnr": psnr})
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
         self.logger.log({"global_step": global_step, "code_norm": code.square().mean()})
+        self.logger.log({"global_step": global_step, "code_reg": code_reg})
 
         return loss_mse, code_optim_state_
 
