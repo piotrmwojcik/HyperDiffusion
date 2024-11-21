@@ -22,6 +22,7 @@ from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes, image_mse, image_psnr)
 from mlp_models import ImplicitMLP, ParallelImplicitMLP
+from reg_loss import RegLoss
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
 from siren.experiment_scripts.test_sdf import SDFDecoder
@@ -68,6 +69,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             loss_type=LossType[cfg.diff_config.params.loss_type],
             diff_pl_module=self,
         )
+
+        self.reg_loss = RegLoss(power=-1, loss_weight=3e-3)
 
         if cache_size > 0:
             split_points = np.round(np.linspace(0, cache_size, num=2)).astype(np.int64)
@@ -316,6 +319,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             #start = time.time()
             mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
+            if self.reg_loss is not None:
+                print(self.reg_loss(mlp))
+                mse_loss = mse_loss + self.reg_loss(mlp)
 
             psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             #psnr.append(psnr_inner)
