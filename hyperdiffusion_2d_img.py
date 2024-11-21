@@ -340,7 +340,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     param.grad = torch.zeros_like(param).cuda()
                     current_idx += num_params
                     param.grad.copy_(grad)
-
+                assert(current_idx == prior_grad_.shape[0])
                 code_optimizer.step()
         #print()
         #end = time.time()
