@@ -7,8 +7,7 @@ def reg_loss(tensor, power=1):
     """
     Compute regularization loss for a given tensor.
     """
-    return tensor.abs().mean() if power == 1 \
-        else (tensor.abs() ** power).mean()
+    return 1.0 / tensor.square().mean()
 
 
 class RegLoss(nn.Module):
