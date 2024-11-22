@@ -20,7 +20,10 @@ class RegLoss(nn.Module):
 
     def forward(self, model):
         total_loss = 0.0
+        total_params = 0
+
         for param in model.parameters():
-            if param.requires_grad:  # Ensure the parameter is trainable
-                total_loss += param.square().mean()
-        return (1.0 / total_loss) * self.loss_weight
+            if param.requires_grad:  # Include only trainable parameters
+                total_loss += param.square().sum()  # Sum of squared values
+                total_params += param.numel()
+        return (1.0 / (total_loss / total_params)) * self.loss_weight
