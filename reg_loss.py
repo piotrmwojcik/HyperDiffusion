@@ -1,6 +1,7 @@
 import torch.nn as nn
-
 import torch.nn as nn
+import numpy
+import torch
 
 def reg_loss(tensor, power=1):
     """
@@ -35,8 +36,9 @@ class RegLoss(nn.Module):
         Returns:
             torch.Tensor: The regularization loss value.
         """
-        total_loss = 0.0
-        for param in model.parameters():
-            if param.requires_grad:  # Only include trainable parameters
-                total_loss += reg_loss(param, power=self.power)
-        return total_loss * self.loss_weight
+        state_dict = model.state_dict()
+        weights = []
+        for weight in state_dict:
+            weights.append(state_dict[weight].flatten().cpu())
+        weights = torch.hstack(weights).requires_grad_()
+        return reg_loss(weights, power=self.power) * self.loss_weight

@@ -70,7 +70,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             diff_pl_module=self,
         )
 
-        self.reg_loss = RegLoss(power=-1, loss_weight=3e-4)
+        self.reg_loss = RegLoss(power=-1, loss_weight=5e-5)
 
         if cache_size > 0:
             split_points = np.round(np.linspace(0, cache_size, num=2)).astype(np.int64)
