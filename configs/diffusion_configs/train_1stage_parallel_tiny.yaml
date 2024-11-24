@@ -31,7 +31,7 @@ cache_size: 1000
 norm_momentum: 0.001
 code_optimizer: Adam
 code_lr: 1e-3
-inverse_steps: 75
+inverse_steps: 50
 code_loss_weight: 10.0
 loss_weight: 7.0
 code_loss_weight_schedule:
@@ -39,7 +39,7 @@ code_loss_weight_schedule:
 code_lr_schedule:
   - 0: 1e-3
 inverse_steps_schedule:
-  - 3: 3
+  - 5: 3
   - 500: 1
 model_resume_path:
 sampling: ddimr
