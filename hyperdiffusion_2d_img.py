@@ -7,6 +7,7 @@ import numpy as np
 import pytorch_lightning as pl
 import torch
 import trimesh
+import math
 from pytorch_lightning.utilities.types import EPOCH_OUTPUT
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
@@ -416,7 +417,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         norm_factor = code.detach().square().mean()
         self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
                               + self.momentum * norm_factor
-        loss_mse = Config.get("loss_weight") * loss_mse / self.norm_factor
+        if global_step <= 1700:
+            warmup_factor = 1.0 - (math.cos(math.pi * global_step / 1700) + 1.0)
+        else:
+            warmup_factor = 1.0
+        loss_mse = warmup_factor * Config.get("loss_weight") * loss_mse / self.norm_factor
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
