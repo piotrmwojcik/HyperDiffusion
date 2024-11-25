@@ -305,11 +305,12 @@ def main(cfg: DictConfig):
                     global_step += 1
                     pbar.set_postfix({"diff_loss": loss.item()})
                 if scheduler is not None:
-                    warmup_scheduler.step()
 
                     # Once warm-up phase is over, switch to StepLR
                     if epoch >= warmup_epochs:
                         step_scheduler.step()
+                    else:
+                        warmup_scheduler.step()
 
                 epoch_loss = sum(output for output in outputs) / len(outputs)
                 run.log({"epoch": epoch, "epoch_loss": epoch_loss})
