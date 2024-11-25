@@ -257,10 +257,9 @@ def main(cfg: DictConfig):
         optim_msg = optimizer.load_state_dict(checkpoint['optimizer'])
         print('Loaded optimizer ',  optim_msg)
 
-        #del code_optimizer.state_dict()['param_groups']
-        del checkpoint['code_optimizer']['param_groups']
-        code_optim_msg = code_optimizer.load_state_dict(checkpoint['code_optimizer'])
-        print('Loaded code optimizer ', code_optim_msg)
+        #del checkpoint['code_optimizer']['param_groups']
+        code_optimizer.state_dict()['state'] = checkpoint['code_optimizer']['state']
+        print('Loaded code optimizer')
 
         # Only load the scheduler if you're using one in your config
         if config["scheduler"]:
