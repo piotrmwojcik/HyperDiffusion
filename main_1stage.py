@@ -263,7 +263,7 @@ def main(cfg: DictConfig):
 
         # Only load the scheduler if you're using one in your config
         if config["scheduler"]:
-            scheduler_msg = warmup_scheduler.load_state_dict(checkpoint['scheduler'])
+            scheduler_msg = step_scheduler.load_state_dict(checkpoint['scheduler'])
             print('Loaded scheduler ', scheduler_msg)
 
     code_optimizer_state = diffuser.optimizer_state_to(code_optimizer.state_dict(), device='cpu', dtype=torch.float32)
