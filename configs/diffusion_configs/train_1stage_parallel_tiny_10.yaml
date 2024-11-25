@@ -1,5 +1,5 @@
 method: hyper_3d
-experiment_name: celebhq5k_small_parallel_tiny
+experiment_name: celebhq5k_small_parallel_tiny_10
 num_file_writers: 4
 cache_dir: None
 calculate_metric_on_test: True
@@ -39,7 +39,7 @@ code_loss_weight_schedule:
 code_lr_schedule:
   - 0: 1e-3
 inverse_steps_schedule:
-  - 5: 3
+  - 5: 10
   - 2000: 1
 model_resume_path:
 sampling: ddimr
