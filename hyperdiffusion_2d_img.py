@@ -412,10 +412,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #end_time = time.time()
         #print(f"Time taken: {end_time - start_time:.4f} seconds")
 
-        print('!!!')
-        print(loss_terms["loss"].std())
-        print(loss_terms["loss"])
-        print(code.detach().square().std())
+        #print('!!!')
+        #print(loss_terms["loss"].std())
+        #print(loss_terms["loss"])
+        #print(code.detach().square().std())
 
         loss_mse = loss_terms["loss"].mean()
 
