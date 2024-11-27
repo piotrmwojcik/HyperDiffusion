@@ -461,8 +461,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.logger.log({"global_step": global_step, "diff_train_loss": loss_mse})
         self.logger.log({"global_step": global_step, "psnr": psnr})
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
-        self.logger.log({"global_step": global_step, "code_norm": code.square().mean()})
-        self.logger.log({"global_step": global_step, "code_reg": code_reg})
+        self.logger.log({"global_step": global_step, "code_norm": code.detach().square().mean()})
+        #self.logger.log({"global_step": global_step, "code_reg": code_reg})
 
         return loss_mse, code_optim_state_
 
