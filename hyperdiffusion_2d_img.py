@@ -421,7 +421,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #    warmup_factor = (2.0 - (math.cos(math.pi * global_step / 1700) + 1.0)) / 2.0
         #else:
         #    warmup_factor = 1.0
-        loss_mse = Config.get("loss_weight") * loss_mse / self.norm_factor
+        loss_mse = Config.get("loss_weight") * loss_mse #/ self.norm_factor
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
