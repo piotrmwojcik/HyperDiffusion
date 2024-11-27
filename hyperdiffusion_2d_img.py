@@ -434,7 +434,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             self.ema_model.update()
         #print(code)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
-
+        for code_ in code_list_:
+            print('!!', code_.grad)
         #print('before inverse code')
         #start = time.time()
         inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
