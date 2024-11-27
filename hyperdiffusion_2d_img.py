@@ -414,6 +414,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         print('!!!')
         print(loss_terms["loss"].std())
+        print(loss_terms["loss"])
         print(code.detach().square().std())
 
         loss_mse = loss_terms["loss"].mean()
