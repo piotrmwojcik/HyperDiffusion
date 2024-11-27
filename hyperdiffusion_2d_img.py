@@ -412,16 +412,19 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #end_time = time.time()
         #print(f"Time taken: {end_time - start_time:.4f} seconds")
 
+        print('!!!')
+        print(loss_terms["loss"].std())
+
         loss_mse = loss_terms["loss"].mean()
 
-        #norm_factor = code.detach().square().mean()
-        #self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
-        #                      + self.momentum * norm_factor
+        norm_factor = code.detach().square().mean()
+        self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
+                              + self.momentum * norm_factor
         #if global_step <= 1700:
         #    warmup_factor = (2.0 - (math.cos(math.pi * global_step / 1700) + 1.0)) / 2.0
         #else:
         #    warmup_factor = 1.0
-        loss_mse = Config.get("loss_weight") * loss_mse #/ self.norm_factor
+        loss_mse = Config.get("loss_weight") * loss_mse / self.norm_factor
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
