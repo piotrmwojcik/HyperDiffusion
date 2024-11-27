@@ -414,9 +414,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         loss_mse = loss_terms["loss"].mean()
 
-        norm_factor = code.detach().square().mean()
-        self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
-                              + self.momentum * norm_factor
+        #norm_factor = code.detach().square().mean()
+        #self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
+        #                      + self.momentum * norm_factor
         #if global_step <= 1700:
         #    warmup_factor = (2.0 - (math.cos(math.pi * global_step / 1700) + 1.0)) / 2.0
         #else:
