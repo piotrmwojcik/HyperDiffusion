@@ -434,15 +434,15 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             self.ema_model.update()
         #print(code)
         prior_grad = [code_.grad.data.clone() for code_ in code_list_]
-        for code_ in code_list_:
-            print('!!', code_.grad)
+        #for code_ in code_list_:
+        #    print('!!', code_.grad)
         #print('before inverse code')
         #start = time.time()
         inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
                                                                             self.deep_copy_dict(code_optimizer_state),
                                                                             prior_grad, self.cfg)
-        for code_ in code_list_:
-            print(code_.grad)
+        #for code_ in code_list_:
+        #    print(code_.grad)
         #code_optimizer_state_ = self.deep_copy_dict(optim_state)
 
         if "hyper" in self.method and global_step % 50 == 0 and global_step % log_interval == 0:
