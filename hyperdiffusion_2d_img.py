@@ -496,11 +496,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             input = get_grid(64, 64, b=0).unsqueeze(0)
             result = siren({'coords': input})
             print(result['model_out'].shape)
-        # print(img)
             img = dataio.lin2img(result['model_out'], (64, 64))
             img = dataio.rescale_img((img + 1) / 2, mode='clamp')
             img = (img * 255).byte()
-            images.append(img)
+            images.append(img[0])
 
         # Convert list of images to a grid
         wandb_images = [wandb.Image(img.permute(1, 2, 0).cpu().numpy()) for img in images[:256]]
