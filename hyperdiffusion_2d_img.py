@@ -502,7 +502,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             images.append(img)
 
         print('!!!')
-        images = torch.cat(images, dim=0).shape
+        images = torch.cat(images, dim=0)
         grid = vutils.make_grid(images, nrow=16, padding=0, normalize=False)
         print("Grid shape:", grid.shape)
         # Convert list of images to a grid
