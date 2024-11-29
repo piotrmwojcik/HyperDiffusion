@@ -8,6 +8,7 @@ import pytorch_lightning as pl
 import torch
 import trimesh
 import math
+import torchvision.utils as vutils
 from pytorch_lightning.utilities.types import EPOCH_OUTPUT
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
@@ -474,6 +475,41 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         return loss_mse, code_optim_state_
 
+    def test_step(self):
+        if Config.get("use_ema"):
+            model = self.ema_model.ema_model
+        else:
+            model = self.model
+
+        x_0s = self.diff.ddim_sample_loop(
+            model, (256, *self.image_size[1:]), clip_denoised=False
+        )
+        x_0s = (x_0s / self.cfg.normalization_factor)
+
+        images = []
+
+        for img_id in range(x_0s.shape[0]):
+            weights = x_0s[img_id].view(-1)
+            siren = generate_mlp_from_weights(weights, self.mlp_kwargs, self.loaded_B)
+            #print(self.mlp_kwargs.model_type)
+
+            input = get_grid(64, 64, b=0).unsqueeze(0)
+            result = siren({'coords': input})
+            print(result['model_out'].shape)
+        # print(img)
+            img = dataio.lin2img(result['model_out'], (64, 64))
+            img = dataio.rescale_img((img + 1) / 2, mode='clamp')
+            img = (img * 255).byte()
+            images.append(img)
+
+        # Convert list of images to a grid
+        grid = vutils.make_grid(torch.stack(images[:256]), nrow=16, padding=2, normalize=False)
+
+        # Log the grid to wandb
+        wandb.log({"generated_images": wandb.Image(grid.permute(1, 2, 0).cpu().numpy())})
+
+
+
     def validation_step(self, epoch):
         if Config.get("use_ema"):
             model = self.ema_model.ema_model
@@ -540,17 +576,3 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         )
         print(var.shape, func(flat))
 
-    def test_step(self, *args, **kwargs):
-        # Then, sampling some new shapes -> outputting and rendering them
-        x_0s = self.diff.ddim_sample_loop(
-            self.ema_model, (16, *self.image_size[1:]), clip_denoised=False
-        )
-        x_0s = x_0s / self.cfg.normalization_factor
-
-        print(
-            "x_0s[0].stats",
-            x_0s.min().item(),
-            x_0s.max().item(),
-            x_0s.mean().item(),
-            x_0s.std().item(),
-        )
