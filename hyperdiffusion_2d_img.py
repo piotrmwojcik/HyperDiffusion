@@ -482,7 +482,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             model = self.model
 
         x_0s = self.diff.ddim_sample_loop(
-            model, (256, *self.image_size[1:]), clip_denoised=False
+            model, (1024, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = (x_0s / self.cfg.normalization_factor)
 
@@ -503,7 +503,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         print('!!!')
         images = torch.cat(images, dim=0)
-        grid = vutils.make_grid(images, nrow=16, padding=0, normalize=False)
+        grid = vutils.make_grid(images, nrow=32, padding=0, normalize=False)
         print("Grid shape:", grid.shape)
         # Convert list of images to a grid
         #wandb_images = [wandb.Image(img.permute(1, 2, 0).cpu().numpy()) for img in images[:256]]
