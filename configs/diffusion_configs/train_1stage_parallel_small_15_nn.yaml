@@ -27,7 +27,7 @@ model_save_period: 40
 mode: train
 data_folder_train: /data_ssd/pwojcik/CelebAHQ_5k/
 image_resolution: 64
-cache_size: 1000
+cache_size: 5000
 norm_momentum: 0.001
 code_optimizer: Adam
 code_lr: 1e-3
