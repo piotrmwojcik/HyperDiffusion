@@ -151,12 +151,12 @@ def generate_mlp_from_weights(weights, mlp_kwargs, B=None):
     return mlp
 
 
-def generate_big_mlp_from_weights(weights, mlp, B=None):
+def generate_big_mlp_from_weights(weights, mlp, batch_size):
     state_dict = mlp.state_dict()
     weight_names = list(state_dict.keys())
     for layer in weight_names:
         val = state_dict[layer]
-        num_params = np.product(list(val.shape))
+        num_params = np.product(list(val.shape)) // batch_size
         w = []
         for i in range(len(weights)):
             w_ = weights[i][:num_params]
