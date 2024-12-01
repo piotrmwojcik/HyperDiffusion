@@ -151,8 +151,7 @@ def generate_mlp_from_weights(weights, mlp_kwargs, B=None):
     return mlp
 
 
-def generate_big_mlp_from_weights(weights, mlp_kwargs, mlp, B=None):
-    mlp = get_mlp(mlp_kwargs, B=B)
+def generate_big_mlp_from_weights(weights, mlp, B=None):
     state_dict = mlp.state_dict()
     weight_names = list(state_dict.keys())
     for layer in weight_names:
