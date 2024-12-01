@@ -164,6 +164,8 @@ def generate_big_mlp_from_weights(weights, mlp_kwargs, mlp, B=None):
             w_ = w_.view(*val.shape)
             w.append(w_)
             weights[i] = weights[i][num_params:]
+        for w__ in w:
+            print(w__.shape)
         w = torch.cat(w, dim=1)
         state_dict[layer] = w
     assert len(weights[0]) == 0, f"len(weights) = {len(weights[0])}"
