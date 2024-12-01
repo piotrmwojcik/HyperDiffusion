@@ -6,7 +6,7 @@ from hyperdiffusion import HyperDiffusion
 
 # Using it to make pyrender work on clusters
 from hyperdiffusion_2d_img import HyperDiffusion_2d_img
-from mlp_models import ImplicitMLP, ParallelImplicitMLP
+from mlp_models import ImplicitMLP, ParallelImplicitMLP, ParallelImplicitMLPGathered
 from scheduler import PrefixStepLRScheduler
 
 os.environ["PYOPENGL_PLATFORM"] = "egl"
@@ -175,8 +175,8 @@ def main(cfg: DictConfig):
         "Train dataset length: {}".format(len(train_dt))
     )
     inr_model = ImplicitMLP(B=torch.load(Config.get("B_path")))
-    mlps = [ImplicitMLP(B=torch.load(Config.get("B_path"))) for _ in range(Config.get("batch_size"))]
-    MLP = ParallelImplicitMLP(mlps)
+    #mlps = [ImplicitMLP(B=torch.load(Config.get("B_path"))) for _ in range(Config.get("batch_size"))]
+    MLP = ParallelImplicitMLPGathered(B=torch.load(Config.get("B_path")), batch_size=Config.get("batch_size"))
     state_dict = inr_model.state_dict()
     weights = []
     shapes = []
@@ -300,7 +300,7 @@ def main(cfg: DictConfig):
                     for p in code_loss_weight_schedule:
                         if epoch >= p[0]:
                             diffuser.cfg['code_loss_weight'] = p[1]
-                    loss, code_optimizer_state_ = diffuser.training_step(data, optimizer, code_optimizer_state, global_step, save_to_disk)  # Forward pass
+                    loss, code_optimizer_state_ = diffuser.training_step(data, optimizer, code_optimizer_state, MLP, global_step, save_to_disk)  # Forward pass
                     outputs.append(loss)
                     global_step += 1
                     pbar.set_postfix({"diff_loss": loss.item()})

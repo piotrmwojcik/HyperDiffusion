@@ -151,6 +151,25 @@ def generate_mlp_from_weights(weights, mlp_kwargs, B=None):
     return mlp
 
 
+def generate_big_mlp_from_weights(weights, mlp_kwargs, mlp, B=None):
+    mlp = get_mlp(mlp_kwargs, B=B)
+    state_dict = mlp.state_dict()
+    weight_names = list(state_dict.keys())
+    for layer in weight_names:
+        val = state_dict[layer]
+        num_params = np.product(list(val.shape))
+        w = []
+        for i in range(len(weights)):
+            w_ = weights[i][:num_params]
+            w_ = w_.view(*val.shape)
+            w.append(w_)
+            weights[i] = weights[i][num_params:]
+        w = torch.cat(w, dim=1)
+        state_dict[layer] = w
+    assert len(weights[0]) == 0, f"len(weights) = {len(weights[0])}"
+    mlp.load_state_dict(state_dict)
+
+
 def load_mlp_from_weights(weights, mlp):
     state_dict = mlp.state_dict()
     weight_names = list(state_dict.keys())
