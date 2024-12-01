@@ -160,13 +160,13 @@ def generate_big_mlp_from_weights(weights, mlp, B=None):
         w = []
         for i in range(len(weights)):
             w_ = weights[i][:num_params]
-            w_ = w_.view(*val.shape)
             w.append(w_)
             weights[i] = weights[i][num_params:]
         if len(w[0].shape) == 2:
             w = torch.cat(w, dim=1)
         else:
             w = torch.cat(w, dim=0)
+        w = w.view(*val.shape)
         state_dict[layer] = w
     assert len(weights[0]) == 0, f"len(weights) = {len(weights[0])}"
     mlp.load_state_dict(state_dict)
