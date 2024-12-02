@@ -156,17 +156,16 @@ def generate_big_mlp_from_weights(weights, mlp, batch_size):
     weight_names = list(state_dict.keys())
     for layer in weight_names:
         val = state_dict[layer]
-        print('!!!! ', np.product(list(val.shape)))
-
-        num_params = int(np.product(list(val.shape)) // batch_size) if len(val.shape) > 1 else np.product(list(val.shape))
+        num_params = int(np.product(list(val.shape)) // batch_size)
         w = []
         for i in range(len(weights)):
             w_ = weights[i][:num_params]
             w.append(w_)
             weights[i] = weights[i][num_params:]
-        for w__ in w:
-            print(w__.shape)
-        w = torch.cat(w, dim=0)
+        if len(w[0].shape) == 2:
+            w = torch.cat(w, dim=1)
+        else:
+            w = torch.cat(w, dim=0)
         w = w.view(*val.shape)
         state_dict[layer] = w
     assert len(weights[0]) == 0, f"len(weights) = {len(weights[0])}"
