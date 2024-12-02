@@ -176,7 +176,7 @@ def main(cfg: DictConfig):
     )
     inr_model = ImplicitMLP(B=torch.load(Config.get("B_path")))
     #mlps = [ImplicitMLP(B=torch.load(Config.get("B_path"))) for _ in range(Config.get("batch_size"))]
-    MLP = ParallelImplicitMLPGathered(B=torch.load(Config.get("B_path")), batch_size=Config.get("batch_size"))
+    MLP = ParallelImplicitMLPGathered(B=torch.load(Config.get("B_path")), batch_size=Config.get("batch_size")).cuda()
     state_dict = inr_model.state_dict()
     weights = []
     shapes = []
