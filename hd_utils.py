@@ -170,6 +170,7 @@ def generate_big_mlp_from_weights(weights, mlp, batch_size):
         state_dict[layer] = w
     assert len(weights[0]) == 0, f"len(weights) = {len(weights[0])}"
     mlp.load_state_dict(state_dict)
+    return mlp
 
 
 def load_mlp_from_weights(weights, mlp):
