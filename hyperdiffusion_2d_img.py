@@ -312,7 +312,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             update_grad = True
 
         for inverse_step_id in range(n_inverse_steps):
-            print('!!! ', grids.shape)
             output = big_mlp(grids)
             #print(output['model_out'].shape)
             #start = time.time()

@@ -188,7 +188,6 @@ class ParallelImplicitMLP(nn.Module):
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i]({'coords': model_input[i].unsqueeze(0)}) for i in range(len(self.models))]
 
-
         # Stack outputs along the N dimension to consolidate them
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
@@ -212,9 +211,10 @@ class ParallelImplicitMLPGathered(nn.Module):
 
         x = self.gff(coords)
         x = rearrange(x, "b c h w -> (b h w) c")  # Flatten the images
+        print('lin1 !!! ', x.shape)
         x = self.linear1(x)
         x = F.relu(x)
-        print('!!! ', x.shape)
+        print('lin2 !!! ', x.shape)
         x = self.linear2(x)
         x = F.relu(x)
         x = self.linear3(x)
