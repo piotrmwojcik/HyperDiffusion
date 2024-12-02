@@ -156,7 +156,7 @@ def generate_big_mlp_from_weights(weights, mlp, batch_size):
     weight_names = list(state_dict.keys())
     for layer in weight_names:
         val = state_dict[layer]
-        print('xxx ', val.shape)
+        print('xxx ', val.shape, batch_size)
         num_params = int(np.product(list(val.shape)) // batch_size)
         print('!!!  ', num_params)
         w = []
