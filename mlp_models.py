@@ -214,6 +214,7 @@ class ParallelImplicitMLPGathered(nn.Module):
         x = rearrange(x, "b c h w -> (b h w) c")  # Flatten the images
         x = self.linear1(x)
         x = F.relu(x)
+        print('!!! ', x.shape)
         x = self.linear2(x)
         x = F.relu(x)
         x = self.linear3(x)
