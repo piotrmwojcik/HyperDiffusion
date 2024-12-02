@@ -162,6 +162,8 @@ def generate_big_mlp_from_weights(weights, mlp, batch_size):
             w_ = weights[i][:num_params]
             w.append(w_)
             weights[i] = weights[i][num_params:]
+        for w__ in w:
+            print(w__.shape)
         w = torch.cat(w, dim=0)
         w = w.view(*val.shape)
         state_dict[layer] = w
