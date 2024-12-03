@@ -154,8 +154,7 @@ class ImplicitMLP(nn.Module):
         self.linear5 = nn.Linear(16, 3)
 
     def forward(self, model_input):
-        h = 64
-        w = 64
+
 
         coords_org = model_input['coords'].clone().detach().requires_grad_(True)
         coords = coords_org
@@ -186,17 +185,20 @@ class ParallelImplicitMLP(nn.Module):
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
     def forward(self, model_input):
-        #print('!!!!')
-        #print(model_input['coords'].shape)
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i]({'coords': model_input[i].unsqueeze(0)}) for i in range(len(self.models))]
-
-
         # Stack outputs along the N dimension to consolidate them
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
         return {'model_in': model_ins, 'model_out': model_outs}
+
+    def reinitialize(self, new_models):
+        assert all(isinstance(model, ImplicitMLP) for model in new_models), \
+            "All elements in `new_models` must be instances of ImplicitMLP"
+
+        self.models = nn.ModuleList(new_models)
+        print("ParallelImplicitMLP reinitialized with new models.")
 
 
 class MLP3D(nn.Module):
