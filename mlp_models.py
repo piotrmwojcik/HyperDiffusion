@@ -211,8 +211,10 @@ class ParallelImplicitMLPGathered(nn.Module):
 
         x = self.gff(coords)
         x = rearrange(x, "b c h w -> (b h w) c")  # Flatten the images
+        print('gf ', x.shape)
         x = self.linear1(x)
         x = F.relu(x)
+        print('x1 ', x.shape)
         x = self.linear2(x)
         x = F.relu(x)
         x = self.linear3(x)
