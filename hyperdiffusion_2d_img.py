@@ -411,6 +411,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             self.logger,
             model_kwargs=None,
         )
+        print('!!! loss shape', loss_terms.shape)
         #end_time = time.time()
         #print(f"Time taken: {end_time - start_time:.4f} seconds")
 
