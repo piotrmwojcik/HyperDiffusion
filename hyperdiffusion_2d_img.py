@@ -298,7 +298,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def inverse_code_1b1(self, gt_imgs, grids, code_, optimizer_state, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
-        x = grids[0].unsqueeze(0)
+        x = grids[0].unsqueeze(0).cuda()
+        x = self.gff(x)
         x = rearrange(x, "b c h w -> (b h w) c")
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
