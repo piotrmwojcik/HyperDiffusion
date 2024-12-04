@@ -41,7 +41,7 @@ code_lr_schedule:
 inverse_steps_schedule:
   - 20: 15
   - 680: 5
-model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_small_parallel_tiny_15_nn/checkpoint/model_epoch_5839.pth
+model_resume_path:
 sampling: ddimr
 val_fid_calculation_period: 1
 lr: 0.0002
@@ -61,7 +61,7 @@ diff_config:
     loss_type: MSE
 transformer_config:
   params:
-    n_embd: 2240
+    n_embd: 800
     n_layer: 12
     n_head: 16
     split_policy: layer_by_layer
