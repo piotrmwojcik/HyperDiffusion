@@ -301,7 +301,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         x = grids[0].unsqueeze(0)
         x = rearrange(x, "b c h w -> (b h w) c")
 
-        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
+        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
         mlp = ParallelImplicitShortMLP(mlps).cuda()
         grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
