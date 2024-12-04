@@ -441,6 +441,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #    print('!!', code_.grad)
         #print('before inverse code')
         #start = time.time()
+        print('!! ', train_batch['coords'].shape)
         inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
                                                                             self.deep_copy_dict(code_optimizer_state),
                                                                             prior_grad, self.cfg)

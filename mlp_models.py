@@ -175,7 +175,7 @@ class ImplicitMLP(nn.Module):
 
 
 class ImplicitMLPShort(nn.Module):
-    def __init__(self, B):
+    def __init__(self):
         super(ImplicitMLPShort, self).__init__()
         self.linear1 = nn.Linear(256, 256) #FMMLinear(256, 256, 100)
         self.linear2 = nn.Linear(256, 128) #FMMLinear(256, 128, 50)
