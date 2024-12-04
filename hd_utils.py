@@ -8,7 +8,7 @@ import trimesh
 import skimage.measure as measure
 #from implicit_kan.implicit_kan import ImplicitEKAN
 
-from mlp_models import MLP, MLP3D, SingleBVPNet, ImplicitMLP
+from mlp_models import MLP, MLP3D, SingleBVPNet, ImplicitMLP, ImplicitMLPShort
 from Pointnet_Pointnet2_pytorch.log.classification.pointnet2_ssg_wo_normals import \
     pointnet2_cls_ssg
 from torchmetrics_fid import FrechetInceptionDistance
@@ -122,21 +122,23 @@ def image_psnr(pred_img, gt_img):
     return {'img_psnr': torch.mean(torch.hstack(psnrs))}
 
 
-def get_mlp(mlp_kwargs, B=None):
+def get_mlp(mlp_kwargs, B=None, short=False):
     if "model_type" in mlp_kwargs:
         if mlp_kwargs.model_type == "mlp_3d":
             mlp = MLP3D(**mlp_kwargs)
         elif mlp_kwargs.model_type == "SingleBVPNet":
             mlp = SingleBVPNet(**mlp_kwargs)
-        elif mlp_kwargs.model_type == "ImplicitMLP":
+        elif mlp_kwargs.model_type == "ImplicitMLP" and not short:
             mlp = ImplicitMLP(B=B)
+        elif mlp_kwargs.model_type == "ImplicitMLP" and short:
+            mlp = ImplicitMLPShort()
     else:
         mlp = MLP(**mlp_kwargs)
     return mlp
 
 
-def generate_mlp_from_weights(weights, mlp_kwargs, B=None):
-    mlp = get_mlp(mlp_kwargs, B=B)
+def generate_mlp_from_weights(weights, mlp_kwargs, B=None, short=False):
+    mlp = get_mlp(mlp_kwargs, B=B, short=short)
     state_dict = mlp.state_dict()
     weight_names = list(state_dict.keys())
     for layer in weight_names:
