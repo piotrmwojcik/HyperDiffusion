@@ -25,7 +25,7 @@ B_path: /data/pwojcik/siren/random_mod/B.pth
 use_ema: False
 model_save_period: 40
 mode: test
-data_folder_train: /data_ssd/pwojcik/CelebAHQ_5k/
+data_folder_train: /data/pwojcik/CelebAHQ_5k/
 image_resolution: 64
 cache_size: 5000
 norm_momentum: 0.001
