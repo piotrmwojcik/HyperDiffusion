@@ -8,6 +8,7 @@ import pytorch_lightning as pl
 import torch
 import trimesh
 import math
+from einops import rearrange
 import torchvision.utils as vutils
 from pytorch_lightning.utilities.types import EPOCH_OUTPUT
 from scipy.spatial.transform import Rotation
@@ -442,7 +443,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print('before inverse code')
         #start = time.time()
         print('!! ', train_batch['coords'].shape)
-        print('!!! ', self.gff(train_batch['coords'][0].unsqueeze(0)).shape)
+        x = train_batch['coords'][0].unsqueeze(0)
+        x = rearrange(x, "b c h w -> (b h w) c")
+        print('!!! ', x.shape)
         inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
                                                                             self.deep_copy_dict(code_optimizer_state),
                                                                             prior_grad, self.cfg)

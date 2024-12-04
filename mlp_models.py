@@ -140,9 +140,7 @@ class GaussianFourierFeatureTransform(nn.Module):
         else:
             x = 2 * pi * x
 
-        x = torch.cat([torch.sin(x), torch.cos(x)], dim=1)
-        x = rearrange(x, "b c h w -> (b h w) c")
-        return x
+        return torch.cat([torch.sin(x), torch.cos(x)], dim=1)
 
 
 class ImplicitMLP(nn.Module):
