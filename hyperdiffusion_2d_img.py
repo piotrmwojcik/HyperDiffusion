@@ -24,7 +24,7 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
 from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes, image_mse, image_psnr)
-from mlp_models import ImplicitMLP, ParallelImplicitMLP, GaussianFourierFeatureTransform
+from mlp_models import ImplicitMLP, ParallelImplicitMLP, GaussianFourierFeatureTransform, ImplicitMLPShort
 from reg_loss import RegLoss
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
@@ -297,8 +297,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def inverse_code_1b1(self, gt_imgs, grids, code_, optimizer_state, prior_grad, cfg):
         n_inverse_steps = cfg['inverse_steps']
 
+        x = grids[0].unsqueeze(0)
+        x = rearrange(x, "b c h w -> (b h w) c")
+
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
-        mlp = ParallelImplicitMLP(mlps).cuda()
+        mlp = ImplicitMLPShort(mlps).cuda()
         grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
         code_optimizer = self.build_optimizer(mlp, cfg)
@@ -442,10 +445,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #    print('!!', code_.grad)
         #print('before inverse code')
         #start = time.time()
-        print('!! ', train_batch['coords'].shape)
-        x = train_batch['coords'][0].unsqueeze(0)
-        x = rearrange(x, "b c h w -> (b h w) c")
-        print('!!! ', x.shape)
         inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
                                                                             self.deep_copy_dict(code_optimizer_state),
                                                                             prior_grad, self.cfg)
