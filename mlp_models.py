@@ -201,6 +201,25 @@ class ImplicitMLPShort(nn.Module):
         return {'model_in': coords_org, 'model_out': output}
 
 
+class ParallelImplicitShortMLP(nn.Module):
+    def __init__(self, models):
+        super(ParallelImplicitShortMLP, self).__init__()
+
+        # Ensure models is a list of ImplicitMLP instances
+        assert all(isinstance(model, ImplicitMLPShort) for model in models), \
+            "All elements in `models` must be instances of ImplicitMLP"
+
+        self.models = nn.ModuleList(models)  # Store models as a ModuleList
+
+    def forward(self, model_input):
+        # model_inputs should be a list of inputs for each of the N models
+        outputs = [self.models[i](model_input.clone()) for i in range(len(self.models))]
+        # Stack outputs along the N dimension to consolidate them
+        model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
+        model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
+
+        return {'model_in': model_ins, 'model_out': model_outs}
+
 class ParallelImplicitMLP(nn.Module):
     def __init__(self, models):
         super(ParallelImplicitMLP, self).__init__()

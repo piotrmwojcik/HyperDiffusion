@@ -24,7 +24,8 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
 from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes, image_mse, image_psnr)
-from mlp_models import ImplicitMLP, ParallelImplicitMLP, GaussianFourierFeatureTransform, ImplicitMLPShort
+from mlp_models import ImplicitMLP, ParallelImplicitMLP, GaussianFourierFeatureTransform, ImplicitMLPShort, \
+    ParallelImplicitShortMLP
 from reg_loss import RegLoss
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
@@ -301,7 +302,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         x = rearrange(x, "b c h w -> (b h w) c")
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B) for code_single in code_]
-        mlp = ImplicitMLPShort(mlps).cuda()
+        mlp = ParallelImplicitShortMLP(mlps).cuda()
         grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
         code_optimizer = self.build_optimizer(mlp, cfg)
