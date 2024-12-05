@@ -126,9 +126,9 @@ class GaussianFourierFeatureTransform(nn.Module):
 
         # Make shape compatible for matmul with _B.
         # From [B, C, W, H] to [(B*W*H), C].
-        x = x.permute(0, 2, 3, 1).reshape(batches * width * height, channels)
+        x = x.permute(0, 2, 3, 1).reshape(batches * width * height, channels).to(x.device)
 
-        x = x @ self._B.to(x.device)
+        #x = x @ self._B.to(x.device)
 
         # From [(B*W*H), C] to [B, W, H, C]
         x = x.view(batches, width, height, self.mapping_dim)
