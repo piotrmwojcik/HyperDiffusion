@@ -1,5 +1,5 @@
 method: hyper_3d
-experiment_name: celebhq5k_small_parallel_small_15_nn
+experiment_name: celebhq5k_small_parallel_small_15_nn_enc
 num_file_writers: 4
 cache_dir: None
 calculate_metric_on_test: True
@@ -24,7 +24,7 @@ model_save_path: None
 B_path: /data/pwojcik/siren/random_mod/B.pth
 use_ema: False
 model_save_period: 40
-mode: test
+mode: train
 data_folder_train: /data_ssd/pwojcik/CelebAHQ_5k/
 image_resolution: 64
 cache_size: 5000
@@ -41,7 +41,7 @@ code_lr_schedule:
 inverse_steps_schedule:
   - 20: 15
   - 680: 5
-model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_small_parallel_small_15_nn/checkpoint/model_epoch_3199.pth
+model_resume_path:
 sampling: ddimr
 val_fid_calculation_period: 1
 lr: 0.0002
@@ -61,9 +61,9 @@ diff_config:
     loss_type: MSE
 transformer_config:
   params:
-    n_embd: 2240
+    n_embd: 768
     n_layer: 12
-    n_head: 16
+    n_head: 12
     split_policy: layer_by_layer
     use_global_residual: False
     condition: 'no'
