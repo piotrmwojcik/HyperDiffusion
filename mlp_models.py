@@ -130,6 +130,10 @@ class GaussianFourierFeatureTransform(nn.Module):
 
         #x = x @ self._B.to(x.device)
 
+        print('!!')
+        print(x.shape)
+        print(self._.shape)
+
         # From [(B*W*H), C] to [B, W, H, C]
         x = x.view(batches, width, height, self.mapping_dim)
         # From [B, W, H, C] to [B, C, W, H]
