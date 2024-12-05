@@ -13,6 +13,8 @@ import torchvision.utils as vutils
 from pytorch_lightning.utilities.types import EPOCH_OUTPUT
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
+from PIL import Image
+from torchvision import transforms
 from collections import defaultdict, abc as container_abcs
 from itertools import chain
 from functools import partial
@@ -489,8 +491,33 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         else:
             model = self.model
 
+        image_list = []
+        image_folder = "/data/pwojcik/CelebAHQ_5k/CelebAHQ/"
+        # Define a transformation pipeline to load images as tensors
+        transform = transforms.Compose([
+            transforms.ToTensor(),  # Convert image to tensor (values in range [0, 1])
+        ])
+
+        # Loop over all JPG files in the folder
+        for image_file in os.listdir(image_folder):
+            if image_file.endswith(".jpg"):
+                # Load the image
+                img_path = os.path.join(image_folder, image_file)
+                img = Image.open(img_path).convert("RGB")  # Ensure RGB format
+
+                # Apply the transform
+                img_tensor = transform(img)  # Shape: [3, 64, 64]
+
+                # Reshape and convert to byte format
+                reshaped_tensor = img_tensor.permute(1, 2, 0).reshape(-1, 3) * 255  # Shape: [4096, 3]
+                reshaped_tensor = reshaped_tensor.byte()  # Convert to byte
+
+                # Append to the list
+                image_list.append(reshaped_tensor)
+        print('Loaded ground truths')
+
         x_0s = self.diff.ddim_sample_loop(
-            model, (1024, *self.image_size[1:]), clip_denoised=False
+            model, (256, *self.image_size[1:]), clip_denoised=False
         )
         x_0s = (x_0s / self.cfg.normalization_factor)
 
@@ -501,13 +528,15 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             siren = generate_mlp_from_weights(weights, self.mlp_kwargs, self.loaded_B)
             #print(self.mlp_kwargs.model_type)
 
-            input = get_grid(64, 64, b=0).unsqueeze(0)
+            input = get_grid(16, 16, b=0).unsqueeze(0)
             result = siren({'coords': input})
-            print(result['model_out'].shape)
+            #print(result['model_out'].shape)
             img = dataio.lin2img(result['model_out'], (64, 64))
             img = dataio.rescale_img((img + 1) / 2, mode='clamp')
             img = (img * 255).byte()
             images.append(img)
+
+        # Initialize a list to store the reshaped images
 
         print('!!!')
         images = torch.cat(images, dim=0)
