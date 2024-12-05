@@ -61,9 +61,9 @@ diff_config:
     loss_type: MSE
 transformer_config:
   params:
-    n_embd: 384
+    n_embd: 800
     n_layer: 12
-    n_head: 6
+    n_head: 16
     split_policy: layer_by_layer
     use_global_residual: False
     condition: 'no'
