@@ -538,8 +538,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         # Initialize a list to store the reshaped images
         images = torch.cat(images, dim=0)
-        flattened_images = images.permute(0, 2, 3, 1).view(images.size(0), -1)
-        flattened_gt = image_tensors.view(image_tensors.size(0), -1)
+        flattened_images = images.permute(0, 2, 3, 1).view(images.size(0), -1) / 255
+        flattened_gt = image_tensors.view(image_tensors.size(0), -1) / 255
         print('!!! ', flattened_images.shape, flattened_gt.shape)
 
         dot_products = torch.mm(flattened_images, flattened_gt.t())  # Shape: [N, N]
