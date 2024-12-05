@@ -514,7 +514,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 # Append to the list
                 image_list.append(reshaped_tensor)
-        print('Loaded ground truths')
+        image_tensors = torch.stack(image_list)
 
         x_0s = self.diff.ddim_sample_loop(
             model, (256, *self.image_size[1:]), clip_denoised=False
@@ -537,9 +537,19 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             images.append(img)
 
         # Initialize a list to store the reshaped images
-
-        print('!!!')
         images = torch.cat(images, dim=0)
+
+        dot_products = torch.mm(images, images.t())  # Shape: [N, N]
+        norms = images.pow(2).sum(dim=1, keepdim=True)  # Shape: [N, 1]
+        distances = norms - 2 * dot_products + norms.t()  # Shape: [N, N]
+        distances.fill_diagonal_(float('inf'))
+        nearest_indices = distances.argmin(dim=1)  # Shape: [N]
+
+        # Output results
+        for i, nearest_idx in enumerate(nearest_indices):
+            print(
+                f"Image {i} is closest to Image {nearest_idx} with L2 distance {distances[i, nearest_idx].item():.2f}")
+
         grid = vutils.make_grid(images, nrow=32, padding=0, normalize=False)
         print("Grid shape:", grid.shape)
         # Convert list of images to a grid
