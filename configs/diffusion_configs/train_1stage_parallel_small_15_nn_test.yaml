@@ -24,7 +24,7 @@ model_save_path: None
 B_path: /data/pwojcik/siren/random_mod/B.pth
 use_ema: False
 model_save_period: 40
-mode: train
+mode: test
 data_folder_train: /data/pwojcik/CelebAHQ_5k/
 image_resolution: 64
 cache_size: 5000
@@ -41,7 +41,7 @@ code_lr_schedule:
 inverse_steps_schedule:
   - 20: 15
   - 680: 5
-model_resume_path:
+model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_small_parallel_small_15_nn/checkpoint/model_epoch_3279.pth
 sampling: ddimr
 val_fid_calculation_period: 1
 lr: 0.0002
