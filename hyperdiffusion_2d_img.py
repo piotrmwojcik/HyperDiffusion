@@ -549,16 +549,22 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         distances.fill_diagonal_(float('inf'))
         nearest_indices = distances.argmin(dim=1)  # Shape: [N]
 
+        gt_grid = []
+
         # Output results
         for i, nearest_idx in enumerate(nearest_indices):
             print(
                 f"Image {i} is closest to Image {nearest_idx} with L2 distance {distances[i, nearest_idx].item():.2f}")
+            gt_grid.append(image_list[nearest_idx])
+        gt_grid = torch.stack(gt_grid)
 
         grid = vutils.make_grid(images, nrow=32, padding=0, normalize=False)
+        gt_grid = vutils.make_grid(gt_grid, nrow=32, padding=0, normalize=False)
         print("Grid shape:", grid.shape)
         # Convert list of images to a grid
         #wandb_images = [wandb.Image(img.permute(1, 2, 0).cpu().numpy()) for img in images[:256]]
-        wandb.log({"generated_images_grid": wandb.Image(grid, caption="16x16 Image Grid")})
+        wandb.log({"generated_images_grid": wandb.Image(grid, caption="generated")})
+        wandb.log({"gt_images_grid": wandb.Image(gt_grid, caption="GT")})
 
 
     def validation_step(self, epoch):
