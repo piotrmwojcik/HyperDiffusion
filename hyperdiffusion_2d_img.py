@@ -542,7 +542,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         flattened_gt = image_tensors.view(image_tensors.size(0), -1)
         print('!!! ', flattened_images.shape, flattened_gt.shape)
 
-        dot_products = torch.mm(images, images.t())  # Shape: [N, N]
+        dot_products = torch.mm(flattened_images, flattened_gt.t())  # Shape: [N, N]
         norms = images.pow(2).sum(dim=1, keepdim=True)  # Shape: [N, 1]
         distances = norms - 2 * dot_products + norms.t()  # Shape: [N, N]
         distances.fill_diagonal_(float('inf'))
