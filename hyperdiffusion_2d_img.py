@@ -543,7 +543,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         print('!!! ', flattened_images.shape, flattened_gt.shape)
 
         dot_products = torch.mm(flattened_images, flattened_gt.t())  # Shape: [N, N]
-        norms = images.pow(2).sum(dim=1, keepdim=True)  # Shape: [N, 1]
+        norms = flattened_images.pow(2).sum(dim=1, keepdim=True)  # Shape: [N, 1]
         distances = norms - 2 * dot_products + norms.t()  # Shape: [N, N]
         distances.fill_diagonal_(float('inf'))
         nearest_indices = distances.argmin(dim=1)  # Shape: [N]
