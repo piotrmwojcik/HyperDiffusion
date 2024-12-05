@@ -560,7 +560,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         print('!!! ', images.shape, gt_grid.shape)
 
         grid = vutils.make_grid(images, nrow=32, padding=0, normalize=False)
-        gt_grid = vutils.make_grid(gt_grid, nrow=32, padding=0, normalize=False)
+        gt_grid = vutils.make_grid(gt_grid.permute(0, 2, 1).view(images.shape), nrow=32, padding=0, normalize=False)
         print("Grid shape:", grid.shape)
         # Convert list of images to a grid
         #wandb_images = [wandb.Image(img.permute(1, 2, 0).cpu().numpy()) for img in images[:256]]
