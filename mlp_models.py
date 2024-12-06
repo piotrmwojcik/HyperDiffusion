@@ -212,14 +212,18 @@ class ParallelImplicitShortMLP(nn.Module):
 
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
-    def forward(self, model_input):
+    def forward(self, model_input, gt_imgs):
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i](model_input.clone()) for i in range(len(self.models))]
         # Stack outputs along the N dimension to consolidate them
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
-        return {'model_in': model_ins, 'model_out': model_outs}
+        output = {'model_in': model_ins, 'model_out': model_outs}
+        mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
+        psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
+
+        return mse_loss, psnr
 
 
 class ParallelImplicitMLP(nn.Module):
@@ -232,18 +236,14 @@ class ParallelImplicitMLP(nn.Module):
 
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
-    def forward(self, model_input, gt_imgs):
+    def forward(self, model_input):
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i]({'coords': model_input[i].unsqueeze(0)}) for i in range(len(self.models))]
         # Stack outputs along the N dimension to consolidate them
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
-        output = {'model_in': model_ins, 'model_out': model_outs}
-        mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
-        psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
-
-        return mse_loss, psnr
+        return {'model_in': model_ins, 'model_out': model_outs}
 
 
 class MLP3D(nn.Module):
@@ -300,6 +300,7 @@ class MLP3D(nn.Module):
 
         return {"model_in": coords_org, "model_out": x}
 
+
 class SingleBVPNet(MetaModule): ## SIREN 2D
     def __init__(self, out_features=1, type='sine', in_features=2,
                  mode='mlp', hidden_features=256, num_hidden_layers=3, **kwargs):
@@ -346,6 +347,13 @@ class SingleBVPNet(MetaModule): ## SIREN 2D
         coords = model_input['coords'].clone().detach().requires_grad_(True)
         activations = self.net.forward_with_activations(coords)
         return {'model_in': coords, 'model_out': activations.popitem(), 'activations': activations}
+
+
+def image_mse(mask, model_output, gt):
+    if mask is None:
+        return {'img_loss': ((model_output['model_out'] - gt) ** 2).mean()}
+    else:
+        return {'img_loss': (mask * (model_output['model_out'] - gt) ** 2).mean()}
 
 
 def image_psnr(pred_img, gt_img):

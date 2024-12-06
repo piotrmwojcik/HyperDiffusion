@@ -89,13 +89,6 @@ def get_grid(h, w, b=0, norm=True, device="cpu"):
         return grid[0].permute(2, 0, 1)  # [UV, H, W]
 
 
-def image_mse(mask, model_output, gt):
-    if mask is None:
-        return {'img_loss': ((model_output['model_out'] - gt) ** 2).mean()}
-    else:
-        return {'img_loss': (mask * (model_output['model_out'] - gt) ** 2).mean()}
-
-
 def get_mlp(mlp_kwargs, B=None, short=False):
     if "model_type" in mlp_kwargs:
         if mlp_kwargs.model_type == "mlp_3d":
