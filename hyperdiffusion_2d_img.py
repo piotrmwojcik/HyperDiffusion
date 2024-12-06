@@ -306,6 +306,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
         mlp = ParallelImplicitShortMLP(mlps).cuda()
+        mlp = torch.nn.DataParallel(mlp, device_ids=[0, 1])
         #grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
         code_optimizer = self.build_optimizer(mlp, cfg)
