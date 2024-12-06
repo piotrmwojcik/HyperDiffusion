@@ -329,7 +329,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for inverse_step_id in range(n_inverse_steps):
             #psnr = []
             print('!!! ', x.shape)
-            mse_loss, psnr = mlp(x.clone(), gt_imgs)
+            mse_loss, psnr = mlp(x.clone(), gt_imgs.clone())
             print('!!! ', mse_loss.shape)
             #torch.cuda.synchronize()
             #start = time.time()
