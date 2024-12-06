@@ -13,6 +13,8 @@ from embedder import Embedder
 from torchmeta.modules import (MetaModule, MetaSequential)
 from math import pi
 from einops import rearrange
+
+from hd_utils import image_mse, image_psnr
 from helpers import (ImageDownsampling, FCBlock)
 
 from collections import OrderedDict
@@ -220,6 +222,7 @@ class ParallelImplicitShortMLP(nn.Module):
 
         return {'model_in': model_ins, 'model_out': model_outs}
 
+
 class ParallelImplicitMLP(nn.Module):
     def __init__(self, models):
         super(ParallelImplicitMLP, self).__init__()
@@ -230,14 +233,18 @@ class ParallelImplicitMLP(nn.Module):
 
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
-    def forward(self, model_input):
+    def forward(self, model_input, gt_imgs):
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i]({'coords': model_input[i].unsqueeze(0)}) for i in range(len(self.models))]
         # Stack outputs along the N dimension to consolidate them
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
-        return {'model_in': model_ins, 'model_out': model_outs}
+        output = {'model_in': model_ins, 'model_out': model_outs}
+        mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
+        psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
+
+        return mse_loss, psnr
 
 
 class MLP3D(nn.Module):
