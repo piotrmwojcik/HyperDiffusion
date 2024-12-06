@@ -14,7 +14,7 @@ from torchmeta.modules import (MetaModule, MetaSequential)
 from math import pi
 from einops import rearrange
 
-from hd_utils import image_mse, image_psnr
+from hd_utils import image_mse
 from helpers import (ImageDownsampling, FCBlock)
 
 from collections import OrderedDict
@@ -347,3 +347,27 @@ class SingleBVPNet(MetaModule): ## SIREN 2D
         coords = model_input['coords'].clone().detach().requires_grad_(True)
         activations = self.net.forward_with_activations(coords)
         return {'model_in': coords, 'model_out': activations.popitem(), 'activations': activations}
+
+
+def image_psnr(pred_img, gt_img):
+    batch_size = pred_img.shape[0]
+    len = int(math.sqrt(pred_img.shape[1]))
+
+    pred_img = pred_img.detach().cpu()
+    gt_img = gt_img.detach().cpu()
+
+    psnrs = list()
+    for i in range(batch_size):
+        p = pred_img[i].view(len, len, 3).numpy()
+        trgt = gt_img[i].view(len, len, 3).numpy()
+
+        p = (p / 2.) + 0.5
+        p = np.clip(p, a_min=0., a_max=1.)
+
+        trgt = (trgt / 2.) + 0.5
+
+        psnr = measure.compare_psnr(p, trgt, data_range=1)
+
+        psnrs.append(torch.tensor(psnr))
+
+    return {'img_psnr': torch.mean(torch.hstack(psnrs))}
