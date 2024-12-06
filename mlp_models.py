@@ -213,6 +213,7 @@ class ParallelImplicitShortMLP(nn.Module):
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
     def forward(self, model_input, gt_imgs):
+        print('inside ', model_input.shape, gt_imgs.shape)
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i](model_input.clone()) for i in range(len(self.models))]
         # Stack outputs along the N dimension to consolidate them
