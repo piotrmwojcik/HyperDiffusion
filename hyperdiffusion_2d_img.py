@@ -8,6 +8,7 @@ import pytorch_lightning as pl
 import torch
 import trimesh
 import math
+import skimage.measure as measure
 from einops import rearrange
 import torchvision.utils as vutils
 from pytorch_lightning.utilities.types import EPOCH_OUTPUT
@@ -306,7 +307,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
         mlp = ParallelImplicitShortMLP(mlps).cuda()
-        mlp = torch.nn.DataParallel(mlp, device_ids=[0])
+        mlp = torch.nn.DataParallel(mlp, device_ids=[0, 1])
         mlp_without_ddp = mlp.module
         #grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
