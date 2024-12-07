@@ -214,9 +214,7 @@ class ParallelImplicitShortMLP(nn.Module):
 
     def forward(self, model_input):
         print('inside ', model_input.shape, ' x')
-        # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i](model_input.clone()) for i in range(len(self.models))]
-        # Stack outputs along the N dimension to consolidate them
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         #model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
@@ -224,7 +222,7 @@ class ParallelImplicitShortMLP(nn.Module):
         #mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
         #psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
 
-        return model_outs
+        return model_outs, outputs
 
 
 class ParallelImplicitMLP(nn.Module):
