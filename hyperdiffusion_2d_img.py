@@ -28,7 +28,7 @@ from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes)
 from mlp_models import ImplicitMLP, ParallelImplicitMLP, GaussianFourierFeatureTransform, ImplicitMLPShort, \
-    ParallelImplicitShortMLP, image_psnr
+    ParallelImplicitShortMLP, image_psnr, image_mse
 from reg_loss import RegLoss
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
@@ -328,27 +328,26 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #start = time.time()
         for inverse_step_id in range(n_inverse_steps):
             #psnr = []
-            print('!!! ', x.shape, gt_imgs.shape)
             #mse_loss, psnr = mlp(x.clone(), gt_imgs.clone())
             outputs = mlp(x.clone(), gt_imgs.clone())
-            print('outside !!! ', outputs.shape)
             #torch.cuda.synchronize()
             #start = time.time()
 
+            mse_loss = image_mse(mask=None, model_output=outputs, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
+
             code_reg = None
             if self.reg_loss is not None:
                 code_reg = self.reg_loss(mlp)
                 #print(self.reg_loss(mlp))
                 mse_loss = mse_loss + code_reg
 
-            #psnr.append(psnr_inner)
+            psnr = image_psnr(outputs, gt_imgs)['img_psnr']
 
             if update_grad:
                 grad_inner = torch.autograd.grad(mse_loss,
                                                  mlp.parameters(),
                                                  create_graph=False)
-
 
                 prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
 
