@@ -220,11 +220,11 @@ class ParallelImplicitShortMLP(nn.Module):
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
-        output = {'model_in': model_ins, 'model_out': model_outs}
-        mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
-        psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
+        #output = {'model_in': model_ins, 'model_out': model_outs}
+        #mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
+        #psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
 
-        return mse_loss, psnr
+        return model_outs
 
 
 class ParallelImplicitMLP(nn.Module):
