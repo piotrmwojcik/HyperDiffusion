@@ -333,7 +333,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             #torch.cuda.synchronize()
             #start = time.time()
 
-            print('!!! ', outputs.shape, dupa.shape)
+            print('!!! ', outputs.shape, dupa[0].shape)
 
             mse_loss = image_mse(mask=None, model_output=outputs, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
