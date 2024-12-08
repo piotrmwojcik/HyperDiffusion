@@ -25,7 +25,7 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
 from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
-                      render_mesh, render_meshes)
+                      render_mesh, render_meshes, image_mse, image_psnr)
 from mlp_models import ImplicitMLP, ParallelImplicitMLP, GaussianFourierFeatureTransform, ImplicitMLPShort, \
     ParallelImplicitShortMLP
 from reg_loss import RegLoss
