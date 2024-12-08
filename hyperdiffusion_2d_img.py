@@ -369,17 +369,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     grad = grad.view(-1)
                     grad = grad + prior_grad_[current_idx:current_idx + num_params]
                     grad = grad.view(grad_shape)
-
-                    # Accumulate gradients directly on the parameter's .grad attribute
-                    if param.grad is None:
-                        param.grad = torch.zeros_like(param).to('cuda:0')
-                    param.grad.add_(grad)  # Accumulate gradients
-
+                    param.grad = torch.zeros_like(param).to('cuda:0')
                     current_idx += num_params
-                assert current_idx == prior_grad_.shape[0]
+                    param.grad.copy_(grad)
+                assert(current_idx == prior_grad_.shape[0])
+                code_optimizer.step()
 
-            if update_grad:
-                code_optimizer.step()  # Perform optimization step
         #print()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
