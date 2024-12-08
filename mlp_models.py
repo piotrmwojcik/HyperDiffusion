@@ -241,6 +241,7 @@ class ParallelImplicitShortMLP(nn.Module):
 
         return model_outs
 
+
 class ParallelImplicitMLP(nn.Module):
     def __init__(self, models):
         super(ParallelImplicitMLP, self).__init__()
