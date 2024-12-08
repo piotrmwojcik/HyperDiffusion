@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch import distributions as dist
 from torch import nn
 import math
+import skimage.measure
 import torch.nn.functional as F
 
 from embedder import Embedder
