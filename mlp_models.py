@@ -237,7 +237,7 @@ class ParallelImplicitShortMLP(nn.Module):
         model_outs_1 = torch.cat([out['model_out'] for out in outputs_1], dim=0)
         model_outs_2 = torch.cat([out['model_out'] for out in outputs_2], dim=0).to("cuda:0")
 
-        print('!!! ', model_outs_1.shape, model_outs_2.shape)
+        #print('!!! ', model_outs_1.shape, model_outs_2.shape)
 
         model_outs = torch.cat([model_outs_1, model_outs_2], dim=0)
 
