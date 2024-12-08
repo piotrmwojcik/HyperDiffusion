@@ -213,38 +213,33 @@ class ParallelImplicitShortMLP(nn.Module):
 
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
-        # Split models between three GPUs
-        num_gpus = min(3, torch.cuda.device_count())  # Use up to 3 GPUs
-        assert num_gpus == 3, "This implementation requires at least 3 GPUs."
+        # Split models between two GPUs
+        num_gpus = min(2, torch.cuda.device_count())  # Use up to 2 GPUs
+        assert num_gpus == 2, "This implementation requires at least 2 GPUs."
 
         self.devices = [torch.device(f"cuda:{i}") for i in range(num_gpus)]
 
-        # Divide models equally across the 3 GPUs
+        # Divide models equally across the 2 GPUs
         size = len(models)
-        self.models_1 = self.models[:size // 3].to(self.devices[0])
-        self.models_2 = self.models[size // 3:2 * size // 3].to(self.devices[1])
-        self.models_3 = self.models[2 * size // 3:].to(self.devices[2])
+        self.models_1 = self.models[:size // 2].to(self.devices[0])
+        self.models_2 = self.models[size // 2:].to(self.devices[1])
 
     def forward(self, model_input):
-        # Split model_input for the three GPUs
+        # Split model_input for the two GPUs
         input_1 = model_input.to(self.devices[0])
         input_2 = model_input.to(self.devices[1])
-        input_3 = model_input.to(self.devices[2])
 
-        # Compute outputs on all GPUs in parallel
+        # Compute outputs on both GPUs in parallel
         outputs_1 = [self.models_1[i](input_1.clone()) for i in range(len(self.models_1))]
         outputs_2 = [self.models_2[i](input_2.clone()) for i in range(len(self.models_2))]
-        outputs_3 = [self.models_3[i](input_3.clone()) for i in range(len(self.models_3))]
 
-        # Combine results from all GPUs
+        # Combine results from both GPUs
         model_outs_1 = torch.cat([out['model_out'] for out in outputs_1], dim=0)
         model_outs_2 = torch.cat([out['model_out'] for out in outputs_2], dim=0).to(self.devices[0])
-        model_outs_3 = torch.cat([out['model_out'] for out in outputs_3], dim=0).to(self.devices[0])
 
-        model_outs = torch.cat([model_outs_1, model_outs_2, model_outs_3], dim=0)
+        model_outs = torch.cat([model_outs_1, model_outs_2], dim=0)
 
         return model_outs
-
 
 class ParallelImplicitMLP(nn.Module):
     def __init__(self, models):
