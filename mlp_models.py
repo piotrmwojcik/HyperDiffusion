@@ -13,7 +13,6 @@ from embedder import Embedder
 from torchmeta.modules import (MetaModule, MetaSequential)
 from math import pi
 from einops import rearrange
-
 from helpers import (ImageDownsampling, FCBlock)
 
 from collections import OrderedDict
@@ -232,18 +231,14 @@ class ParallelImplicitMLP(nn.Module):
 
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
-    def forward(self, model_input, gt_imgs):
+    def forward(self, model_input):
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i]({'coords': model_input[i].unsqueeze(0)}) for i in range(len(self.models))]
         # Stack outputs along the N dimension to consolidate them
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
-        output = {'model_in': model_ins, 'model_out': model_outs}
-        mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
-        psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
-
-        return mse_loss, psnr
+        return {'model_in': model_ins, 'model_out': model_outs}
 
 
 class MLP3D(nn.Module):
@@ -346,27 +341,3 @@ class SingleBVPNet(MetaModule): ## SIREN 2D
         coords = model_input['coords'].clone().detach().requires_grad_(True)
         activations = self.net.forward_with_activations(coords)
         return {'model_in': coords, 'model_out': activations.popitem(), 'activations': activations}
-
-
-def image_psnr(pred_img, gt_img):
-    batch_size = pred_img.shape[0]
-    len = int(math.sqrt(pred_img.shape[1]))
-
-    pred_img = pred_img.detach().cpu()
-    gt_img = gt_img.detach().cpu()
-
-    psnrs = list()
-    for i in range(batch_size):
-        p = pred_img[i].view(len, len, 3).numpy()
-        trgt = gt_img[i].view(len, len, 3).numpy()
-
-        p = (p / 2.) + 0.5
-        p = np.clip(p, a_min=0., a_max=1.)
-
-        trgt = (trgt / 2.) + 0.5
-
-        psnr = measure.compare_psnr(p, trgt, data_range=1)
-
-        psnrs.append(torch.tensor(psnr))
-
-    return {'img_psnr': torch.mean(torch.hstack(psnrs))}
