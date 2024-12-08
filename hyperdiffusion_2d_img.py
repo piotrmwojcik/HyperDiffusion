@@ -332,12 +332,13 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             outputs = mlp(x.clone())
             #torch.cuda.synchronize()
             #start = time.time()
-
-            outputs1 = outputs[:32]  # First half
-            outputs2 = outputs[32:]  # Second half
-
-            # Concatenate along the first dimension
-            outputs = torch.cat((outputs1, outputs2), dim=0)
+            num_gpus = torch.cuda.device_count()
+            chunk_size = outputs.size(0) // num_gpus
+            chunks = torch.split(outputs, chunk_size, dim=0)
+            processed_chunks = []  # List to store processed chunks
+            for chunk in chunks:
+                processed_chunks.append(chunk)
+            outputs = torch.cat(processed_chunks, dim=0)
 
             mse_loss = image_mse(mask=None, model_output=outputs, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
