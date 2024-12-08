@@ -338,7 +338,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             processed_chunks = []  # List to store processed chunks
             for chunk in chunks:
                 processed_chunks.append(chunk)
-            outputs = torch.cat(processed_chunks, dim=0)
+            outputs = torch.cat(processed_chunks, dim=1)
 
             mse_loss = image_mse(mask=None, model_output=outputs, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
