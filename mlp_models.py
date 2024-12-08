@@ -235,7 +235,7 @@ class ParallelImplicitShortMLP(nn.Module):
 
         # Combine results
         model_outs_1 = torch.cat([out['model_out'] for out in outputs_1], dim=0)
-        model_outs_2 = torch.cat([out['model_out'] for out in outputs_2], dim=0).device("cuda:0")
+        model_outs_2 = torch.cat([out['model_out'] for out in outputs_2], dim=0).to("cuda:0")
 
         model_outs = torch.cat([model_outs_1, model_outs_2], dim=0)
 
