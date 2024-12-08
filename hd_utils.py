@@ -1,9 +1,11 @@
+import math
 from math import ceil
 
 import numpy as np
 import pyrender
 import torch
 import trimesh
+import skimage.measure as measure
 #from implicit_kan.implicit_kan import ImplicitEKAN
 
 from mlp_models import MLP, MLP3D, SingleBVPNet, ImplicitMLP, ImplicitMLPShort
@@ -87,6 +89,37 @@ def get_grid(h, w, b=0, norm=True, device="cpu"):
         return grid.permute(0, 3, 1, 2)  # [Batch, UV, H, W]
     else:
         return grid[0].permute(2, 0, 1)  # [UV, H, W]
+
+
+def image_mse(mask, model_output, gt):
+    if mask is None:
+        return {'img_loss': ((model_output['model_out'] - gt) ** 2).mean()}
+    else:
+        return {'img_loss': (mask * (model_output['model_out'] - gt) ** 2).mean()}
+
+
+def image_psnr(pred_img, gt_img):
+    batch_size = pred_img.shape[0]
+    len = int(math.sqrt(pred_img.shape[1]))
+
+    pred_img = pred_img.detach().cpu()
+    gt_img = gt_img.detach().cpu()
+
+    psnrs = list()
+    for i in range(batch_size):
+        p = pred_img[i].view(len, len, 3).numpy()
+        trgt = gt_img[i].view(len, len, 3).numpy()
+
+        p = (p / 2.) + 0.5
+        p = np.clip(p, a_min=0., a_max=1.)
+
+        trgt = (trgt / 2.) + 0.5
+
+        psnr = measure.compare_psnr(p, trgt, data_range=1)
+
+        psnrs.append(torch.tensor(psnr))
+
+    return {'img_psnr': torch.mean(torch.hstack(psnrs))}
 
 
 def get_mlp(mlp_kwargs, B=None, short=False):
