@@ -355,8 +355,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 grad_inner = torch.autograd.grad(
                     mse_loss,
                     mlp.parameters(),
-                    create_graph=True,
-                    retain_graph=True
+                    create_graph=False,
+                    retain_graph=False
                 )
 
                 prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
