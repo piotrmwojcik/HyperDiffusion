@@ -213,14 +213,32 @@ class ParallelImplicitShortMLP(nn.Module):
 
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
-    def forward(self, model_input):
-        #print('inside ', model_input.shape, ' x')
-        outputs = [self.models[i](model_input.clone()) for i in range(len(self.models))]
-        model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
-        #model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
+        # Split models between two GPUs
+        num_gpus = min(2, torch.cuda.device_count())  # Use up to 2 GPUs
+        assert num_gpus == 2, "This implementation requires at least 2 GPUs."
 
-        #output = {'model_in': model_ins, 'model_out': model_outs}
-        #psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
+        self.device1 = torch.device("cuda:0")
+        self.device2 = torch.device("cuda:1")
+
+        half_size = len(models) // 2
+        self.models_1 = self.models[:half_size].to(self.device1)
+        self.models_2 = self.models[half_size:].to(self.device2)
+
+    def forward(self, model_input):
+        # Split model_input for the two GPUs
+        half_size = model_input.size(0) // 2
+        input_1 = model_input[:half_size].to(self.device1)
+        input_2 = model_input[half_size:].to(self.device2)
+
+        # Compute outputs on both GPUs in parallel
+        outputs_1 = [self.models_1[i](input_1.clone()) for i in range(len(self.models_1))]
+        outputs_2 = [self.models_2[i](input_2.clone()) for i in range(len(self.models_2))]
+
+        # Combine results
+        model_outs_1 = torch.cat([out['model_out'] for out in outputs_1], dim=0)
+        model_outs_2 = torch.cat([out['model_out'] for out in outputs_2], dim=0)
+
+        model_outs = torch.cat([model_outs_1, model_outs_2], dim=0)
 
         return model_outs
 
