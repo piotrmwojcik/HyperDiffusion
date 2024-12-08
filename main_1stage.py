@@ -92,7 +92,7 @@ def main(cfg: DictConfig):
         )
         if torch.cuda.device_count() >= 2:
             print("Using", torch.cuda.device_count(), "GPUs!")
-            model = torch.nn.DataParallel(model, device_ids=[0, 1])  # Specify GPUs to use
+            model = torch.nn.DataParallel(model, device_ids=list(range(torch.cuda.device_count())))  # Specify GPUs to use
         else:
             print("Not enough GPUs available.")
         model = model.cuda()
