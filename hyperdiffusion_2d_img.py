@@ -375,7 +375,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #print()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
-        for idx, _mlp in enumerate(mlp.models):
+        for idx, _mlp in enumerate(mlp_without_ddp.models):
             state_dict = _mlp.state_dict()
             weights = []
             for weight in state_dict:
