@@ -243,6 +243,8 @@ class ParallelImplicitShortMLP(nn.Module):
 
         model_outs = torch.cat([model_outs_1, model_outs_2, model_outs_3], dim=0)
 
+        print('!!! ', model_outs.shape)
+
         return model_outs
 
 
