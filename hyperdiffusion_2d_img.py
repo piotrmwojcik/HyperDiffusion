@@ -25,7 +25,7 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
 from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
-                      render_mesh, render_meshes)
+                      render_mesh, render_meshes, image_mse, image_psnr)
 from mlp_models import ImplicitMLP, ParallelImplicitMLP, GaussianFourierFeatureTransform, ImplicitMLPShort, \
     ParallelImplicitShortMLP
 from reg_loss import RegLoss
@@ -306,8 +306,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
         mlp = ParallelImplicitShortMLP(mlps).cuda()
-        mlp = torch.nn.DataParallel(mlp, device_ids=[0])
-        mlp_without_ddp = mlp.module
         #grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
         code_optimizer = self.build_optimizer(mlp, cfg)
@@ -327,11 +325,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #start = time.time()
         for inverse_step_id in range(n_inverse_steps):
             #psnr = []
-            mse_loss, psnr = mlp(x.clone())
-            #print('!!! ', mse_loss.shape)
-            #torch.cuda.synchronize()
+            output = mlp(x.clone())
+            #print(output['model_out'].shape)
             #start = time.time()
-
+            mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
             code_reg = None
             if self.reg_loss is not None:
@@ -339,6 +336,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #print(self.reg_loss(mlp))
                 mse_loss = mse_loss + code_reg
 
+            psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             #psnr.append(psnr_inner)
 
             if update_grad:
@@ -352,7 +350,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #for code_idx, single_mlp in enumerate(mlp.models):
                 #    prior_grad[code_idx] = prior_grad[code_idx].cuda()
                 current_idx = 0
-                for grad, param in zip(grad_inner, mlp_without_ddp.parameters()):
+                for grad, param in zip(grad_inner, mlp.parameters()):
                     grad_shape = grad.shape
                     num_params = np.product(list(grad.shape))
                     grad = grad.view(-1)
