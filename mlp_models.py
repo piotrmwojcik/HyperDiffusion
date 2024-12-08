@@ -6,7 +6,6 @@ import torch.nn.functional as F
 from torch import distributions as dist
 from torch import nn
 import math
-import skimage.measure
 import torch.nn.functional as F
 
 from embedder import Embedder
@@ -213,33 +212,14 @@ class ParallelImplicitShortMLP(nn.Module):
 
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
-        # Split models between two GPUs
-        num_gpus = min(2, torch.cuda.device_count())  # Use up to 2 GPUs
-        assert num_gpus == 2, "This implementation requires at least 2 GPUs."
-
-        self.devices = [torch.device(f"cuda:{i}") for i in range(num_gpus)]
-
-        # Divide models equally across the 2 GPUs
-        size = len(models)
-        self.models_1 = self.models[:size // 2].to(self.devices[0])
-        self.models_2 = self.models[size // 2:].to(self.devices[1])
-
     def forward(self, model_input):
-        # Split model_input for the two GPUs
-        input_1 = model_input.to(self.devices[0])
-        input_2 = model_input.to(self.devices[1])
+        # model_inputs should be a list of inputs for each of the N models
+        outputs = [self.models[i](model_input.clone()) for i in range(len(self.models))]
+        # Stack outputs along the N dimension to consolidate them
+        model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
+        model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
-        # Compute outputs on both GPUs in parallel
-        outputs_1 = [self.models_1[i](input_1.clone()) for i in range(len(self.models_1))]
-        outputs_2 = [self.models_2[i](input_2.clone()) for i in range(len(self.models_2))]
-
-        # Combine results from both GPUs
-        model_outs_1 = torch.cat([out['model_out'] for out in outputs_1], dim=0)
-        model_outs_2 = torch.cat([out['model_out'] for out in outputs_2], dim=0).to(self.devices[0])
-
-        model_outs = torch.cat([model_outs_1, model_outs_2], dim=0)
-
-        return model_outs
+        return {'model_in': model_ins, 'model_out': model_outs}
 
 
 class ParallelImplicitMLP(nn.Module):
@@ -252,14 +232,18 @@ class ParallelImplicitMLP(nn.Module):
 
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
-    def forward(self, model_input):
+    def forward(self, model_input, gt_imgs):
         # model_inputs should be a list of inputs for each of the N models
         outputs = [self.models[i]({'coords': model_input[i].unsqueeze(0)}) for i in range(len(self.models))]
         # Stack outputs along the N dimension to consolidate them
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
-        return {'model_in': model_ins, 'model_out': model_outs}
+        output = {'model_in': model_ins, 'model_out': model_outs}
+        mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
+        psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
+
+        return mse_loss, psnr
 
 
 class MLP3D(nn.Module):
@@ -316,7 +300,6 @@ class MLP3D(nn.Module):
 
         return {"model_in": coords_org, "model_out": x}
 
-
 class SingleBVPNet(MetaModule): ## SIREN 2D
     def __init__(self, out_features=1, type='sine', in_features=2,
                  mode='mlp', hidden_features=256, num_hidden_layers=3, **kwargs):
@@ -365,13 +348,6 @@ class SingleBVPNet(MetaModule): ## SIREN 2D
         return {'model_in': coords, 'model_out': activations.popitem(), 'activations': activations}
 
 
-def image_mse(mask, model_output, gt):
-    if mask is None:
-        return {'img_loss': ((model_output - gt) ** 2).mean()}
-    else:
-        return {'img_loss': (mask * (model_output - gt) ** 2).mean()}
-
-
 def image_psnr(pred_img, gt_img):
     batch_size = pred_img.shape[0]
     len = int(math.sqrt(pred_img.shape[1]))
@@ -389,7 +365,7 @@ def image_psnr(pred_img, gt_img):
 
         trgt = (trgt / 2.) + 0.5
 
-        psnr = skimage.measure.compare_psnr(p, trgt, data_range=1)
+        psnr = measure.compare_psnr(p, trgt, data_range=1)
 
         psnrs.append(torch.tensor(psnr))
 

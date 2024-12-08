@@ -8,7 +8,6 @@ import pytorch_lightning as pl
 import torch
 import trimesh
 import math
-import skimage.measure as measure
 from einops import rearrange
 import torchvision.utils as vutils
 from pytorch_lightning.utilities.types import EPOCH_OUTPUT
@@ -26,9 +25,9 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
 from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
-                      render_mesh, render_meshes)
+                      render_mesh, render_meshes, image_mse, image_psnr)
 from mlp_models import ImplicitMLP, ParallelImplicitMLP, GaussianFourierFeatureTransform, ImplicitMLPShort, \
-    ParallelImplicitShortMLP, image_psnr, image_mse
+    ParallelImplicitShortMLP
 from reg_loss import RegLoss
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
@@ -51,7 +50,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.train_dt = train_dt
         self.test_dt = test_dt
         self.loaded_B = torch.load(Config.get("B_path"))
-        self.gff = GaussianFourierFeatureTransform(B=self.loaded_B, mapping_dim=128).cuda()
+        self.gff = GaussianFourierFeatureTransform(B=self.loaded_B, mapping_dim=128)
         self.cache_size = cache_size
         self.file_queues = None
         self.ae_model = None
@@ -305,12 +304,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         x = self.gff(x)
         x = rearrange(x, "b c h w -> (b h w) c")
 
-        start = time.time()
-
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
-        mlp = ParallelImplicitShortMLP(mlps)
-        #mlp = torch.nn.DataParallel(mlp, device_ids=list(range(torch.cuda.device_count())))
-        #mlp_without_ddp = mlp#.module
+        mlp = ParallelImplicitShortMLP(mlps).cuda()
+        mlp = torch.nn.DataParallel(mlp, device_ids=[0])
+        mlp_without_ddp = mlp.module
         #grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
         code_optimizer = self.build_optimizer(mlp, cfg)
@@ -326,76 +323,55 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             update_grad = False
         else:
             update_grad = True
-        elapsed_time = time.time() - start
-        print(f"Time taken for building execution: {elapsed_time:.4f} seconds")
 
-        start = time.time()
+        #start = time.time()
         for inverse_step_id in range(n_inverse_steps):
             #psnr = []
-            #mse_loss, psnr = mlp(x.clone(), gt_imgs.clone())
-            outputs = mlp(x.clone())
+            mse_loss, psnr = mlp(x.clone())
+            #print('!!! ', mse_loss.shape)
             #torch.cuda.synchronize()
             #start = time.time()
-            # num_gpus = torch.cuda.device_count()
-            # chunk_size = outputs.size(0) // num_gpus
-            # chunks = torch.split(outputs, chunk_size, dim=0)
-            # processed_chunks = []  # List to store processed chunks
-            # for chunk in chunks:
-            #     processed_chunks.append(chunk)
-            # outputs = torch.cat(processed_chunks, dim=1)
 
-            mse_loss = image_mse(mask=None, model_output=outputs, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
-
             code_reg = None
             if self.reg_loss is not None:
                 code_reg = self.reg_loss(mlp)
                 #print(self.reg_loss(mlp))
                 mse_loss = mse_loss + code_reg
 
-            psnr = image_psnr(outputs, gt_imgs)['img_psnr']
+            #psnr.append(psnr_inner)
 
             if update_grad:
-                #grad_inner = torch.autograd.grad(
-                #    mse_loss,
-                #    mlp.parameters(),
-                #    create_graph=False,
-                #    retain_graph=False
-                #)
+                grad_inner = torch.autograd.grad(mse_loss,
+                                                 mlp.parameters(),
+                                                 create_graph=False)
 
-                mse_loss.backward()
 
                 prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
+
+                #for code_idx, single_mlp in enumerate(mlp.models):
+                #    prior_grad[code_idx] = prior_grad[code_idx].cuda()
                 current_idx = 0
-                for param in mlp.parameters():
-                    grad = param.grad
-                    grad = grad.to('cuda:0')
-                    param = param.to('cuda:0')
+                for grad, param in zip(grad_inner, mlp_without_ddp.parameters()):
                     grad_shape = grad.shape
                     num_params = np.product(list(grad.shape))
                     grad = grad.view(-1)
                     grad = grad + prior_grad_[current_idx:current_idx + num_params]
                     grad = grad.view(grad_shape)
-                    param.grad = torch.zeros_like(param).to('cuda:0')
+                    param.grad = torch.zeros_like(param).cuda()
                     current_idx += num_params
                     param.grad.copy_(grad)
-                #assert (current_idx == prior_grad_.shape[0])
+                assert(current_idx == prior_grad_.shape[0])
                 code_optimizer.step()
-
         #print()
-        elapsed_time = time.time() - start
-        print(f"Time taken for inverse_code_1b1 execution: {elapsed_time:.4f} seconds")
-
-        start = time.time()
+        #end = time.time()
+        #print(f"grad and optim {round(end - start, 3)} seconds")
         for idx, _mlp in enumerate(mlp.models):
             state_dict = _mlp.state_dict()
             weights = []
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
-
-        elapsed_time = time.time() - start
-        print(f"Time taken for copy execution: {elapsed_time:.4f} seconds")
 
         #psnr = torch.mean(torch.hstack(psnr))
         optim_state = code_optimizer.state_dict()
@@ -474,10 +450,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #for code_ in code_list_:
         #    print('!!', code_.grad)
         #print('before inverse code')
+        #start = time.time()
         inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
                                                                             self.deep_copy_dict(code_optimizer_state),
                                                                             prior_grad, self.cfg)
-
         #for code_ in code_list_:
         #    print(code_.grad)
         #code_optimizer_state_ = self.deep_copy_dict(optim_state)
@@ -566,7 +542,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         images = torch.cat(images, dim=0)
         flattened_images = images.permute(0, 2, 3, 1).view(images.size(0), -1) / 255
         flattened_gt = image_tensors.view(image_tensors.size(0), -1) / 255
-        #print('!!! ', flattened_images.shape, flattened_gt.shape)
+        print('!!! ', flattened_images.shape, flattened_gt.shape)
 
         dot_products = torch.mm(flattened_images, flattened_gt.t())  # Shape: [N, N]
         norms1 = flattened_images.pow(2).sum(dim=1, keepdim=True)  # Shape: [N, 1]
