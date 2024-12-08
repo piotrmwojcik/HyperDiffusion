@@ -305,6 +305,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         x = self.gff(x)
         x = rearrange(x, "b c h w -> (b h w) c")
 
+        start = time.time()
+
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
         mlp = ParallelImplicitShortMLP(mlps)
         #mlp = torch.nn.DataParallel(mlp, device_ids=list(range(torch.cuda.device_count())))
@@ -324,8 +326,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             update_grad = False
         else:
             update_grad = True
+        elapsed_time = time.time() - start
+        print(f"Time taken for building execution: {elapsed_time:.4f} seconds")
 
-        #start = time.time()
+        start = time.time()
         for inverse_step_id in range(n_inverse_steps):
             #psnr = []
             #mse_loss, psnr = mlp(x.clone(), gt_imgs.clone())
@@ -379,14 +383,19 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 code_optimizer.step()
 
         #print()
-        #end = time.time()
-        #print(f"grad and optim {round(end - start, 3)} seconds")
+        elapsed_time = time.time() - start
+        print(f"Time taken for inverse_code_1b1 execution: {elapsed_time:.4f} seconds")
+
+        start = time.time()
         for idx, _mlp in enumerate(mlp.models):
             state_dict = _mlp.state_dict()
             weights = []
             for weight in state_dict:
                 weights.append(state_dict[weight].flatten())
             code_[idx] = torch.hstack(weights)
+
+        elapsed_time = time.time() - start
+        print(f"Time taken for copy execution: {elapsed_time:.4f} seconds")
 
         #psnr = torch.mean(torch.hstack(psnr))
         optim_state = code_optimizer.state_dict()
@@ -465,12 +474,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #for code_ in code_list_:
         #    print('!!', code_.grad)
         #print('before inverse code')
-        start = time.time()
         inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
                                                                             self.deep_copy_dict(code_optimizer_state),
                                                                             prior_grad, self.cfg)
-        elapsed_time = time.time() - start
-        print(f"Time taken for inverse_code_1b1 execution: {elapsed_time:.4f} seconds")
+
         #for code_ in code_list_:
         #    print(code_.grad)
         #code_optimizer_state_ = self.deep_copy_dict(optim_state)
