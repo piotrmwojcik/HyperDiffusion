@@ -352,14 +352,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             psnr = image_psnr(outputs, gt_imgs)['img_psnr']
 
             if update_grad:
-                grad_inner = torch.autograd.grad(mse_loss,
-                                                 mlp.parameters(),
-                                                 create_graph=False)
+                grad_inner = torch.autograd.grad(
+                    mse_loss,
+                    mlp.parameters(),
+                    create_graph=False,
+                    retain_graph=True  # Keep computational graph for subsequent steps
+                )
 
                 prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
-
-                #for code_idx, single_mlp in enumerate(mlp.models):
-                #    prior_grad[code_idx] = prior_grad[code_idx].cuda()
                 current_idx = 0
                 for grad, param in zip(grad_inner, mlp.parameters()):
                     grad = grad.to('cuda:0')
@@ -369,11 +369,17 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     grad = grad.view(-1)
                     grad = grad + prior_grad_[current_idx:current_idx + num_params]
                     grad = grad.view(grad_shape)
-                    param.grad = torch.zeros_like(param).to('cuda:0')
+
+                    # Accumulate gradients directly on the parameter's .grad attribute
+                    if param.grad is None:
+                        param.grad = torch.zeros_like(param).to('cuda:0')
+                    param.grad.add_(grad)  # Accumulate gradients
+
                     current_idx += num_params
-                    param.grad.copy_(grad)
-                assert(current_idx == prior_grad_.shape[0])
-                code_optimizer.step()
+                assert current_idx == prior_grad_.shape[0]
+
+            if update_grad:
+                code_optimizer.step()  # Perform optimization step
         #print()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
