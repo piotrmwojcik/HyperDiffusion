@@ -361,22 +361,18 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 mse_loss.backward()
 
-                prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
-                current_idx = 0
-                for grad, param in zip(grad_inner, mlp.parameters()):
-                    grad = grad.to('cuda:0')
-                    param = param.to('cuda:0')
-                    grad_shape = grad.shape
-                    num_params = np.product(list(grad.shape))
-                    grad = grad.view(-1)
-                    grad = grad + prior_grad_[current_idx:current_idx + num_params]
-                    grad = grad.view(grad_shape)
-                    param.grad = torch.zeros_like(param).to('cuda:0')
-                    current_idx += num_params
-                    param.grad.copy_(grad)
-                assert(current_idx == prior_grad_.shape[0])
-                code_optimizer.step()
-
+                if prior_grad is not None:
+                    prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
+                    current_idx = 0
+                    for param in mlp.parameters():
+                        param = param.to('cuda:0')
+                        if param.grad is not None:
+                            grad_shape = param.grad.shape
+                            num_params = np.product(list(grad_shape))
+                            grad = prior_grad_[current_idx:current_idx + num_params].view(grad_shape)
+                            param.grad.add_(grad)  # Add prior gradient
+                            current_idx += num_params
+                    assert current_idx == prior_grad_.shape[0]
         #print()
         #end = time.time()
         #print(f"grad and optim {round(end - start, 3)} seconds")
