@@ -352,12 +352,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             psnr = image_psnr(outputs, gt_imgs)['img_psnr']
 
             if update_grad:
-                grad_inner = torch.autograd.grad(
-                    mse_loss,
-                    mlp.parameters(),
-                    create_graph=False,
-                    retain_graph=False
-                )
+                #grad_inner = torch.autograd.grad(
+                #    mse_loss,
+                #    mlp.parameters(),
+                #    create_graph=False,
+                #    retain_graph=False
+                #)
+
+                mse_loss.backward()
 
                 prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
                 current_idx = 0
