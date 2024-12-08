@@ -226,9 +226,8 @@ class ParallelImplicitShortMLP(nn.Module):
 
     def forward(self, model_input):
         # Split model_input for the two GPUs
-        half_size = model_input.size(0) // 2
-        input_1 = model_input[:half_size].to(self.device1)
-        input_2 = model_input[half_size:].to(self.device2)
+        input_1 = model_input.to(self.device1)
+        input_2 = model_input.to(self.device2)
 
         # Compute outputs on both GPUs in parallel
         outputs_1 = [self.models_1[i](input_1.clone()) for i in range(len(self.models_1))]
@@ -236,7 +235,7 @@ class ParallelImplicitShortMLP(nn.Module):
 
         # Combine results
         model_outs_1 = torch.cat([out['model_out'] for out in outputs_1], dim=0)
-        model_outs_2 = torch.cat([out['model_out'] for out in outputs_2], dim=0)
+        model_outs_2 = torch.cat([out['model_out'] for out in outputs_2], dim=0).device("cuda:0")
 
         model_outs = torch.cat([model_outs_1, model_outs_2], dim=0)
 
