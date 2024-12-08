@@ -372,7 +372,7 @@ def image_psnr(pred_img, gt_img):
 
         trgt = (trgt / 2.) + 0.5
 
-        psnr = measure.compare_psnr(p, trgt, data_range=1)
+        psnr = skimage.measure.compare_psnr(p, trgt, data_range=1)
 
         psnrs.append(torch.tensor(psnr))
 
