@@ -212,17 +212,16 @@ class ParallelImplicitShortMLP(nn.Module):
 
         self.models = nn.ModuleList(models)  # Store models as a ModuleList
 
-    def forward(self, model_input, gt_imgs):
-        print('inside ', model_input.shape, gt_imgs.shape, ' x')
+    def forward(self, model_input):
+        print('inside ', model_input.shape, ' x')
         outputs = [self.models[i](model_input.clone()) for i in range(len(self.models))]
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         #model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
 
         #output = {'model_in': model_ins, 'model_out': model_outs}
-        mse_loss = image_mse(mask=None, model_output=model_outs, gt=gt_imgs)['img_loss']
         #psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
 
-        return mse_loss, model_outs
+        return model_outs
 
 
 class ParallelImplicitMLP(nn.Module):
