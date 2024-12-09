@@ -20,6 +20,7 @@ def main():
 
     # Loop over all JPG files in the folder
     for image_file in os.listdir(gt_image_folder):
+        print(image_file)
         if image_file.endswith(".jpg"):
             try:
                 # Load the image
