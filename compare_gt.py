@@ -19,7 +19,15 @@ def main():
         return
 
     # Loop over all JPG files in the folder
-    for image_file in os.listdir(gt_image_folder):
+    all_files = os.listdir(gt_image_folder)
+    fnames = [
+        f for f in all_files
+        if (f.endswith('.jpg') or f.endswith('.png')) and f.split('.')[0].isdigit() and 0 <= int(
+            f.split('.')[0]) <= 26999
+    ]
+    fnames.sort()
+
+    for image_file in fnames:
         print(image_file)
         if image_file.endswith(".jpg"):
             try:
