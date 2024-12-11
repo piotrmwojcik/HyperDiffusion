@@ -25,7 +25,7 @@ from diffusion.gaussian_diffusion import (GaussianDiffusion, LossType,
                                           ModelMeanType, ModelVarType)
 from ema import ExponentialMovingAverage
 from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
-                      render_mesh, render_meshes, image_mse, image_psnr)
+                      render_mesh, render_meshes, image_mse, image_psnr, generate_mlp_from_weights_mlp)
 from mlp_models import ImplicitMLP, ParallelImplicitMLP, GaussianFourierFeatureTransform, ImplicitMLPShort, \
     ParallelImplicitShortMLP
 from reg_loss import RegLoss
@@ -297,17 +297,17 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             return [optimizer], [scheduler]
         return optimizer
 
-    def inverse_code_1b1(self, gt_imgs, grids, code_, optimizer_state, prior_grad, cfg):
+    def inverse_code_1b1(self, gt_imgs, grids, code_, optimizer_state, prior_grad, cfg, mlp):
         n_inverse_steps = cfg['inverse_steps']
 
         x = grids[0].unsqueeze(0).cuda()
         x = self.gff(x)
         x = rearrange(x, "b c h w -> (b h w) c")
 
-        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
+        mlp = generate_mlp_from_weights_mlp(code_, self.mlp_kwargs, mlp)
         #num_params = sum(p.numel() for p in mlps[0].parameters())
         #print(f"Number of parameters of one mlp: {num_params}, {len(mlps)}")
-        mlp = ParallelImplicitShortMLP(mlps).cuda()
+        #mlp = ParallelImplicitShortMLP(mlps).cuda()
         #grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
         code_optimizer = self.build_optimizer(mlp, cfg)
@@ -400,7 +400,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 copied_dict[key] = copy.deepcopy(value)
         return copied_dict
 
-    def training_step(self, train_batch, optimizer, code_optimizer_state, global_step, save_to_disk):
+    def training_step(self, train_batch, optimizer, code_optimizer_state, global_step, save_to_disk, MLP):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_img = train_batch['gt_img'][0].clone().detach().view(64, 64, 3).permute(2, 0, 1).cuda()
 
@@ -460,7 +460,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         start = time.time()
         inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
                                                                             self.deep_copy_dict(code_optimizer_state),
-                                                                            prior_grad, self.cfg)
+                                                                            prior_grad, self.cfg, MLP)
         print('Inverse step took:', time.time() - start)
         #for code_ in code_list_:
         #    print(code_.grad)

@@ -153,6 +153,22 @@ def generate_mlp_from_weights(weights, mlp_kwargs, B=None, short=False):
     return mlp
 
 
+def generate_mlp_from_weights_mlp(weights, mlp):
+    for midx, _mlp in enumerate(mlp.modules):
+        state_dict = _mlp.state_dict()
+        weight_names = list(state_dict.keys())
+        for layer in weight_names:
+            val = state_dict[layer]
+            num_params = np.product(list(val.shape))
+            w = weights[midx][:num_params]
+            w = w.view(*val.shape)
+            state_dict[layer] = w
+            weights = weights[midx][num_params:]
+        #assert len(weights) == 0, f"len(weights) = {len(weights)}"
+        _mlp.load_state_dict(state_dict)
+    return mlp
+
+
 def load_mlp_from_weights(weights, mlp):
     state_dict = mlp.state_dict()
     weight_names = list(state_dict.keys())
