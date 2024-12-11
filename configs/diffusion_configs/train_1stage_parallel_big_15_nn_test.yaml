@@ -30,7 +30,7 @@ cache_size: 27000
 norm_momentum: 0.001
 code_optimizer: Adam
 code_lr: 1e-3
-inverse_steps: 5
+inverse_steps: 15
 code_loss_weight: 10.0
 loss_weight: 175
 code_loss_weight_schedule:
