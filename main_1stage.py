@@ -253,7 +253,7 @@ def main(cfg: DictConfig):
         for key, value in checkpoint['diffuser'].items():
             new_key = f"model.module.{key}"  # Prepend 'model.module.' to each key
             new_model_dict[new_key] = value
-        checkpoint['diffuser']['model'] = new_model_dict
+        checkpoint['diffuser'] = new_model_dict
 
         global_step = checkpoint.get('global_step', 0)
         epoch_start = checkpoint.get('epoch', 0)
