@@ -249,14 +249,12 @@ def main(cfg: DictConfig):
 
     if Config.get('model_resume_path') is not None:
         checkpoint = torch.load(Config.get('model_resume_path'))
-        if 'model' in checkpoint['diffuser']:
-            new_model_dict = {}
-            for key, value in checkpoint['diffuser']['model'].items():
-                new_key = f"model.module.{key}"  # Prepend 'model.module.' to each key
-                new_model_dict[new_key] = value
-            checkpoint['diffuser']['model'] = new_model_dict
-        else:
-            print("No 'model' key found in the checkpoint.")
+        new_model_dict = {}
+        for key, value in checkpoint['diffuser'].items():
+            new_key = f"model.module.{key}"  # Prepend 'model.module.' to each key
+            new_model_dict[new_key] = value
+        checkpoint['diffuser']['model'] = new_model_dict
+
         global_step = checkpoint.get('global_step', 0)
         epoch_start = checkpoint.get('epoch', 0)
 
