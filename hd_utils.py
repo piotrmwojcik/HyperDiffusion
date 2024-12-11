@@ -154,7 +154,7 @@ def generate_mlp_from_weights(weights, mlp_kwargs, B=None, short=False):
 
 
 def generate_mlp_from_weights_mlp(weights, mlp):
-    for midx, _mlp in enumerate(mlp.modules):
+    for midx, _mlp in enumerate(mlp.models):
         state_dict = _mlp.state_dict()
         weight_names = list(state_dict.keys())
         for layer in weight_names:
