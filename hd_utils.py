@@ -161,7 +161,7 @@ def generate_mlp_from_weights_mlp(weights, mlp):
         for layer in weight_names:
             val = state_dict[layer]
             num_params = np.product(list(val.shape))
-            print(weights[midx].shape)
+            print(weights[midx].shape, num_params)
             w = weights[midx][:num_params]
             w = w.view(*val.shape)
             state_dict[layer] = w
