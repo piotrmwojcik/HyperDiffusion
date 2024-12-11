@@ -6,7 +6,7 @@ from hyperdiffusion import HyperDiffusion
 
 # Using it to make pyrender work on clusters
 from hyperdiffusion_2d_img import HyperDiffusion_2d_img
-from mlp_models import ImplicitMLP, ParallelImplicitMLP, ParallelImplicitShortMLP
+from mlp_models import ImplicitMLP, ParallelImplicitMLP, ParallelImplicitShortMLP, ImplicitMLPShort
 from scheduler import PrefixStepLRScheduler
 
 os.environ["PYOPENGL_PLATFORM"] = "egl"
@@ -174,8 +174,8 @@ def main(cfg: DictConfig):
     print(
         "Train dataset length: {}".format(len(train_dt))
     )
-    inr_model = ImplicitMLP(B=torch.load(Config.get("B_path")))
-    mlps = [ImplicitMLP(B=torch.load(Config.get("B_path"))) for _ in range(Config.get("batch_size"))]
+    inr_model = ImplicitMLPShort()
+    mlps = [ImplicitMLPShort() for _ in range(Config.get("batch_size"))]
     MLP = ParallelImplicitShortMLP(mlps)
     state_dict = inr_model.state_dict()
     weights = []
