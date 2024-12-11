@@ -301,6 +301,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         n_inverse_steps = cfg['inverse_steps']
 
         x = grids[0].unsqueeze(0).cuda()
+        print('!!!! ', x.shape)
         x = self.gff(x)
         x = rearrange(x, "b c h w -> (b h w) c")
 
