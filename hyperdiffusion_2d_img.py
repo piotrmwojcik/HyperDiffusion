@@ -338,11 +338,14 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
             psnr = 5.0#image_psnr(output['model_out'], gt_imgs)['img_psnr']
             #psnr.append(psnr_inner)
-            code_optimizer.zero_grad()
+            #code_optimizer.zero_grad()
             if update_grad:
+                start_grad = time.time()
                 grad_inner = torch.autograd.grad(mse_loss,
                                                  mlp.parameters(),
                                                  create_graph=False)
+                end_grad = start_grad - time.time()
+                print('Grad calculation took: ', end_grad)
 
                 prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
                 #for code_idx, single_mlp in enumerate(mlp.models):
