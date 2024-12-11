@@ -304,7 +304,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         x = self.gff(x)
         x = rearrange(x, "b c h w -> (b h w) c")
 
-        mlp = generate_mlp_from_weights_mlp(code_, self.mlp_kwargs, mlp)
+        mlp = generate_mlp_from_weights_mlp(code_, mlp)
         #num_params = sum(p.numel() for p in mlps[0].parameters())
         #print(f"Number of parameters of one mlp: {num_params}, {len(mlps)}")
         #mlp = ParallelImplicitShortMLP(mlps).cuda()
