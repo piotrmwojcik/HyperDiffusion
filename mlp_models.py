@@ -213,7 +213,7 @@ class ParallelImplicitShortMLP(nn.Module):
 
     def forward(self, model_input):
         # model_inputs should be a list of inputs for each of the N models
-        outputs = [self.models[i](model_input.clone()) for i in range(len(self.models))]
+        outputs = [self.models[i](model_input) for i in range(len(self.models))]
         # Stack outputs along the N dimension to consolidate them
         model_outs = torch.cat([out['model_out'] for out in outputs], dim=0)
         model_ins = torch.cat([out['model_in'] for out in outputs], dim=0)
