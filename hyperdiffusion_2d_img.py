@@ -337,8 +337,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             #    code_reg = self.reg_loss(mlp)
                 #print(self.reg_loss(mlp))
             #    mse_loss = mse_loss + code_reg
-
-            psnr = 5.0 #image_psnr(output['model_out'], gt_imgs)['img_psnr']
+            with torch.no_grad():
+                psnr = image_psnr(output['model_out'], gt_imgs)['img_psnr']
             #psnr.append(psnr_inner)
             #code_optimizer.zero_grad()
             if update_grad:
