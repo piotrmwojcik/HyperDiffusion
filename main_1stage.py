@@ -176,7 +176,7 @@ def main(cfg: DictConfig):
     )
     inr_model = ImplicitMLPShort()
     mlps = [ImplicitMLPShort() for _ in range(Config.get("batch_size"))]
-    MLP = ParallelImplicitShortMLP(mlps)
+    MLP = ParallelImplicitShortMLP(mlps).cuda()
     state_dict = inr_model.state_dict()
     weights = []
     shapes = []
