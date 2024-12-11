@@ -165,7 +165,7 @@ def generate_mlp_from_weights_mlp(weights, mlp):
             w = weights[midx][:num_params]
             w = w.view(*val.shape)
             state_dict[layer] = w
-            weights = weights[midx][num_params:]
+            weights[midx] = weights[midx][num_params:]
         #assert len(weights) == 0, f"len(weights) = {len(weights)}"
         _mlp.load_state_dict(state_dict)
     return mlp
