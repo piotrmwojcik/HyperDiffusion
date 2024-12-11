@@ -304,7 +304,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         x = self.gff(x)
         x = rearrange(x, "b c h w -> (b h w) c")
 
-        mlps = [generate_mlp_from_weights(code_single.detach(), self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
+        mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
         mlp = ParallelImplicitShortMLP(mlps).cuda()
         #grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
@@ -338,15 +338,13 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
             psnr = 5.0#image_psnr(output['model_out'], gt_imgs)['img_psnr']
             #psnr.append(psnr_inner)
-
+            code_optimizer.zero_grad()
             if update_grad:
                 grad_inner = torch.autograd.grad(mse_loss,
                                                  mlp.parameters(),
                                                  create_graph=False)
 
-
                 prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
-
                 #for code_idx, single_mlp in enumerate(mlp.models):
                 #    prior_grad[code_idx] = prior_grad[code_idx].cuda()
                 current_idx = 0
