@@ -351,6 +351,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #for code_idx, single_mlp in enumerate(mlp.models):
                 #    prior_grad[code_idx] = prior_grad[code_idx].cuda()
                 current_idx = 0
+                start_grad_cp = time.time()
                 for grad, param in zip(grad_inner, mlp.parameters()):
                     grad_shape = grad.shape
                     num_params = np.product(list(grad.shape))
@@ -362,6 +363,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     param.grad.copy_(grad)
                 assert(current_idx == prior_grad_.shape[0])
                 code_optimizer.step()
+                print('Grad copy took: ', time.time() - start_grad_cp)
         #print()
         end = time.time()
         print(f"grad and optim {round(end - start, 3)} seconds")
