@@ -342,13 +342,13 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             #psnr.append(psnr_inner)
             #code_optimizer.zero_grad()
             if update_grad:
-                start_grad = time.time()
+                #start_grad = time.time()
                 grad_inner = torch.autograd.grad(mse_loss,
                                                  mlp.parameters(),
                                                  create_graph=False)
-                end_grad = time.time() - start_grad
+                #end_grad = time.time() - start_grad
 
-                print('Grad calculation took: ', end_grad)
+                #print('Grad calculation took: ', end_grad)
                 #num_params = sum(p.numel() for p in mlp.parameters())
 
                 #print(f"Number of parameters considered for gradient computation: {num_params}")
