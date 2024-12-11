@@ -330,7 +330,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             #start = time.time()
             mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
             mse_loss = mse_loss * Config.get('code_loss_weight')
-            #code_reg = None
+            code_reg = None
             #if self.reg_loss is not None:
             #    code_reg = self.reg_loss(mlp)
                 #print(self.reg_loss(mlp))
