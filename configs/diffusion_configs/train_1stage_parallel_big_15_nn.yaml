@@ -45,7 +45,7 @@ sampling: ddimr
 val_fid_calculation_period: 1
 lr: 0.0002
 log_interval: 40
-batch_size: 32
+batch_size: 24
 accumulate_grad_batches: 1
 val:
   num_points: 2048
