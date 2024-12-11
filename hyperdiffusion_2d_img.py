@@ -305,8 +305,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         x = rearrange(x, "b c h w -> (b h w) c")
 
         mlps = [generate_mlp_from_weights(code_single, self.mlp_kwargs, self.loaded_B, short=True) for code_single in code_]
-        num_params = sum(p.numel() for p in mlps[0].parameters())
-        print(f"Number of parameters of one mlp: {num_params}, {len(mlps)}")
+        #num_params = sum(p.numel() for p in mlps[0].parameters())
+        #print(f"Number of parameters of one mlp: {num_params}, {len(mlps)}")
         mlp = ParallelImplicitShortMLP(mlps).cuda()
         #grids = grids.cuda()
         gt_imgs = gt_imgs.cuda()
@@ -348,10 +348,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                                  create_graph=False)
                 end_grad = time.time() - start_grad
 
-                print('Grad calculation took: ', end_grad)
+                #print('Grad calculation took: ', end_grad)
                 num_params = sum(p.numel() for p in mlp.parameters())
 
-                print(f"Number of parameters considered for gradient computation: {num_params}")
+                #print(f"Number of parameters considered for gradient computation: {num_params}")
 
                 prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
                 #for code_idx, single_mlp in enumerate(mlp.models):
@@ -369,10 +369,10 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     param.grad.copy_(grad)
                 assert(current_idx == prior_grad_.shape[0])
                 code_optimizer.step()
-                print('Grad copy took: ', time.time() - start_grad_cp)
+                #print('Grad copy took: ', time.time() - start_grad_cp)
         #print()
         end = time.time()
-        print(f"grad and optim {round(end - start, 3)} seconds")
+        #print(f"grad and optim {round(end - start, 3)} seconds")
         for idx, _mlp in enumerate(mlp.models):
             state_dict = _mlp.state_dict()
             weights = []
