@@ -556,7 +556,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         norms1 = flattened_images.pow(2).sum(dim=1, keepdim=True)  # Shape: [N, 1]
         norms2 = flattened_gt.pow(2).sum(dim=1, keepdim=True)  # Shape: [N, 1]
         distances = norms1 - 2 * dot_products + norms2.t()  # Shape: [N, N]
-        distances.fill_diagonal_(float('inf'))
+        #distances.fill_diagonal_(float('inf'))
         nearest_indices = distances.argmin(dim=1)  # Shape: [N]
 
         gt_grid = []
