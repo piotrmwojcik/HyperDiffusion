@@ -301,7 +301,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         n_inverse_steps = cfg['inverse_steps']
 
         x = grids[0].unsqueeze(0).cuda()
-        print('!!!! ', x.shape)
         x = self.gff(x)
         x = rearrange(x, "b c h w -> (b h w) c")
 
@@ -346,7 +345,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                                                  mlp.parameters(),
                                                  create_graph=False)
                 end_grad = time.time() - start_grad
+
                 print('Grad calculation took: ', end_grad)
+                num_params = sum(p.numel() for p in mlp.parameters())
+
+                print(f"Number of parameters considered for gradient computation: {num_params}")
 
                 prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
                 #for code_idx, single_mlp in enumerate(mlp.models):
