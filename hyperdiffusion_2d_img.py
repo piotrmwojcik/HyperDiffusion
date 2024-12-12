@@ -400,7 +400,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 copied_dict[key] = copy.deepcopy(value)
         return copied_dict
 
-    def training_step(self, train_batch, optimizer, code_optimizer_state, global_step, save_to_disk, MLP):
+    def training_step(self, train_batch, optimizer, code_optimizer_state, global_step, save_to_disk, MLP, epoch):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_img = train_batch['gt_img'][0].clone().detach().view(64, 64, 3).permute(2, 0, 1).cuda()
 
@@ -439,14 +439,11 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
         loss_mse = loss_terms["loss"].mean()
 
-        #norm_factor = code.detach().square().mean()
-        #self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
-        #                      + self.momentum * norm_factor
-        #if global_step <= 1700:
-        #    warmup_factor = (2.0 - (math.cos(math.pi * global_step / 1700) + 1.0)) / 2.0
-        #else:
-        #    warmup_factor = 1.0
-        loss_mse = Config.get("loss_weight") * loss_mse #/ self.norm_factor
+        norm_factor = code.detach().square().mean()
+        if epoch < Config.get("freeze_norm"):
+            self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
+                                    + self.momentum * norm_factor
+        loss_mse = Config.get("loss_weight") * loss_mse / self.norm_factor
 
         loss_mse.backward()  # Backpropagation
         optimizer.step()
