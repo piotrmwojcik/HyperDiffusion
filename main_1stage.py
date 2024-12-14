@@ -290,7 +290,7 @@ def main(cfg: DictConfig):
             # Training phase
             outputs = []
             diffuser.train()  # Set model to training mode
-            #total_train_loss = 0.0
+            #start_time = time.time()
             save_to_disk = ((epoch + 1) % Config.get("model_save_period") == 0) or (epoch == num_epochs - 1)
             with tqdm(train_dl, desc=f"Epoch {epoch + 1}/{num_epochs}", unit="batch") as pbar:
                 for batch_idx, data in enumerate(pbar):
