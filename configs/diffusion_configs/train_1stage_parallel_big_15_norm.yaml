@@ -41,7 +41,7 @@ code_lr_schedule:
   - 0: 1e-3
 inverse_steps_schedule:
   - 20: 5
-model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_small_parallel_big_15_norm/checkpoint/model_epoch_199.pth
+model_resume_path:
 sampling: ddimr
 val_fid_calculation_period: 1
 lr: 0.0002
