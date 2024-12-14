@@ -91,11 +91,11 @@ def main(cfg: DictConfig):
         model = Transformer(
             layers, layer_names, **Config.config["transformer_config"]["params"]
         )
-        if torch.cuda.device_count() >= 2:
-            print("Using", torch.cuda.device_count(), "GPUs!")
-            model = torch.nn.DataParallel(model, device_ids=list(range(torch.cuda.device_count())))  # Specify GPUs to use
-        else:
-            print("Not enough GPUs available.")
+        #if torch.cuda.device_count() >= 2:
+        #   print("Using", torch.cuda.device_count(), "GPUs!")
+        #   model = torch.nn.DataParallel(model, device_ids=list(range(torch.cuda.device_count())))  # Specify GPUs to use
+        #else:
+        #    print("Not enough GPUs available.")
         model = model.cuda()
     # Initialize UNet for Voxel baseline
     else:
