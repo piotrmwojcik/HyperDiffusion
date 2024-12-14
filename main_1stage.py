@@ -203,8 +203,10 @@ def main(cfg: DictConfig):
         model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, Config.get("cache_size"), cfg
     )
     coords = train_dt[0]['coords'].unsqueeze(0).cuda()
+    print('!!! ', coords.shape)
     coords = diffuser.gff(coords)
     coords = rearrange(coords, "b c h w -> (b h w) c").cuda()
+    print('!!! !!! ', coords.shape)
 
     diffuser.logger = run
     # best_acc_checkpoint = ModelCheckpoint(
