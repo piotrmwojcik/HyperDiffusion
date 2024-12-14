@@ -297,14 +297,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             return [optimizer], [scheduler]
         return optimizer
 
-    def inverse_code_1b1(self, gt_imgs, grids, code_, optimizer_state, prior_grad, cfg, mlp):
+    def inverse_code_1b1(self, gt_imgs, coords, code_, optimizer_state, prior_grad, cfg, mlp):
         n_inverse_steps = cfg['inverse_steps']
-
-        start = time.time()
-        x = grids[0].unsqueeze(0).cuda()
-        x = self.gff(x)
-        x = rearrange(x, "b c h w -> (b h w) c")
-        print('Coordinates inversion: ', time.time() - start)
 
         mlp = generate_mlp_from_weights_mlp(code_, mlp)
         #num_params = sum(p.numel() for p in mlps[0].parameters())
@@ -329,7 +323,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #start = time.time()
         for inverse_step_id in range(n_inverse_steps):
             #psnr = []
-            output = mlp(x)
+            output = mlp(coords)
             #print(output['model_out'].shape)
             #start = time.time()
             mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
@@ -402,7 +396,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 copied_dict[key] = copy.deepcopy(value)
         return copied_dict
 
-    def training_step(self, train_batch, optimizer, code_optimizer_state, global_step, save_to_disk, MLP, epoch):
+    def training_step(self, train_batch, coords, optimizer, code_optimizer_state, global_step, save_to_disk, MLP, epoch):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
         input_img = train_batch['gt_img'][0].clone().detach().view(64, 64, 3).permute(2, 0, 1).cuda()
 
@@ -458,7 +452,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #    print('!!', code_.grad)
         #print('before inverse code')
         #start = time.time()
-        inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], train_batch['coords'], code_list_,
+        inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], coords, code_list_,
                                                                             self.deep_copy_dict(code_optimizer_state),
                                                                             prior_grad, self.cfg, MLP)
         #print('Inverse step took:', time.time() - start)
