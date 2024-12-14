@@ -2,7 +2,6 @@ import os
 
 from dataset import VoxelDataset, WeightDataset, CelebAHQ, CelebAHQ_collate_fn
 from hd_utils import Config, get_mlp
-from hyperdiffusion import HyperDiffusion
 
 # Using it to make pyrender work on clusters
 from hyperdiffusion_2d_img import HyperDiffusion_2d_img
