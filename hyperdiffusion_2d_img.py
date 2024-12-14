@@ -9,7 +9,7 @@ import trimesh
 import math
 from einops import rearrange
 import torchvision.utils as vutils
-from pytorch_lightning.utilities.types import EPOCH_OUTPUT
+#from pytorch_lightning.utilities.types import EPOCH_OUTPUT
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 from PIL import Image
@@ -622,9 +622,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #for metric_name in metrics:
         #    self.log("val/" + metric_name, metrics[metric_name])
 
-    def training_epoch_end(self, outputs: EPOCH_OUTPUT) -> None:
-        epoch_loss = sum(output["loss"] for output in outputs) / len(outputs)
-        self.log({"epoch_loss": epoch_loss})
+    #def training_epoch_end(self, outputs: EPOCH_OUTPUT) -> None:
+    #    epoch_loss = sum(output["loss"] for output in outputs) / len(outputs)
+    #    self.log({"epoch_loss": epoch_loss})
 
     def print_summary(self, flat, func):
         var = func(flat, dim=0)
