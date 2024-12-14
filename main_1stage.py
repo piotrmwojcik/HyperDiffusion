@@ -19,6 +19,7 @@ import multiprocessing as mp
 import numpy as np
 import pytorch_lightning as pl
 import torch
+from einops import rearrange
 from torch.optim.lr_scheduler import LambdaLR, StepLR
 from tqdm.autonotebook import tqdm
 from omegaconf import DictConfig
@@ -201,6 +202,10 @@ def main(cfg: DictConfig):
     diffuser = HyperDiffusion_2d_img(
         model, train_dt, val_dt, test_dt, mlp_kwargs, input_data.shape, method, Config.get("cache_size"), cfg
     )
+    coords = train_dt[0]['coords'].unsqueeze(0).cuda()
+    coords = diffuser.gff(coords)
+    coords = rearrange(coords, "b c h w -> (b h w) c")
+    print('!!! ', coords.shape)
 
     diffuser.logger = run
     # best_acc_checkpoint = ModelCheckpoint(
