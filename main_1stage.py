@@ -267,17 +267,17 @@ def main(cfg: DictConfig):
 
         model_msg = diffuser.load_state_dict(checkpoint['diffuser'])
         print('Loaded model ',  model_msg)
-        optim_msg = optimizer.load_state_dict(checkpoint['optimizer'])
-        print('Loaded optimizer ',  optim_msg)
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        print('Loaded optimizer')
 
         #del checkpoint['code_optimizer']['param_groups']
-        code_optimizer.state_dict()['state'] = checkpoint['code_optimizer']['state']
+        code_optimizer.load_state_dict(checkpoint['code_optimizer'])
         print('Loaded code optimizer')
 
         # Only load the scheduler if you're using one in your config
         if config["scheduler"]:
-            scheduler_msg = step_scheduler.load_state_dict(checkpoint['scheduler'])
-            print('Loaded scheduler ', scheduler_msg)
+            step_scheduler.load_state_dict(checkpoint['scheduler'])
+            print('Loaded scheduler')
 
     code_optimizer_state = diffuser.optimizer_state_to(code_optimizer.state_dict(), device='cpu', dtype=torch.float32)
 
