@@ -18,6 +18,7 @@ import multiprocessing as mp
 import numpy as np
 #import pytorch_lightning as pl
 import torch
+import copy
 from einops import rearrange
 from torch.optim.lr_scheduler import LambdaLR, StepLR
 from tqdm.autonotebook import tqdm
@@ -271,7 +272,9 @@ def main(cfg: DictConfig):
         print('Loaded optimizer')
 
         #del checkpoint['code_optimizer']['param_groups']
-        code_optimizer.state_dict()['state'] = checkpoint['code_optimizer']['state']
+        code_optimizer_state_dict = code_optimizer.state_dict()
+        code_optimizer_state_dict['state'] = copy.deepcopy(checkpoint['code_optimizer']['state'])
+        code_optimizer.load_state_dict(code_optimizer_state_dict)
         print(checkpoint['code_optimizer']['state'])
         print(code_optimizer.state_dict()['state'])
         print('Loaded code optimizer')
