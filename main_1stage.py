@@ -23,7 +23,7 @@ from torch.optim.lr_scheduler import LambdaLR, StepLR
 from tqdm.autonotebook import tqdm
 from omegaconf import DictConfig
 #from pytorch_lightning.callbacks import ModelCheckpoint
-from pytorch_lightning.loggers import WandbLogger
+#from pytorch_lightning.loggers import WandbLogger
 from torch.utils.data import DataLoader, random_split
 
 import ldm.ldm.modules.diffusionmodules.openaimodel
@@ -57,8 +57,8 @@ def main(cfg: DictConfig):
     )
     wandb.define_metric("*", step_metric="global_step")
     wandb.define_metric("epoch_loss", step_metric="epoch")
-    wandb_logger = WandbLogger()
-    wandb_logger.log_text("config", ["config"], [[str(config)]])
+    #wandb_logger = WandbLogger()
+    #wandb_logger.log_text("config", ["config"], [[str(config)]])
     print("wandb", wandb.run.name, wandb.run.id)
 
     train_dt = val_dt = test_dt = None
@@ -357,7 +357,7 @@ def main(cfg: DictConfig):
         #if (epoch + 1) % Config.get("model_save_period") == 0:
         #    torch.save(diffuser.state_dict(), f'{Config.get("model_save_path")}/model_epoch_{epoch}.pt')
 
-    wandb_logger.finalize("Success")
+    #wandb_logger.finalize("Success")
 
 
 if __name__ == "__main__":
