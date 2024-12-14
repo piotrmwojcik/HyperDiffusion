@@ -185,7 +185,7 @@ class ImplicitMLPShort(nn.Module):
 
     def forward(self, model_input):
 
-        coords_org = model_input.clone().detach().requires_grad_(True)
+        coords_org = model_input.clone().detach()#.requires_grad_(True)
         coords = coords_org
 
         x = self.linear1(coords)
