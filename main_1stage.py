@@ -16,13 +16,13 @@ from os.path import join
 import hydra
 import multiprocessing as mp
 import numpy as np
-import pytorch_lightning as pl
+#import pytorch_lightning as pl
 import torch
 from einops import rearrange
 from torch.optim.lr_scheduler import LambdaLR, StepLR
 from tqdm.autonotebook import tqdm
 from omegaconf import DictConfig
-from pytorch_lightning.callbacks import ModelCheckpoint
+#from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 from torch.utils.data import DataLoader, random_split
 
