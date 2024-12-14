@@ -128,6 +128,8 @@ class GaussianFourierFeatureTransform(nn.Module):
         # From [B, C, W, H] to [(B*W*H), C].
         x = x.permute(0, 2, 3, 1).reshape(batches * width * height, channels).to(x.device)
 
+        print('!!! ', self._B.shape)
+
         x = x @ self._B[:, :self.mapping_dim].to(x.device)
 
         # From [(B*W*H), C] to [B, W, H, C]
