@@ -247,6 +247,8 @@ def main(cfg: DictConfig):
     step_scheduler = StepLR(optimizer, step_size=config["scheduler_step"], gamma=0.9)
     scheduler = (warmup_scheduler, step_scheduler) if config["scheduler"] else None
 
+    print('!!! ', scheduler)
+
     global_step = 0
     epoch_start = 0
 
