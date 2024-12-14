@@ -2,10 +2,8 @@ import copy
 import os
 
 import numpy as np
-import pytorch_lightning as pl
 import torch
 import trimesh
-from pytorch_lightning.utilities.types import EPOCH_OUTPUT
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 
