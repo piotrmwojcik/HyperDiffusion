@@ -24,14 +24,14 @@ model_save_path: None
 B_path: /data/pwojcik/siren/random_mod/B.pth
 use_ema: False
 model_save_period: 40
-mode: test
+mode: train
 data_folder_train: /data/pwojcik/CelebAHQ_5k/
 image_resolution: 64
 cache_size: 5000
 norm_momentum: 0.001
 code_optimizer: Adam
 code_lr: 1e-3
-inverse_steps: 50
+inverse_steps: 3
 code_loss_weight: 10.0
 loss_weight: 175
 code_loss_weight_schedule:
