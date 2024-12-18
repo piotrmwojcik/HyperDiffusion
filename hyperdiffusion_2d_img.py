@@ -132,9 +132,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
     def get_init_code_(self, device=None):
         #print('!!!!')
         model = ImplicitMLP(B=self.loaded_B)
-        #checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
-        #checkpoint = torch.load(checkpoint_path, map_location=device)
-        #model.load_state_dict(checkpoint)
+        checkpoint_path = "/data/pwojcik/siren/logs/033013.jpg/checkpoints/model_epoch_14500.pth"
+        checkpoint = torch.load(checkpoint_path, map_location=device)
+        model.load_state_dict(checkpoint)
 
         state_dict = model.state_dict()
         weights = []
@@ -323,7 +323,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         for inverse_step_id in range(n_inverse_steps):
             #psnr = []
             output = mlp(coords)
-            print('!!! ', coords.dtype, gt_imgs.dtype)
             #print(output['model_out'].shape)
             #start = time.time()
             mse_loss = image_mse(mask=None, model_output=output, gt=gt_imgs)['img_loss']
