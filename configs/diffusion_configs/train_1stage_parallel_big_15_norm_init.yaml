@@ -13,7 +13,7 @@ dataset: 02958343
 tensorboard_log_dir: .
 augment: False
 augment_amount: 0
-freeze_norm: 100
+freeze_norm: 2000
 jitter_augment: False
 normalization_factor: 1.0
 timesteps: 500
@@ -41,7 +41,8 @@ code_lr_schedule:
   - 0: 1e-3
 inverse_steps_schedule:
   - 20: 5
-model_resume_path:
+  - 120: 1
+model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_small_parallel_big_15_norm_init/checkpoint/model_epoch_119.pth
 sampling: ddimr
 val_fid_calculation_period: 1
 lr: 0.0002
