@@ -13,7 +13,7 @@ dataset: 02958343
 tensorboard_log_dir: .
 augment: False
 augment_amount: 0
-freeze_norm: 100
+freeze_norm: 300
 jitter_augment: False
 normalization_factor: 1.0
 timesteps: 500
@@ -26,7 +26,7 @@ B_path: /data/pwojcik/siren/random_mod/B.pth
 use_ema: False
 model_save_period: 40
 mode: train
-data_folder_train: /data_ssd/pwojcik/CelebAHQ_5k
+data_folder_train: /data/pwojcik/CelebAHQ_5k/
 image_resolution: 64
 cache_size: 5000
 norm_momentum: 0.001
@@ -40,13 +40,13 @@ code_loss_weight_schedule:
 code_lr_schedule:
   - 0: 1e-3
 inverse_steps_schedule:
-  - 20: 5
+  - 20: 3
 model_resume_path:
 sampling: ddimr
 val_fid_calculation_period: 1
 lr: 0.0002
 log_interval: 40
-batch_size: 25
+batch_size: 24
 accumulate_grad_batches: 1
 val:
   num_points: 2048
@@ -62,7 +62,7 @@ diff_config:
 transformer_config:
   params:
     n_embd: 2240
-    n_layer: 12
+    n_layer: 24
     n_head: 16
     split_policy: layer_by_layer
     use_global_residual: False
