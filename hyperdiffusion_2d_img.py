@@ -27,7 +27,6 @@ from hd_utils import (Config, calculate_fid_3d, generate_mlp_from_weights,
                       render_mesh, render_meshes, image_mse, image_psnr, generate_mlp_from_weights_mlp)
 from mlp_models import ImplicitMLP, ParallelImplicitMLP, GaussianFourierFeatureTransform, ImplicitMLPShort, \
     ParallelImplicitShortMLP
-from reg_loss import RegLoss
 from siren import sdf_meshing, dataio
 from siren.dataio import anime_read, get_mgrid, get_grid
 from siren.experiment_scripts.test_sdf import SDFDecoder
