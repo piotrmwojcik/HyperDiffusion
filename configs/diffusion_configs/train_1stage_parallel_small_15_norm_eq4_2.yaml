@@ -13,7 +13,7 @@ dataset: 02958343
 tensorboard_log_dir: .
 augment: False
 augment_amount: 0
-freeze_norm: 600
+freeze_norm: 200
 jitter_augment: False
 normalization_factor: 1.0
 timesteps: 500
