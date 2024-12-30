@@ -340,6 +340,12 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 grad_inner = torch.autograd.grad(mse_loss,
                                                  mlp.parameters(),
                                                  create_graph=False)
+                for i, grad in enumerate(grad_inner):
+                    if grad is not None:  # Check to avoid issues with None gradients
+                        grad_norm = grad.norm().item()
+                        print(f"Gradient norm for parameter {i}: {grad_norm}")
+                    else:
+                        print(f"Gradient for parameter {i} is None.")
                 #end_grad = time.time() - start_grad
 
                 #print('Grad calculation took: ', end_grad)
