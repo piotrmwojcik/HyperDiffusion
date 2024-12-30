@@ -348,6 +348,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                 #print(f"Number of parameters considered for gradient computation: {num_params}")
 
                 prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
+                print('!!! ', prior_grad_.shape)
                 #for code_idx, single_mlp in enumerate(mlp.models):
                 #    prior_grad[code_idx] = prior_grad[code_idx].cuda()
                 current_idx = 0

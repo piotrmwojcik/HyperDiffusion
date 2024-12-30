@@ -36,13 +36,12 @@ inverse_steps: 20
 code_loss_weight: 100.0
 loss_weight: 175.0
 code_loss_weight_schedule:
-  - 20: 300.0
   - 5000: 10.0
 code_lr_schedule:
   - 0: 1e-3
 inverse_steps_schedule:
   - 20: 3
-  - 1000: 1
+  - 5000: 1
 model_resume_path:
 sampling: ddimr
 val_fid_calculation_period: 1
