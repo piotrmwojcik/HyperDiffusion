@@ -441,7 +441,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         if epoch < Config.get("freeze_norm"):
             self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
                                     + self.momentum * norm_factor
-        loss_mse = Config.get("loss_weight") * loss_mse / self.norm_factor
+        loss_mse = Config.get("loss_weight") * loss_mse #/ self.norm_factor
         #print('!!!!', Config.get("loss_weight"),  1 / self.norm_factor)
 
         loss_mse.backward()  # Backpropagation
