@@ -347,7 +347,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
                 #print(f"Number of parameters considered for gradient computation: {num_params}")
 
-                prior_grad_ = torch.cat(prior_grad, dim=0).cuda()
+                prior_grad_ = 5.0 * torch.cat(prior_grad, dim=0).cuda()
                 #prior_grad_norm = prior_grad_.norm().item()
                 #print('!!! ', prior_grad_.shape)
                 #print('!!! ', grad_inner[0].shape)
