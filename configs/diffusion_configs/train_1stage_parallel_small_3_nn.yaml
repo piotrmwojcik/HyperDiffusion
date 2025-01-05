@@ -1,5 +1,5 @@
 method: hyper_3d
-experiment_name: celebhq5k_small_parallel_small_3_nn
+experiment_name: celebhq5k_small_parallel_small_3_nn_2
 num_file_writers: 4
 cache_dir: None
 calculate_metric_on_test: True
@@ -35,13 +35,18 @@ code_lr: 1e-3
 inverse_steps: 20
 code_loss_weight: 10.0
 loss_weight: 175
+inverse_amplify: 4.3
 code_loss_weight_schedule:
   - 5000: 10.0
 code_lr_schedule:
   - 0: 1e-3
+inverse_amplify_schedule:
+  - 0: 4.3
+  - 20: 5.0
+  - 3000: 15.0
 inverse_steps_schedule:
   - 20: 3
-  - 1000: 1
+  - 3000: 1
 model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_small_parallel_small_3_nn/checkpoint/model_epoch_879.pth
 sampling: ddimr
 val_fid_calculation_period: 1

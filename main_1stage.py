@@ -310,6 +310,10 @@ def main(cfg: DictConfig):
                     for p in inverse_steps_schedule:
                         if epoch >= p[0]:
                             diffuser.cfg['inverse_steps'] = p[1]
+                    inverse_amplify_schedule = [(k, v) for d in diffuser.cfg['inverse_amplify_schedule'] for k, v in d.items()]
+                    for p in inverse_amplify_schedule:
+                        if epoch >= p[0]:
+                            diffuser.cfg['inverse_amplify'] = p[1]
                     code_lr_schedule = [(k, v) for d in diffuser.cfg['code_lr_schedule'] for k, v in d.items()]
                     for p in code_lr_schedule:
                         if epoch >= p[0]:
