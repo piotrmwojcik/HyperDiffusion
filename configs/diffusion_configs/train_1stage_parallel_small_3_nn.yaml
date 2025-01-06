@@ -41,7 +41,7 @@ code_loss_weight_schedule:
 code_lr_schedule:
   - 0: 1e-3
 inverse_amplify_schedule:
-  - 20: 12.0
+  - 20: 9.0
   - 3000: 15.0
 inverse_steps_schedule:
   - 20: 3
