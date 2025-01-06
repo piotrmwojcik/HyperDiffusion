@@ -41,13 +41,12 @@ code_loss_weight_schedule:
 code_lr_schedule:
   - 0: 1e-3
 inverse_amplify_schedule:
-  - 0: 4.3
-  - 20: 5.0
+  - 20: 7.5
   - 3000: 15.0
 inverse_steps_schedule:
   - 20: 3
   - 3000: 1
-model_resume_path:
+model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_small_parallel_small_3_nn_2/checkpoint/model_epoch_879.pth
 sampling: ddimr
 val_fid_calculation_period: 1
 lr: 0.0002
