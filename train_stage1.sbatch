@@ -14,4 +14,5 @@
 # source activate myenv
 
 # Run the Python script
+source activate hyper
 python main_1stage.py --config-name=train_1stage_parallel_big_3_nn
