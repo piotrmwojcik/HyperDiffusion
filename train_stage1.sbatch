@@ -5,7 +5,7 @@
 #SBATCH --mem=100G                 # Memory allocation
 #SBATCH --gres=gpu:1               # Number of GPUs
 #SBATCH --nodelist=ada06           # Specific node
-#SBATCH --time=4-00:00:00          # Maximum runtime (4 days)
+#SBATCH --time=4-00:00:00          # Maximum runtime (5 days)
 #SBATCH --output=train_stage1_output.log # Output file for the job
 #SBATCH --error=train_stage1_error.log   # Error file for the job
 
