@@ -48,7 +48,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         self.train_dt = train_dt
         self.test_dt = test_dt
         self.loaded_B = torch.load(Config.get("B_path"))
-        self.gff = GaussianFourierFeatureTransform(B=self.loaded_B, mapping_dim=128)
+        self.gff = GaussianFourierFeatureTransform(B=self.loaded_B, mapping_dim=64)
         self.cache_size = cache_size
         self.file_queues = None
         self.ae_model = None
@@ -74,9 +74,6 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             loss_type=LossType[cfg.diff_config.params.loss_type],
             diff_pl_module=self,
         )
-
-        self.latent_to_weights = torch.nn.Linear(Config.get("latent_channels"),
-                                                 103395) # MLP size
 
         self.reg_loss = None #RegLoss(loss_weight=4e-3)
 

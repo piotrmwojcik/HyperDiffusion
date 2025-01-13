@@ -1,6 +1,6 @@
 import os
 
-from dataset import VoxelDataset, WeightDataset, CelebAHQ, CelebAHQ_collate_fn
+from dataset import VoxelDataset, WeightDataset, CelebAHQ, CelebAHQ_collate_fn, Cifar10
 from hd_utils import Config, get_mlp
 
 # Using it to make pyrender work on clusters
@@ -160,7 +160,7 @@ def main(cfg: DictConfig):
         #         fmt="%s",
         #     )
 
-        train_dt = CelebAHQ(downsampled=True,
+        train_dt = Cifar10(downsampled=True,
                             resolution=data_res,
                             dataset_root=data_folder_train)
         train_dl = DataLoader(

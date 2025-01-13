@@ -148,10 +148,10 @@ class GaussianFourierFeatureTransform(nn.Module):
 class ImplicitMLP(nn.Module):
     def __init__(self, B):
         super(ImplicitMLP, self).__init__()
-        self.gff = GaussianFourierFeatureTransform(B=B, mapping_dim=128)
-        self.linear1 = nn.Linear(256, 256) #FMMLinear(256, 256, 100)
-        self.linear2 = nn.Linear(256, 128) #FMMLinear(256, 128, 50)
-        self.linear3 = nn.Linear(128, 32)
+        self.gff = GaussianFourierFeatureTransform(B=B, mapping_dim=64)
+        self.linear1 = nn.Linear(128, 128) #FMMLinear(256, 256, 100)
+        self.linear2 = nn.Linear(128, 64) #FMMLinear(256, 128, 50)
+        self.linear3 = nn.Linear(64, 32)
         self.linear4 = nn.Linear(32, 16)
         self.linear5 = nn.Linear(16, 3)
 
@@ -179,11 +179,12 @@ class ImplicitMLP(nn.Module):
 class ImplicitMLPShort(nn.Module):
     def __init__(self):
         super(ImplicitMLPShort, self).__init__()
-        self.linear1 = nn.Linear(256, 256) #FMMLinear(256, 256, 100)
-        self.linear2 = nn.Linear(256, 128) #FMMLinear(256, 128, 50)
-        self.linear3 = nn.Linear(128, 32)
+        self.linear1 = nn.Linear(128, 128) #FMMLinear(256, 256, 100)
+        self.linear2 = nn.Linear(128, 64) #FMMLinear(256, 128, 50)
+        self.linear3 = nn.Linear(64, 32)
         self.linear4 = nn.Linear(32, 16)
         self.linear5 = nn.Linear(16, 3)
+
 
     def forward(self, model_input):
 

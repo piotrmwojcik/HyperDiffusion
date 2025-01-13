@@ -1,5 +1,5 @@
 method: hyper_3d
-experiment_name: celebhq5k_small_parallel_small_3_latent
+experiment_name: cifar10_parallel_small_3
 num_file_writers: 4
 cache_dir: None
 calculate_metric_on_test: True
@@ -26,9 +26,9 @@ B_path: /data/pwojcik/siren/random_mod/B.pth
 use_ema: False
 model_save_period: 40
 mode: train
-data_folder_train: /data_ssd/pwojcik/CelebAHQ_5k/
-image_resolution: 64
-cache_size: 5000
+data_folder_train: /data_ssd/pwojcik/cifar10_filtered/
+image_resolution: 32
+cache_size: 60000
 norm_momentum: 0.001
 latent_channels: 8192
 code_optimizer: Adam
