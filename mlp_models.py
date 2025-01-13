@@ -148,12 +148,10 @@ class GaussianFourierFeatureTransform(nn.Module):
 class ImplicitMLP(nn.Module):
     def __init__(self, B):
         super(ImplicitMLP, self).__init__()
-        self.gff = GaussianFourierFeatureTransform(B=B, mapping_dim=64)
-        self.linear1 = nn.Linear(128, 128) #FMMLinear(256, 256, 100)
-        self.linear2 = nn.Linear(128, 64) #FMMLinear(256, 128, 50)
-        self.linear3 = nn.Linear(64, 16)
-        self.linear4 = nn.Linear(16, 8)
-        self.linear5 = nn.Linear(8, 3)
+        self.gff = GaussianFourierFeatureTransform(B=B, mapping_dim=128)
+        self.linear1 = nn.Linear(256, 64)  # FMMLinear(256, 256, 100)
+        self.linear2 = nn.Linear(64, 16)
+        self.linear3 = nn.Linear(16, 3)
 
     def forward(self, model_input):
 
@@ -166,22 +164,16 @@ class ImplicitMLP(nn.Module):
         x = F.relu(x)
         x = self.linear2(x)
         x = F.relu(x)
-        x = self.linear3(x)
-        x = F.relu(x)
-        x = self.linear4(x)
-        x = F.relu(x)
-        output = self.linear5(x).unsqueeze(0)
+        output = self.linear3(x).unsqueeze(0)
         return {'model_in': coords_org, 'model_out': output}
 
 
 class ImplicitMLPShort(nn.Module):
     def __init__(self):
         super(ImplicitMLPShort, self).__init__()
-        self.linear1 = nn.Linear(128, 128) #FMMLinear(256, 256, 100)
-        self.linear2 = nn.Linear(128, 64) #FMMLinear(256, 128, 50)
-        self.linear3 = nn.Linear(64, 16)
-        self.linear4 = nn.Linear(16, 8)
-        self.linear5 = nn.Linear(8, 3)
+        self.linear1 = nn.Linear(256, 64)  # FMMLinear(256, 256, 100)
+        self.linear2 = nn.Linear(64, 16)
+        self.linear3 = nn.Linear(16, 3)
 
 
     def forward(self, model_input):
@@ -193,11 +185,7 @@ class ImplicitMLPShort(nn.Module):
         x = F.relu(x)
         x = self.linear2(x)
         x = F.relu(x)
-        x = self.linear3(x)
-        x = F.relu(x)
-        x = self.linear4(x)
-        x = F.relu(x)
-        output = self.linear5(x).unsqueeze(0)
+        output = self.linear3(x).unsqueeze(0)
 
         return {'model_in': coords_org, 'model_out': output}
 
