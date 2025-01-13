@@ -330,7 +330,8 @@ class Cifar10(Dataset):
         all_files = os.listdir(self.root)
         self.fnames = [
             f for f in all_files
-            if (f.endswith('.jpg') or f.endswith('.png')) and f.split('.')[0].isdigit()
+            if (f.endswith('.jpg') or f.endswith('.png')) and f.split('.')[0].isdigit() and 0 <= int(
+                f.split('.')[0]) <= 4999
         ]
         self.fnames.sort()
 
