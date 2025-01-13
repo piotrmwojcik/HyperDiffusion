@@ -360,7 +360,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
                     num_params = np.product(list(grad.shape))
                     grad = grad.view(-1)
                     #print(grad.shape, grad.norm(p=2).item(), prior_grad_[current_idx:current_idx + num_params].norm(p=2).item())
-                    grad = grad #+ prior_grad_[current_idx:current_idx + num_params]
+                    grad = grad + prior_grad_[current_idx:current_idx + num_params]
                     grad = grad.view(grad_shape)
                     param.grad = torch.zeros_like(param).cuda()
                     current_idx += num_params
