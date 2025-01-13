@@ -400,7 +400,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
 
     def training_step(self, train_batch, coords, optimizer, code_optimizer_state, global_step, save_to_disk, MLP, epoch):
         # Extract input_data (either voxel or weight) which is the first element of the tuple
-        input_img = train_batch['gt_img'][0].clone().detach().view(64, 64, 3).permute(2, 0, 1).cuda()
+        input_img = train_batch['gt_img'][0].clone().detach().view(32, 32, 3).permute(2, 0, 1).cuda()
 
         log_interval = int(Config.get("log_interval"))
 
@@ -466,7 +466,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             mlp = generate_mlp_from_weights(code_list_[0], self.mlp_kwargs, self.loaded_B)
             #model_input = {'coords': model_input}
             input = train_batch['coords'][0].unsqueeze(0)
-            inr_output = mlp({'coords': input})['model_out'][0].view(64, 64, 3).permute(2, 0, 1)
+            inr_output = mlp({'coords': input})['model_out'][0].view(32, 32, 3).permute(2, 0, 1)
 
             #psnr_test = image_psnr(mlp({'coords': input})['model_out'], train_batch['gt_img'][16].unsqueeze(0))['img_psnr']
             #print('!!!!')
