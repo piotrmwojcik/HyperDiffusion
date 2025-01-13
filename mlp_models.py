@@ -111,7 +111,7 @@ class GaussianFourierFeatureTransform(nn.Module):
      returns a tensor of size [batches, mapping_dim*2, width, height].
     """
 
-    def __init__(self, B, num_input_channels=2, mapping_dim=128):
+    def __init__(self, B, num_input_channels=2, mapping_dim=32):
         super().__init__()
 
         self._num_input_channels = num_input_channels
@@ -179,11 +179,11 @@ class ImplicitMLP(nn.Module):
 class ImplicitMLPShort(nn.Module):
     def __init__(self):
         super(ImplicitMLPShort, self).__init__()
-        self.linear1 = nn.Linear(128, 128) #FMMLinear(256, 256, 100)
-        self.linear2 = nn.Linear(128, 64) #FMMLinear(256, 128, 50)
-        self.linear3 = nn.Linear(64, 32)
-        self.linear4 = nn.Linear(32, 16)
-        self.linear5 = nn.Linear(16, 3)
+        self.linear1 = nn.Linear(64, 64) #FMMLinear(256, 256, 100)
+        self.linear2 = nn.Linear(64, 32) #FMMLinear(256, 128, 50)
+        self.linear3 = nn.Linear(32, 16)
+        self.linear4 = nn.Linear(16, 3)
+        #self.linear5 = nn.Linear(16, 3)
 
 
     def forward(self, model_input):
@@ -198,8 +198,9 @@ class ImplicitMLPShort(nn.Module):
         x = self.linear3(x)
         x = F.relu(x)
         x = self.linear4(x)
-        x = F.relu(x)
-        output = self.linear5(x).unsqueeze(0)
+        return x.unsqueeze(0)
+        #x = F.relu(x)
+        #output = self.linear5(x).unsqueeze(0)
 
         return {'model_in': coords_org, 'model_out': output}
 
