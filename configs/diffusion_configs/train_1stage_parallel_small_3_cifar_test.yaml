@@ -26,7 +26,7 @@ B_path: /data/pwojcik/siren/random_mod/B.pth
 use_ema: False
 model_save_period: 40
 mode: train
-data_folder_train: /data_ssd/pwojcik/cifar10_filtered/
+data_folder_train: /data/pwojcik/cifar10_filtered/
 image_resolution: 32
 cache_size: 50000
 norm_momentum: 0.001
