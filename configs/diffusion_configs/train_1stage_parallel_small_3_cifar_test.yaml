@@ -35,15 +35,15 @@ code_optimizer: Adam
 code_lr: 1e-3
 inverse_steps: 15
 code_loss_weight: 10.0
-loss_weight: 20.0
-inverse_amplify: 4.3
+loss_weight: 5.0
+inverse_amplify: 1.0
 code_loss_weight_schedule:
   - 5000: 10.0
 code_lr_schedule:
   - 0: 1e-3
 inverse_amplify_schedule:
   - 20: 1.0
-  - 3000: 15.0
+  - 3000: 1.0
 inverse_steps_schedule:
   - 20: 3
   - 3000: 1
