@@ -33,7 +33,7 @@ norm_momentum: 0.001
 latent_channels: 8192
 code_optimizer: Adam
 code_lr: 1e-3
-inverse_steps: 25
+inverse_steps: 15
 code_loss_weight: 10.0
 loss_weight: 20.0
 inverse_amplify: 4.3
