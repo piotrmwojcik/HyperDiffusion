@@ -28,7 +28,7 @@ model_save_period: 40
 mode: train
 data_folder_train: /data/pwojcik/cifar10_filtered/
 image_resolution: 32
-cache_size: 50000
+cache_size: 5000
 norm_momentum: 0.001
 latent_channels: 8192
 code_optimizer: Adam
