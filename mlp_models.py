@@ -149,30 +149,26 @@ class ImplicitMLP(nn.Module):
     def __init__(self, B):
         super(ImplicitMLP, self).__init__()
         self.gff = GaussianFourierFeatureTransform(B=B, mapping_dim=64)
-        self.linear1 = nn.Linear(128, 128) #FMMLinear(256, 256, 100)
-        self.linear2 = nn.Linear(128, 64) #FMMLinear(256, 128, 50)
-        self.linear3 = nn.Linear(64, 32)
-        self.linear4 = nn.Linear(32, 16)
-        self.linear5 = nn.Linear(16, 3)
+        self.linear1 = nn.Linear(128, 64) #FMMLinear(256, 256, 100)
+        self.linear2 = nn.Linear(64, 32) #FMMLinear(256, 128, 50)
+        self.linear3 = nn.Linear(32, 16)
+        self.linear4 = nn.Linear(16, 3)
 
     def forward(self, model_input):
-
 
         coords_org = model_input['coords'].clone().detach().requires_grad_(True)
         coords = coords_org
 
         x = self.gff(coords)
         x = rearrange(x, "b c h w -> (b h w) c")  # Flatten the images
-        x = self.linear1(x)
+        x = self.linear1(coords)
         x = F.relu(x)
         x = self.linear2(x)
         x = F.relu(x)
         x = self.linear3(x)
         x = F.relu(x)
         x = self.linear4(x)
-        x = F.relu(x)
-        output = self.linear5(x).unsqueeze(0)
-
+        output = x.unsqueeze(0)
         return {'model_in': coords_org, 'model_out': output}
 
 
