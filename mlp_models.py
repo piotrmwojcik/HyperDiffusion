@@ -169,7 +169,8 @@ class ImplicitMLP(nn.Module):
         x = self.linear3(x)
         x = F.relu(x)
         x = self.linear4(x)
-        output = x.unsqueeze(0)
+        x = F.relu(x)
+        output = self.linear5(x).unsqueeze(0)
         return {'model_in': coords_org, 'model_out': output}
 
 
@@ -195,7 +196,6 @@ class ImplicitMLPShort(nn.Module):
         x = self.linear3(x)
         x = F.relu(x)
         x = self.linear4(x)
-        #output = x.unsqueeze(0)
         x = F.relu(x)
         output = self.linear5(x).unsqueeze(0)
 
