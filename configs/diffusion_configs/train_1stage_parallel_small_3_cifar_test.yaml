@@ -34,7 +34,7 @@ latent_channels: 8192
 code_optimizer: Adam
 code_lr: 1e-3
 inverse_steps: 20
-code_loss_weight: 10.0
+code_loss_weight: 50.0
 loss_weight: 5.0
 inverse_amplify: 1.0
 code_loss_weight_schedule:
