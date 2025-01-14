@@ -381,8 +381,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #psnr = torch.mean(torch.hstack(psnr))
         optim_state = code_optimizer.state_dict()
         del optim_state['param_groups']
+        flat_grad = torch.cat([g.view(-1) for g in grad_inner if g is not None])
         #print('state: ', code_optimizer.state_dict()['state'][0]['step'])
-        return mse_loss, code_reg, psnr, optim_state
+        return mse_loss, code_reg, psnr, prior_grad_.norm().item(), flat_grad.norm().item(), optim_state
 
     def deep_copy_dict(self, input_dict):
         copied_dict = {}
@@ -454,9 +455,9 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         #    print('!!', code_.grad)
         #print('before inverse code')
         #start = time.time()
-        inv_loss, code_reg, psnr, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], coords, code_list_,
-                                                                            self.deep_copy_dict(code_optimizer_state),
-                                                                            prior_grad, self.cfg, MLP)
+        inv_loss, code_reg, psnr, prior_grad_norm, inner_grad_norm, code_optim_state_ = self.inverse_code_1b1(train_batch['gt_img'], coords, code_list_,
+                                                                                                              self.deep_copy_dict(code_optimizer_state),
+                                                                                                              prior_grad, self.cfg, MLP)
         #print('Inverse step took:', time.time() - start)
         #for code_ in code_list_:
         #    print(code_.grad)
@@ -484,6 +485,8 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         # ==== save cache ====
         self.save_cache(code_list_, train_batch['scene_id'], save_to_disk)
         self.logger.log({"global_step": global_step, "diff_train_loss": loss_mse})
+        self.logger.log(({"global_step": global_step, "prior grad norm": prior_grad_norm}))
+        self.logger.log(({"global_step": global_step, "inner grad norm": inner_grad_norm}))
         self.logger.log({"global_step": global_step, "psnr": psnr})
         self.logger.log({"global_step": global_step, "inr_train_loss": inv_loss})
         self.logger.log({"global_step": global_step, "code_norm": code.detach().square().mean()})
