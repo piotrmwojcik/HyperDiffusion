@@ -45,7 +45,7 @@ inverse_amplify_schedule:
   - 20: 1.0
   - 3000: 1.0
 inverse_steps_schedule:
-  - 10: 5
+  - 5: 5
   - 3000: 1
 model_resume_path:
 sampling: ddimr
