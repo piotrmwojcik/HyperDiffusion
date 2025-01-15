@@ -14,7 +14,7 @@ tensorboard_log_dir: .
 augment: False
 augment_amount: 0
 jitter_augment: False
-normalization_factor: 1.0
+normalization_factor: 5.0
 timesteps: 500
 freeze_norm: 600
 epochs: 6000
