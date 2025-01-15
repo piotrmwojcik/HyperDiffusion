@@ -35,7 +35,7 @@ code_optimizer: Adam
 code_lr: 1e-3
 inverse_steps: 20
 code_loss_weight: 50.0
-loss_weight: 0.0083
+loss_weight: 1.0
 inverse_amplify: 1.0
 code_loss_weight_schedule:
   - 5000: 10.0
