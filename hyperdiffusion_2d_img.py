@@ -63,7 +63,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
         betas = torch.tensor(np.linspace(1e-4, 2e-2, timesteps))
         self.image_size = encoded_outs[:1].shape
 
-        self.register_buffer('norm_factor', torch.ones(1, dtype=torch.float))
+        self.register_buffer('norm_factor', torch.tensor([0.003], dtype=torch.float))
         self.momentum = Config.config["norm_momentum"]
 
         # Initialize diffusion utiities

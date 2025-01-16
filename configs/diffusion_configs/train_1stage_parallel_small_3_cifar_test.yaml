@@ -29,7 +29,7 @@ mode: train
 data_folder_train: /data/pwojcik/cifar10_filtered/
 image_resolution: 32
 cache_size: 5000
-norm_momentum: 0.001
+norm_momentum: 0.01
 latent_channels: 8192
 code_optimizer: Adam
 code_lr: 1e-3
