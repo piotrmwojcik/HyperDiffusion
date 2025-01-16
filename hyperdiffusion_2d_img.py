@@ -443,7 +443,7 @@ class HyperDiffusion_2d_img(torch.nn.Module):
             self.norm_factor[:] = (1 - self.momentum) * self.norm_factor \
                                     + self.momentum * norm_factor
         loss_mse = Config.get("loss_weight") * loss_mse #/ self.norm_factor
-        self.logger.log({"global_step": global_step, "norm factor": 1.0 / self.norm_factor.item()})
+        self.logger.log({"global_step": global_step, "norm factor": 1.0 / 333.37 * self.norm_factor.item()})
         #print('!!!!', Config.get("loss_weight"),  1 / self.norm_factor)
 
         loss_mse.backward()  # Backpropagation
