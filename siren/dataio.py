@@ -546,7 +546,7 @@ class PointCloud(Dataset):
                 inside_surface_values = igl.fast_winding_number_for_meshes(
                     obj.vertices, obj.faces, points
                 )
-                thresh = 0.5
+                thresh = 0.0
                 occupancies_winding = np.piecewise(
                     inside_surface_values,
                     [inside_surface_values < thresh, inside_surface_values >= thresh],
