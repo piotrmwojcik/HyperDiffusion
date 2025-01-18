@@ -529,6 +529,7 @@ class PointCloud(Dataset):
                 v_max = np.amax(vertices)
                 v_min = np.amin(vertices)
                 vertices *= 0.5 * 0.95 / (max(abs(v_min), abs(v_max)))
+                print(vertices)
                 obj.vertices = vertices
                 self.obj = obj
                 total_points = cfg.n_points  # 100000
@@ -555,7 +556,7 @@ class PointCloud(Dataset):
                 print(points.shape, occupancies.shape, occupancies.sum())
                 point_cloud = points
                 point_cloud = np.hstack((point_cloud, occupancies))
-                print(point_cloud.shape, points.shape, occupancies.shape)
+                #print(point_cloud.shape, points.shape, occupancies.shape)
 
         else:
             point_cloud = np.genfromtxt(path)
