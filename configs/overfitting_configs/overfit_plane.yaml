@@ -1,9 +1,9 @@
 input_type: "mesh"
 output_type: "occ" # or sdf or occ
-in_out: False
+in_out: True
 augment_on_the_fly: False
 mesh_jitter: False
-dataset_folder: "/data/pwojcik/02691156_2048_pc/"
+dataset_folder: "/data/pwojcik/HyperDiffusion/data/02691156/"
 wandb_dir: .
 batch_size: 2048
 lr: 1e-2
@@ -34,7 +34,7 @@ multi_process:
   ignore_first: False
 n_points: 100000
 is_meta: True
-strategy:
+strategy: first_weights
 clip_grad: False
 out_act: sigmoid
 mlp_config:
