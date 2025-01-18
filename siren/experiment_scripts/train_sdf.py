@@ -104,7 +104,6 @@ def main(cfg: DictConfig):
             filename = file.split(".")[0]
             filename = f"{filename}_jitter_{j}"
 
-            print('!!!! n_points ', cfg.n_points)
             sdf_dataset = dataio.PointCloud(
                 os.path.join(cfg.dataset_folder, file),
                 on_surface_points=cfg.batch_size,
