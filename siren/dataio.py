@@ -655,6 +655,7 @@ class PointCloud(Dataset):
             )
             self.coords = point_cloud[:, :3]
             self.occupancies = point_cloud[:, 3]
+            print(self.occupancies)
 
         if cfg.shape_modify == "half":
             included_points = self.coords[:, 0] < 0
