@@ -653,7 +653,6 @@ class PointCloud(Dataset):
             point_cloud = np.load(
                 os.path.join(pc_folder, os.path.basename(path) + ".npy")
             )
-            print('!!!! ', os.path.join(pc_folder, os.path.basename(path) + ".npy"))
             self.coords = point_cloud[:, :3]
             self.occupancies = point_cloud[:, 3]
 

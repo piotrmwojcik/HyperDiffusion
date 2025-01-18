@@ -34,7 +34,7 @@ multi_process:
   ignore_first: False
 n_points: 100000
 is_meta: True
-strategy: first_weights
+strategy:
 clip_grad: False
 out_act: sigmoid
 mlp_config:
