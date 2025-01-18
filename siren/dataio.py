@@ -529,7 +529,7 @@ class PointCloud(Dataset):
                 v_max = np.amax(vertices)
                 v_min = np.amin(vertices)
                 vertices *= 0.5 * 0.95 / (max(abs(v_min), abs(v_max)))
-                print(vertices)
+                print(vertices, np.amax(vertices), np.amin(vertices))
                 obj.vertices = vertices
                 self.obj = obj
                 total_points = cfg.n_points  # 100000
