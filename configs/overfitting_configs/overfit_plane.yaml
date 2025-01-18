@@ -11,7 +11,7 @@ model_type: mlp_3d
 bayesian: False
 logging_root: './logs'
 shape_modify: 'no'
-exp_name: "insert_name_here"
+exp_name: "small_planes"
 steps_til_summary: 100
 epochs_til_ckpt: 1
 hidden_features: 128
