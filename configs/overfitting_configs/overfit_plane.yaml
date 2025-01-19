@@ -18,7 +18,7 @@ hidden_features: 128
 kl_weight: 0
 epochs: 5000
 scheduler:
-  type: adaptive
+  type: fixed
   step_size: 30
   gamma: 0.1
   min_lr: 1e-5
