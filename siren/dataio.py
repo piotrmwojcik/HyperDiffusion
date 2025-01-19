@@ -700,10 +700,11 @@ class PointCloud(Dataset):
             }
         coords = self.coords[idx]
         occs = self.occupancies[idx, None]
+        normals = self.normals[idx]
 
 
         return {"coords": torch.from_numpy(coords).float()}, {
-            "sdf": torch.from_numpy(occs)
+            "sdf": torch.from_numpy(occs), "normals": torch.from_numpy(normals)
         }
 
 
