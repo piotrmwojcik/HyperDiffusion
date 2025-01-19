@@ -272,7 +272,7 @@ class MLP3D(nn.Module):
         x = self.layers[-1](x)
 
         if self.output_type == "occ":
-            x = torch.sigmoid(x)
+            #x = torch.sigmoid(x)
             pass
         elif self.output_type == "sdf":
             x = torch.tanh(x)
