@@ -56,7 +56,10 @@ def main(cfg: DictConfig):
     )
     first_state_dict = None
     if cfg.strategy == "same_init":
-        first_state_dict = get_model(cfg).state_dict()
+        first_state_dict = torch.load(
+            os.path.join('/data/pwojcik/HyperDiffusion/logs/small_planes/occ_ffef991d85e3136a9a6e43b878d5b335_jitter_0_model_final.pth')
+        )
+        #first_state_dict = get_model(cfg).state_dict()
     x_0s = []
     with open_dict(cfg):
         cfg.mlp_config.output_type = cfg.output_type
