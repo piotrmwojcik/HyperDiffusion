@@ -49,6 +49,10 @@ def train(
             threshold=cfg.scheduler.threshold,
             min_lr=cfg.scheduler.min_lr,
         )
+    elif cfg.scheduler.type == "fixed":
+        # Fixed learning rate (no change)
+        def lr_lambda(epoch):
+            return cfg.scheduler.fixed_lr  # Always return 1, meaning no change in learning rate
 
     # copy settings from Raissi et al. (2019) and here
     # https://github.com/maziarraissi/PINNs
