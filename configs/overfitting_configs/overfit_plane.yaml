@@ -23,8 +23,8 @@ scheduler:
   gamma: 0.1
   min_lr: 1e-5
   fixed_lr: 1e-3
-  patience: 100
-  patience_adaptive: 10
+  patience: 500
+  patience_adaptive: 50
   factor: 0.8
   threshold: 0
 multi_process:
