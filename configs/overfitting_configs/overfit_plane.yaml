@@ -19,7 +19,7 @@ kl_weight: 0
 epochs: 5000
 scheduler:
   type: step
-  step_size: 30
+  step_size: 150
   gamma: 0.1
   min_lr: 1e-5
   fixed_lr: 1e-3
