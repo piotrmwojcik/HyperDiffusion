@@ -543,22 +543,20 @@ class PointCloud(Dataset):
                 points_surface += 0.01 * np.random.randn(n_points_surface, 3)
                 points = np.concatenate([points_surface, points_uniform], axis=0)
 
-                #inside_surface_values = igl.fast_winding_number_for_meshes(
-                #    obj.vertices, obj.faces, points
-                #)
-                #print(np.max(inside_surface_values), np.min(inside_surface_values), np.median(inside_surface_values))
-                #thresh = 0.5
-                #occupancies_winding = np.piecewise(
-                #    inside_surface_values,
-                #    [inside_surface_values < thresh, inside_surface_values >= thresh],
-                #    [0, 1],
-                #)
-                sdf_values = obj.nearest.signed_distance(points)
-                sdf_values = sdf_values[..., None]
-                #occupancies = occupancies_winding[..., None]
-                print(points.shape, sdf_values.shape)
+                inside_surface_values = igl.fast_winding_number_for_meshes(
+                    obj.vertices, obj.faces, points
+                )
+                print(np.max(inside_surface_values), np.min(inside_surface_values), np.median(inside_surface_values))
+                thresh = 0.5
+                occupancies_winding = np.piecewise(
+                    inside_surface_values,
+                    [inside_surface_values < thresh, inside_surface_values >= thresh],
+                    [0, 1],
+                )
+                occupancies = occupancies_winding[..., None]
+                print(points.shape, occupancies.shape, occupancies.sum())
                 point_cloud = points
-                point_cloud = np.hstack((point_cloud, sdf_values))
+                point_cloud = np.hstack((point_cloud, occupancies))
                 #print(point_cloud.shape, points.shape, occupancies.shape)
 
         else:
