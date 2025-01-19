@@ -22,7 +22,7 @@ scheduler:
   step_size: 30
   gamma: 0.1
   min_lr: 1e-5
-  patience: 50
+  patience: 150
   patience_adaptive: 10
   factor: 0.8
   threshold: 0
