@@ -51,8 +51,7 @@ def train(
         )
     elif cfg.scheduler.type == "fixed":
         # Fixed learning rate (no change)
-        def lr_lambda(epoch):
-            return cfg.scheduler.fixed_lr  # Always return 1, meaning no change in learning rate
+        scheduler = None  # Always return 1, meaning no change in learning rate
 
     # copy settings from Raissi et al. (2019) and here
     # https://github.com/maziarraissi/PINNs
@@ -192,7 +191,7 @@ def train(
                 curr_bad_epochs = scheduler.num_bad_epochs
                 new_lr = next(iter(optim.param_groups))["lr"]
                 new_best = scheduler.best
-            else:
+            elif scheduler is not None:
                 scheduler.step()
             if best_loss > epoch_loss:
                 best_loss = epoch_loss
