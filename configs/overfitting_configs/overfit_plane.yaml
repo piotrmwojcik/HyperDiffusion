@@ -1,9 +1,9 @@
 input_type: "mesh"
-output_type: "sdf" # or sdf or occ
+output_type: "occ" # or sdf or occ
 in_out: True
 augment_on_the_fly: False
 mesh_jitter: False
-dataset_folder: "./data/02691156/"
+dataset_folder: "./data/planes_small/"
 wandb_dir: .
 batch_size: 2048
 lr: 1e-2
@@ -35,12 +35,12 @@ multi_process:
   ignore_first: False
 n_points: 100000
 is_meta: True
-strategy: same_init
+strategy: random
 clip_grad: False
 out_act: sigmoid
 mlp_config:
   out_size: 1
-  output_type: sdf
+  output_type: occ
   out_act: sigmoid
   use_leaky_relu: False
   hidden_neurons: [128, 128, 128]
