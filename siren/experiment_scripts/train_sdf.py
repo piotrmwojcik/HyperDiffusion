@@ -57,7 +57,7 @@ def main(cfg: DictConfig):
     first_state_dict = None
     if cfg.strategy == "same_init":
         first_state_dict = torch.load(
-            os.path.join('/data/pwojcik/HyperDiffusion/logs/small_planes/occ_ffef991d85e3136a9a6e43b878d5b335_jitter_0_model_final.pth')
+            os.path.join('/data/pwojcik/HyperDiffusion/logs/small_planes/occ_a14b262838529c2c81e1d9f6b27f1a92_jitter_0_model_final.pth')
         )
         #first_state_dict = get_model(cfg).state_dict()
     x_0s = []
