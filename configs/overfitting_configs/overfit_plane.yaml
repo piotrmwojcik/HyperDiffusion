@@ -43,6 +43,6 @@ mlp_config:
   output_type: occ
   out_act: sigmoid
   use_leaky_relu: False
-  hidden_neurons: [256, 256, 256]
+  hidden_neurons: [128, 128, 128]
   multires: 4
   move: False
