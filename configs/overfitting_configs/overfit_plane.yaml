@@ -30,11 +30,11 @@ multi_process:
   enabled: False
   part_id: 0
   n_of_parts: 4
-  first_weights_name:
+  first_weights_name: occ_a14b262838529c2c81e1d9f6b27f1a92_jitter_0_model_final.pth
   ignore_first: False
 n_points: 100000
 is_meta: True
-strategy: same_init
+strategy: first_weights
 clip_grad: False
 out_act: sigmoid
 mlp_config:
