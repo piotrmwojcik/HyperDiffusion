@@ -160,6 +160,8 @@ def main(cfg: DictConfig):
                     loss = loss_fn(model_output, gt, model)
                 if loss["occupancy"] > 0.5:
                     print("Outlier:", loss)
+                else:
+                    print("Cool: ", loss)
                 continue
             if cfg.strategy == "continue":
                 if not os.path.exists(checkpoint_path):
