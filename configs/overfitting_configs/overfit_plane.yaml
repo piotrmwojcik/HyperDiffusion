@@ -27,7 +27,7 @@ scheduler:
   factor: 0.8
   threshold: 0
 multi_process:
-  enabled: True
+  enabled: False
   part_id: 0
   n_of_parts: 4
   first_weights_name: occ_a14b262838529c2c81e1d9f6b27f1a92_jitter_0_model_final.pth
