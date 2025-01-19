@@ -41,6 +41,6 @@ out_act: sigmoid
 mlp_config:
   out_size: 1
   use_leaky_relu: False
-  hidden_neurons: [256, 256, 256]
+  hidden_neurons: [128, 128, 128]
   multires: 4
   move: False
