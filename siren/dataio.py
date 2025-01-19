@@ -658,6 +658,7 @@ class PointCloud(Dataset):
             )
             self.coords = point_cloud[:, :3]
             self.occupancies = point_cloud[:, 3]
+            #self.normals = point_cloud[:, 3:]
             print(self.occupancies)
 
         if cfg.shape_modify == "half":
@@ -690,7 +691,6 @@ class PointCloud(Dataset):
             occs = self.occupancies[time]
             occs = occs[:, idx]
 
-
             occs = occs.reshape(-1, 1)
 
             coords = np.hstack((coords, time_expanded))
@@ -700,11 +700,10 @@ class PointCloud(Dataset):
             }
         coords = self.coords[idx]
         occs = self.occupancies[idx, None]
-        normals = self.normals[idx]
-
+       # normals = self.normals[idx]
 
         return {"coords": torch.from_numpy(coords).float()}, {
-            "sdf": torch.from_numpy(occs), "normals": torch.from_numpy(normals)
+            "sdf": torch.from_numpy(occs)
         }
 
 
