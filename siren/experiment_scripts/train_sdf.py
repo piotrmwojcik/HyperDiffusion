@@ -146,7 +146,7 @@ def main(cfg: DictConfig):
             checkpoint_path = os.path.join(root_path, f"{filename}_model_final.pth")
             if os.path.exists(checkpoint_path):
                 print("Checkpoint exists:", checkpoint_path)
-                continue
+                #continue
             if cfg.strategy == "remove_bad":
                 model.load_state_dict(torch.load(checkpoint_path))
                 model.eval()
