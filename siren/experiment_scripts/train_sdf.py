@@ -264,7 +264,7 @@ def main(cfg: DictConfig):
                     sdf_meshing.create_mesh(
                         sdf_decoder,
                         os.path.join(cfg.logging_root, f"{cfg.exp_name}_ply", filename),
-                        N=256,
+                        N=64,
                         level=0
                         if cfg.output_type == "occ" and cfg.out_act == "sigmoid"
                         else 0,
