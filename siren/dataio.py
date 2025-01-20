@@ -551,6 +551,9 @@ class PointCloud(Dataset):
                 #print(np.max(inside_surface_values), np.min(inside_surface_values), np.median(inside_surface_values))
                 #query_points = np.random.uniform(-0.5, 0.5, size=(1000, 3))  # Replace with desired points
 
+
+                print('faces ', self.obj.faces)
+
                 # Compute the signed distance values
                 sdf_values, _, _, normals = igl.signed_distance(
                     points,
