@@ -2,7 +2,7 @@ input_type: "mesh"
 output_type: "occ" # or sdf or occ
 in_out: True
 augment_on_the_fly: False
-mesh_jitter: True
+mesh_jitter: False
 dataset_folder: "./data/planes_small/"
 wandb_dir: .
 batch_size: 2048
