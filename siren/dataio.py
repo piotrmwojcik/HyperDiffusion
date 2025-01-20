@@ -556,12 +556,12 @@ class PointCloud(Dataset):
                 #print('faces ', self.obj.faces)
 
                 # Compute the signed distance values
-                #sdf_values, _, _, normals = igl.signed_distance(
-                #    points,
-                #    self.obj.vertices,
-                #    self.obj.faces,
-                #    return_normals=True  # Set to True if normals are needed
-                #)
+                sdf_values, _, _, normals = igl.signed_distance(
+                    points,
+                    self.obj.vertices,
+                    self.obj.faces,
+                    return_normals=True  # Set to True if normals are needed
+                )
                 f = SDF(obj.vertices, obj.faces)
                 sdf_values = f(points)
                 #proximity = trimesh.proximity.ProximityQuery(obj)
