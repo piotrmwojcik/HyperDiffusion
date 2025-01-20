@@ -272,6 +272,8 @@ class MLP3D(nn.Module):
             x = F.leaky_relu(x) if self.use_leaky_relu else F.relu(x)
         x = self.layers[-1](x)
 
+        print(x)
+
         if self.output_type == "occ":
             #pass
             #x = torch.tanh(x)
