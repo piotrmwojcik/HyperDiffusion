@@ -354,8 +354,8 @@ def sdf(model_output, gt, model, cfg=None):
         torch.zeros_like(gradient[..., :1]),
     )
     print('!!!')
-    print(inter_constraint.shape)
-    print(normal_constraint.shape)
+    print(gt_sdf, pred_sdf)
+    print(gt_normals)
 
     grad_constraint = torch.abs(gradient.norm(dim=-1) - 1)
     # kl_loss = kl_loss_fn(model)
