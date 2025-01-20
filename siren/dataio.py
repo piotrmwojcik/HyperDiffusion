@@ -559,7 +559,7 @@ class PointCloud(Dataset):
                     return_normals=True  # Set to True if normals are needed
                 )
 
-                sdf_values_surface, _, _, normals = igl.signed_distance(
+                sdf_values_surface, _, _, _ = igl.signed_distance(
                     points_surface,
                     obj.vertices,
                     obj.faces,
@@ -567,6 +567,15 @@ class PointCloud(Dataset):
                 )
 
                 print('surface :', np.min(sdf_values_surface), np.max(sdf_values_surface))
+                sdf_values_uniform, _, _, _ = igl.signed_distance(
+                    points_uniform,
+                    obj.vertices,
+                    obj.faces,
+                    return_normals=True  # Set to True if normals are needed
+                )
+
+                print('uniform :', np.min(sdf_values_uniform), np.max(sdf_values_uniform))
+
 
                 #normals = np.array(obj.face_normals[closest_faces])
 
