@@ -571,9 +571,7 @@ class PointCloud(Dataset):
                 #occupancies = occupancies_winding[..., None]
                 #print(points.shape, occupancies.shape, occupancies.sum())
                 point_cloud = points
-                print(point_cloud.shape, sdf_values.shape)
                 point_cloud = np.hstack((point_cloud, sdf_values[..., None]))
-                print('!!! normals ', normals.shape, point_cloud.shape)
                 point_cloud = np.hstack((point_cloud, normals))
                 #print(point_cloud.shape, points.shape, occupancies.shape)
 
@@ -664,8 +662,6 @@ class PointCloud(Dataset):
             self.coords = np.array(self.coords)
             self.occupancies = np.array(self.occupancies)
         elif cfg.strategy == "save_pc":
-            print('!!!!!!')
-            print(point_cloud.shape)
             self.coords = point_cloud[:, :3]
             self.sdf = point_cloud[:, 3]
             self.normals = point_cloud[:, 4:]
@@ -681,7 +677,7 @@ class PointCloud(Dataset):
             self.coords = point_cloud[:, :3]
             self.sdfs = point_cloud[:, 3]
             self.normals = point_cloud[:, 4:]
-            print(self.sdfs)
+            print(self.sdfs, np.max(self.sdfs), np.min(self.sdfs))
 
         if cfg.shape_modify == "half":
             included_points = self.coords[:, 0] < 0
