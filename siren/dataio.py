@@ -539,17 +539,17 @@ class PointCloud(Dataset):
                 points_uniform = np.random.uniform(
                     -0.5, 0.5, size=(n_points_uniform, 3)
                 )
-                points_surface, _ = obj.sample(n_points_surface, return_index=True)
+                points_surface = obj.sample(n_points_surface)
                 points_surface += 0.01 * np.random.randn(n_points_surface, 3)
                 points = np.concatenate([points_surface, points_uniform], axis=0)
 
                 _, faces = obj.sample(points, return_index=True)
                 normals = np.array(obj.face_normals[faces])
 
-                inside_surface_values = igl.fast_winding_number_for_meshes(
-                    obj.vertices, obj.faces, points
-                )
-                print(np.max(inside_surface_values), np.min(inside_surface_values), np.median(inside_surface_values))
+                #inside_surface_values = igl.fast_winding_number_for_meshes(
+                #    obj.vertices, obj.faces, points
+                #)
+                #print(np.max(inside_surface_values), np.min(inside_surface_values), np.median(inside_surface_values))
                 #query_points = np.random.uniform(-0.5, 0.5, size=(1000, 3))  # Replace with desired points
 
                 # Compute the signed distance values
