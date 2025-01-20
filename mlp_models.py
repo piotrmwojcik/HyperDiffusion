@@ -268,10 +268,9 @@ class MLP3D(nn.Module):
         x = self.embedder.embed(x)
         for i, layer in enumerate(self.layers[:-1]):
             x = layer(x)
+            print('!!! ', x.shape, x)
             x = F.leaky_relu(x) if self.use_leaky_relu else F.relu(x)
         x = self.layers[-1](x)
-
-        print('!!! ', x.shape, x)
 
         if self.output_type == "occ":
             #x = torch.sigmoid(x)

@@ -175,6 +175,9 @@ def main(cfg: DictConfig):
                 print("loaded")
                 model.load_state_dict(first_state_dict)
 
+            for param in model.parameters():
+                param.requires_grad = False
+
             training.train(
                 model=model,
                 train_dataloader=dataloader,
