@@ -540,7 +540,7 @@ class PointCloud(Dataset):
                     -0.5, 0.5, size=(n_points_uniform, 3)
                 )
                 points_surface, faces = obj.sample(n_points_surface, return_index=True)
-                #normals = np.array(obj.face_normals[obj.faces])
+                normals = np.array(obj.face_normals[faces])
                 points_surface += 0.01 * np.random.randn(n_points_surface, 3)
                 points = np.concatenate([points_surface, points_uniform], axis=0)
 
@@ -663,9 +663,10 @@ class PointCloud(Dataset):
             print('!!!!!!')
             print(point_cloud.shape)
             self.coords = point_cloud[:, :3]
-            self.normals = point_cloud[:, 3:]
+            self.sdf = point_cloud[:, 3]
+            self.normals = point_cloud[:, 4:]
 
-            point_cloud_xyz = np.hstack((self.coords, self.normals))
+            point_cloud_xyz = np.hstack((self.coords, self.sdf, self.normals))
             print('!!! ', self.coords.shape, self.normals.shape, point_cloud_xyz.shape)
             os.makedirs(pc_folder, exist_ok=True)
             np.save(os.path.join(pc_folder, os.path.basename(path)), point_cloud_xyz)
@@ -674,9 +675,9 @@ class PointCloud(Dataset):
                 os.path.join(pc_folder, os.path.basename(path) + ".npy")
             )
             self.coords = point_cloud[:, :3]
-            self.occupancies = point_cloud[:, 3]
-            #self.normals = point_cloud[:, 3:]
-            print(self.occupancies)
+            self.sdfs = point_cloud[:, 3]
+            self.normals = point_cloud[:, 4:]
+            print(self.sdfs)
 
         if cfg.shape_modify == "half":
             included_points = self.coords[:, 0] < 0
@@ -716,11 +717,11 @@ class PointCloud(Dataset):
                 "sdf": torch.from_numpy(occs)
             }
         coords = self.coords[idx]
-        occs = self.occupancies[idx, None]
+        sdfs = self.sdfs[idx, None]
         normals = self.normals[idx]
 
         return {"coords": torch.from_numpy(coords).float()}, {
-            "sdf": torch.from_numpy(occs),
+            "sdf": torch.from_numpy(sdfs),
             "normals": torch.from_numpy(normals)
         }
 
