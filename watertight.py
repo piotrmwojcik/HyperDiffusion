@@ -29,7 +29,7 @@ p_vol = (np.random.rand(num_vol_pts, 3) - 0.5) * 1.1
 sdf, _, _  = pcu.signed_distance_to_mesh(p_vol, vm, fm)
 print(sdf.shape)
 
-output = np.hstack(p_vol, sdf[..., None])
+output = np.hstack((p_vol, sdf[..., None]))
 np.save('dupa.npy', output)
 
 # Sample points on the surface as face ids and barycentric coordinates
