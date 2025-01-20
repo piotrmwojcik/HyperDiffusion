@@ -330,7 +330,7 @@ def occ_tanh(model_output, gt, model, cfg=None):
 
     # kl_loss_fn = torchbnn.BKLLoss(reduction='mean', last_layer_only=False)
     # kl_loss = kl_loss_fn(model)
-    return {"occupancy": F.mse_loss(pred_sdf, gt_sdf)}  # , 'kl_weights': 0.1 * kl_loss}
+    return {"occupancy": F.l1_loss(pred_sdf, gt_sdf)}  # , 'kl_weights': 0.1 * kl_loss}
 
 
 def sdf(model_output, gt, model, cfg=None):
