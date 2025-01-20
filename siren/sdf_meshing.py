@@ -196,6 +196,7 @@ def create_mesh(
 
     sdf_values = samples[:, 3]
     sdf_values = sdf_values.reshape(N, N, N)
+    sdf_values = (sdf_values > 0).float()
     end = time.time()
     # print("sampling takes: %f" % (end - start))
 
