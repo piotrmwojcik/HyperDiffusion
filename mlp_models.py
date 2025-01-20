@@ -275,6 +275,7 @@ class MLP3D(nn.Module):
             #x = torch.sigmoid(x)
             pass
         elif self.output_type == "sdf":
+            print('!!! ', x.shape, x)
             x = torch.tanh(x)
         elif self.output_type == "logits":
             x = x
