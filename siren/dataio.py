@@ -551,11 +551,13 @@ class PointCloud(Dataset):
 
                 # Compute the signed distance values
                 sdf_values, closest_points, closest_faces = igl.signed_distance(
-                    points,
+                    points_surface,
                     obj.vertices,
                     obj.faces,
                     return_normals=False  # Set to True if normals are needed
                 )
+
+                print(sdf_values)
 
                 thresh = 0.5
                 occupancies_winding = np.piecewise(
