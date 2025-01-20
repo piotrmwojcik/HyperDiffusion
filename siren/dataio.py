@@ -670,7 +670,7 @@ class PointCloud(Dataset):
             self.sdf = point_cloud[:, 3]
             self.normals = point_cloud[:, 4:]
 
-            point_cloud_xyz = np.hstack((self.coords, self.sdf, self.normals))
+            point_cloud_xyz = np.hstack((self.coords, self.sdf[..., None], self.normals))
             print('!!! ', self.coords.shape, self.normals.shape, point_cloud_xyz.shape)
             os.makedirs(pc_folder, exist_ok=True)
             np.save(os.path.join(pc_folder, os.path.basename(path)), point_cloud_xyz)
