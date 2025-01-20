@@ -272,6 +272,7 @@ class MLP3D(nn.Module):
         x = self.layers[-1](x)
 
         if self.output_type == "occ":
+            print('dupa')
             #x = torch.sigmoid(x)
             pass
         elif self.output_type == "sdf":
