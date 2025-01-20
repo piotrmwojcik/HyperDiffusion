@@ -265,6 +265,7 @@ class MLP3D(nn.Module):
     def forward(self, model_input):
         coords_org = model_input["coords"].clone().detach().requires_grad_(True)
         x = coords_org
+        print('!!! ', x.shape, x)
         x = self.embedder.embed(x)
         for i, layer in enumerate(self.layers[:-1]):
             x = layer(x)
@@ -275,7 +276,6 @@ class MLP3D(nn.Module):
             #x = torch.sigmoid(x)
             pass
         elif self.output_type == "sdf":
-            print('!!! ', x.shape, x)
             x = torch.tanh(x)
         elif self.output_type == "logits":
             x = x
@@ -283,7 +283,6 @@ class MLP3D(nn.Module):
             raise f"This self.output_type ({self.output_type}) not implemented"
         #x = dist.Bernoulli(logits=x).logits
 
-        print(x.shape, x)
 
         return {"model_in": coords_org, "model_out": x}
 
