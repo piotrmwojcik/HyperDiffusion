@@ -37,7 +37,7 @@ n_points: 100000
 is_meta: True
 strategy: random
 clip_grad: False
-out_act: sdf
+out_act: tanh
 mlp_config:
   out_size: 1
   use_leaky_relu: False
