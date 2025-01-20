@@ -163,7 +163,7 @@ def main(cfg: DictConfig):
                     print("Outlier:", loss)
                 else:
                     print("Cool: ", loss)
-                continue
+                #continue
             if cfg.strategy == "continue":
                 if not os.path.exists(checkpoint_path):
                     continue
@@ -179,22 +179,22 @@ def main(cfg: DictConfig):
             for param in model.parameters():
                 param.requires_grad = False
 
-            training.train(
-                model=model,
-                train_dataloader=dataloader,
-                epochs=cfg.epochs,
-                lr=curr_lr,
-                steps_til_summary=cfg.steps_til_summary,
-                epochs_til_checkpoint=cfg.epochs_til_ckpt,
-                model_dir=root_path,
-                loss_fn=loss_fn,
-                summary_fn=summary_fn,
-                double_precision=False,
-                clip_grad=cfg.clip_grad,
-                wandb=wandb,
-                filename=filename,
-                cfg=cfg,
-            )
+            # training.train(
+            #     model=model,
+            #     train_dataloader=dataloader,
+            #     epochs=cfg.epochs,
+            #     lr=curr_lr,
+            #     steps_til_summary=cfg.steps_til_summary,
+            #     epochs_til_checkpoint=cfg.epochs_til_ckpt,
+            #     model_dir=root_path,
+            #     loss_fn=loss_fn,
+            #     summary_fn=summary_fn,
+            #     double_precision=False,
+            #     clip_grad=cfg.clip_grad,
+            #     wandb=wandb,
+            #     filename=filename,
+            #     cfg=cfg,
+            # )
             if (
                 i == 0
                 and first_state_dict is None
