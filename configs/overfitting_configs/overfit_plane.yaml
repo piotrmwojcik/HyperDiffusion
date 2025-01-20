@@ -40,8 +40,6 @@ clip_grad: False
 out_act: sigmoid
 mlp_config:
   out_size: 1
-  output_type: occ
-  out_act: sigmoid
   use_leaky_relu: False
   hidden_neurons: [128, 128, 128]
   multires: 4

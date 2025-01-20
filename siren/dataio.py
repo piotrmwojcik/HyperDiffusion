@@ -539,7 +539,8 @@ class PointCloud(Dataset):
                 points_uniform = np.random.uniform(
                     -0.5, 0.5, size=(n_points_uniform, 3)
                 )
-                points_surface = obj.sample(n_points_surface)
+                points_surface = obj.sample(n_points_surface, return_index=True)
+                #normals = np.array(obj.face_normals[obj.faces])
                 points_surface += 0.01 * np.random.randn(n_points_surface, 3)
                 points = np.concatenate([points_surface, points_uniform], axis=0)
 
@@ -569,6 +570,7 @@ class PointCloud(Dataset):
                 point_cloud = points
                 print(point_cloud.shape, sdf_values.shape)
                 point_cloud = np.hstack((point_cloud, sdf_values[..., None]))
+                point_cloud = np.hstack(point_cloud, normals)
                 #print(point_cloud.shape, points.shape, occupancies.shape)
 
         else:
