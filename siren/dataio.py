@@ -547,6 +547,16 @@ class PointCloud(Dataset):
                     obj.vertices, obj.faces, points
                 )
                 print(np.max(inside_surface_values), np.min(inside_surface_values), np.median(inside_surface_values))
+                #query_points = np.random.uniform(-0.5, 0.5, size=(1000, 3))  # Replace with desired points
+
+                # Compute the signed distance values
+                sdf_values, closest_points, closest_faces = igl.signed_distance(
+                    points,
+                    obj.vertices,
+                    obj.faces,
+                    return_normals=False  # Set to True if normals are needed
+                )
+
                 thresh = 0.5
                 occupancies_winding = np.piecewise(
                     inside_surface_values,
@@ -621,15 +631,6 @@ class PointCloud(Dataset):
                     obj.vertices, obj.faces, coords
                 )
 
-                query_points = np.random.uniform(-0.5, 0.5, size=(1000, 3))  # Replace with desired points
-
-                # Compute the signed distance values
-                sdf_values, closest_points, closest_faces = igl.signed_distance(
-                    query_points,
-                    obj.vertices,
-                    obj.faces,
-                    return_normals=False  # Set to True if normals are needed
-                )
 
                 thresh = 0.5
                 occupancies = np.piecewise(
