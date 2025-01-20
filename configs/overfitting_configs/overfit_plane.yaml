@@ -1,5 +1,5 @@
 input_type: "mesh"
-output_type: "tanh" # or sdf or occ
+output_type: "occ" # or sdf or occ
 in_out: True
 augment_on_the_fly: False
 mesh_jitter: False
