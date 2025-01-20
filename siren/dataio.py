@@ -552,14 +552,14 @@ class PointCloud(Dataset):
                 #query_points = np.random.uniform(-0.5, 0.5, size=(1000, 3))  # Replace with desired points
 
                 # Compute the signed distance values
-                sdf_values, _, closest_faces = igl.signed_distance(
+                sdf_values, _, _, normals = igl.signed_distance(
                     points,
                     obj.vertices,
                     obj.faces,
                     return_normals=True  # Set to True if normals are needed
                 )
 
-                normals = np.array(obj.face_normals[closest_faces])
+                #normals = np.array(obj.face_normals[closest_faces])
 
                 #print(sdf_values)
                 #thresh = 0.5
