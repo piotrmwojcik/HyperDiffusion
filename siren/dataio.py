@@ -551,7 +551,7 @@ class PointCloud(Dataset):
 
                 # Compute the signed distance values
                 sdf_values, closest_points, closest_faces = igl.signed_distance(
-                    points_surface,
+                    points_uniform,
                     obj.vertices,
                     obj.faces,
                     return_normals=False  # Set to True if normals are needed
