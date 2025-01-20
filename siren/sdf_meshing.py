@@ -242,7 +242,6 @@ def convert_sdf_samples_to_ply(
         np.zeros((0, 3)),
         np.zeros(0),
     )
-    print(numpy_3d_sdf_tensor)
     try:
         verts, faces, normals, values = skimage.measure.marching_cubes_lewiner(
             numpy_3d_sdf_tensor, level=level, spacing=[voxel_size] * 3
