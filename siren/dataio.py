@@ -543,7 +543,7 @@ class PointCloud(Dataset):
                 points_surface += 0.01 * np.random.randn(n_points_surface, 3)
                 points = np.concatenate([points_surface, points_uniform], axis=0)
 
-                _, faces = obj.sample(n_points_surface, return_index=True)
+                _, faces = obj.sample(points, return_index=True)
                 normals = np.array(obj.face_normals[faces])
 
                 inside_surface_values = igl.fast_winding_number_for_meshes(
