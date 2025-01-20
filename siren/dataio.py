@@ -671,7 +671,7 @@ class PointCloud(Dataset):
             self.normals = point_cloud[:, 4:]
 
             point_cloud_xyz = np.hstack((self.coords, self.sdf[..., None], self.normals))
-            print('!!! ', self.coords.shape, self.normals.shape, point_cloud_xyz.shape)
+            #print('!!! ', self.coords.shape, self.normals.shape, point_cloud_xyz.shape)
             os.makedirs(pc_folder, exist_ok=True)
             np.save(os.path.join(pc_folder, os.path.basename(path)), point_cloud_xyz)
         else:
@@ -725,8 +725,8 @@ class PointCloud(Dataset):
         normals = self.normals[idx]
 
         return {"coords": torch.from_numpy(coords).float()}, {
-            "sdf": torch.from_numpy(sdfs),
-            "normals": torch.from_numpy(normals)
+            "sdf": torch.from_numpy(sdfs).float(),
+            "normals": torch.from_numpy(normals).float()
         }
 
 
