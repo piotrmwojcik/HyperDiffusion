@@ -268,7 +268,6 @@ class MLP3D(nn.Module):
         x = self.embedder.embed(x)
         for i, layer in enumerate(self.layers[:-1]):
             x = layer(x)
-            print('!!! ', x.shape, x)
             x = F.leaky_relu(x) if self.use_leaky_relu else F.relu(x)
         x = self.layers[-1](x)
 
@@ -281,8 +280,8 @@ class MLP3D(nn.Module):
             x = x
         else:
             raise f"This self.output_type ({self.output_type}) not implemented"
-        #x = dist.Bernoulli(logits=x).logits
-
+        x = dist.Bernoulli(logits=x).logits
+        print('!!! ', x.shape, x)
 
         return {"model_in": coords_org, "model_out": x}
 
