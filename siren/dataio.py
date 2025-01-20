@@ -551,24 +551,23 @@ class PointCloud(Dataset):
 
                 # Compute the signed distance values
                 sdf_values, closest_points, closest_faces = igl.signed_distance(
-                    points_uniform,
+                    points,
                     obj.vertices,
                     obj.faces,
                     return_normals=False  # Set to True if normals are needed
                 )
 
-                print(sdf_values)
-
-                thresh = 0.5
-                occupancies_winding = np.piecewise(
-                    inside_surface_values,
-                    [inside_surface_values < thresh, inside_surface_values >= thresh],
-                    [0, 1],
-                )
-                occupancies = occupancies_winding[..., None]
-                print(points.shape, occupancies.shape, occupancies.sum())
+                #print(sdf_values)
+                #thresh = 0.5
+                #occupancies_winding = np.piecewise(
+                #    inside_surface_values,
+                #    [inside_surface_values < thresh, inside_surface_values >= thresh],
+                #    [0, 1],
+                #)
+                #occupancies = occupancies_winding[..., None]
+                #print(points.shape, occupancies.shape, occupancies.sum())
                 point_cloud = points
-                point_cloud = np.hstack((point_cloud, occupancies))
+                point_cloud = np.hstack((point_cloud, sdf_values))
                 #print(point_cloud.shape, points.shape, occupancies.shape)
 
         else:
@@ -633,7 +632,6 @@ class PointCloud(Dataset):
                     obj.vertices, obj.faces, coords
                 )
 
-
                 thresh = 0.5
                 occupancies = np.piecewise(
                     inside_surface_values,
@@ -659,6 +657,8 @@ class PointCloud(Dataset):
             self.coords = np.array(self.coords)
             self.occupancies = np.array(self.occupancies)
         elif cfg.strategy == "save_pc":
+            print('!!!!!!')
+            print(point_cloud.shape)
             self.coords = point_cloud[:, :3]
             self.normals = point_cloud[:, 3:]
 
@@ -714,10 +714,11 @@ class PointCloud(Dataset):
             }
         coords = self.coords[idx]
         occs = self.occupancies[idx, None]
-       # normals = self.normals[idx]
+        normals = self.normals[idx]
 
         return {"coords": torch.from_numpy(coords).float()}, {
-            "sdf": torch.from_numpy(occs)
+            "sdf": torch.from_numpy(occs),
+            "normals": torch.from_numpy(normals)
         }
 
 
