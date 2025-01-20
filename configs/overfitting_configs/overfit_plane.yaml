@@ -40,7 +40,7 @@ clip_grad: False
 out_act: tanh
 mlp_config:
   out_size: 1
-  use_leaky_relu: False
+  use_leaky_relu: True
   hidden_neurons: [128, 128, 128]
   multires: 4
   move: False
