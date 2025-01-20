@@ -282,6 +282,8 @@ class MLP3D(nn.Module):
             raise f"This self.output_type ({self.output_type}) not implemented"
         #x = dist.Bernoulli(logits=x).logits
 
+        print(x.shape, x)
+
         return {"model_in": coords_org, "model_out": x}
 
 class SingleBVPNet(MetaModule): ## SIREN 2D
