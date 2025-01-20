@@ -677,7 +677,7 @@ class PointCloud(Dataset):
             self.coords = point_cloud[:, :3]
             self.sdfs = point_cloud[:, 3]
             self.normals = point_cloud[:, 4:]
-            print(self.sdfs, np.max(self.sdfs), np.min(self.sdfs))
+            #print(self.sdfs, np.max(self.sdfs), np.min(self.sdfs))
 
         if cfg.shape_modify == "half":
             included_points = self.coords[:, 0] < 0
