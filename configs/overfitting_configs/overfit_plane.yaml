@@ -34,10 +34,10 @@ multi_process:
   first_weights_name: occ_a14b262838529c2c81e1d9f6b27f1a92_jitter_0_model_final.pth
   ignore_first: False
 n_points: 100000
-is_meta: True
+is_meta: False
 strategy: random
 clip_grad: False
-out_act: tanh
+out_act: occ
 mlp_config:
   out_size: 1
   use_leaky_relu: True
