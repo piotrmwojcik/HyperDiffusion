@@ -559,6 +559,15 @@ class PointCloud(Dataset):
                     return_normals=True  # Set to True if normals are needed
                 )
 
+                sdf_values_surface, _, _, normals = igl.signed_distance(
+                    points_surface,
+                    obj.vertices,
+                    obj.faces,
+                    return_normals=True  # Set to True if normals are needed
+                )
+
+                print('surface :', np.min(sdf_values_surface), np.max(sdf_values_surface))
+
                 #normals = np.array(obj.face_normals[closest_faces])
 
                 #print(sdf_values)
