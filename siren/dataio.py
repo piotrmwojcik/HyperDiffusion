@@ -539,12 +539,11 @@ class PointCloud(Dataset):
                 points_uniform = np.random.uniform(
                     -0.5, 0.5, size=(n_points_uniform, 3)
                 )
-                points_surface = obj.sample(n_points_surface)
+
+                points_surface, faces = obj.sample(n_points_surface, return_index=True)
                 points_surface += 0.01 * np.random.randn(n_points_surface, 3)
                 points = np.concatenate([points_surface, points_uniform], axis=0)
 
-                _, faces = obj.sample(points, return_index=True)
-                normals = np.array(obj.face_normals[faces])
 
                 #inside_surface_values = igl.fast_winding_number_for_meshes(
                 #    obj.vertices, obj.faces, points
@@ -553,12 +552,14 @@ class PointCloud(Dataset):
                 #query_points = np.random.uniform(-0.5, 0.5, size=(1000, 3))  # Replace with desired points
 
                 # Compute the signed distance values
-                sdf_values, _, _ = igl.signed_distance(
+                sdf_values, _, closest_faces = igl.signed_distance(
                     points,
                     obj.vertices,
                     obj.faces,
-                    return_normals=False  # Set to True if normals are needed
+                    return_normals=True  # Set to True if normals are needed
                 )
+
+                normals = np.array(obj.face_normals[closest_faces])
 
                 #print(sdf_values)
                 #thresh = 0.5
