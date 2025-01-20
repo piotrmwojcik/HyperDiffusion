@@ -353,6 +353,10 @@ def sdf(model_output, gt, model, cfg=None):
         1 - F.cosine_similarity(gradient, gt_normals, dim=-1)[..., None],
         torch.zeros_like(gradient[..., :1]),
     )
+    print('!!!')
+    print(inter_constraint.shape)
+    print(normal_constraint.shape)
+
     grad_constraint = torch.abs(gradient.norm(dim=-1) - 1)
     # kl_loss = kl_loss_fn(model)
     # Exp      # Lapl
