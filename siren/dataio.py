@@ -561,7 +561,9 @@ class PointCloud(Dataset):
                 #    self.obj.faces,
                 #    return_normals=True  # Set to True if normals are needed
                 #)
-                sdf_values = self.obj.signed_distance(points)
+                proximity = trimesh.proximity.ProximityQuery(obj)
+                sdf_values, _, _ = proximity.signed_distance(points)
+                #sdf_values = self.obj.signed_distance(points)
 
                 #print('uniform :', np.min(sdf_values_uniform), np.max(sdf_values_uniform))
 
