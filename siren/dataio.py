@@ -570,6 +570,7 @@ class PointCloud(Dataset):
                 point_cloud = points
                 print(point_cloud.shape, sdf_values.shape)
                 point_cloud = np.hstack((point_cloud, sdf_values[..., None]))
+                print('!!! normals ', normals.shape)
                 point_cloud = np.hstack(point_cloud, normals)
                 #print(point_cloud.shape, points.shape, occupancies.shape)
 
