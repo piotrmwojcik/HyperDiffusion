@@ -326,8 +326,6 @@ def occ_sigmoid(model_output, gt, model, cfg=None, first_state_dict=None):
 def occ_tanh(model_output, gt, model, cfg=None):
     gt_sdf = gt["sdf"]
     pred_sdf = model_output["model_out"]
-    print(gt_sdf)
-    print(pred_sdf)
     #print(gt_sdf, pred_sdf)
 
     # kl_loss_fn = torchbnn.BKLLoss(reduction='mean', last_layer_only=False)
