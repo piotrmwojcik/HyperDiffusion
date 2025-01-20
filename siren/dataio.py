@@ -562,7 +562,7 @@ class PointCloud(Dataset):
                     self.obj.faces,
                     return_normals=True  # Set to True if normals are needed
                 )
-                f = SDF(obj.vertices, obj.faces)
+                f = SDF(self.obj.vertices, self.obj.faces)
                 sdf_values = f(points)
                 #proximity = trimesh.proximity.ProximityQuery(obj)
                 #sdf_values, _, _ = proximity.signed_distance(points)
