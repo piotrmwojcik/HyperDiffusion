@@ -157,6 +157,7 @@ def main(cfg: DictConfig):
                     }
                     gt = {key: value.cuda() for key, value in gt.items()}
                     model_output = model(model_input)
+                    print(model_output)
                     loss = loss_fn(model_output, gt, model)
                 if loss["occupancy"] > 0.5:
                     print("Outlier:", loss)
