@@ -539,7 +539,7 @@ class PointCloud(Dataset):
                 points_uniform = np.random.uniform(
                     -0.5, 0.5, size=(n_points_uniform, 3)
                 )
-                points_surface = obj.sample(n_points_surface, return_index=True)
+                points_surface, faces = obj.sample(n_points_surface, return_index=True)
                 #normals = np.array(obj.face_normals[obj.faces])
                 points_surface += 0.01 * np.random.randn(n_points_surface, 3)
                 points = np.concatenate([points_surface, points_uniform], axis=0)
