@@ -568,7 +568,7 @@ class PointCloud(Dataset):
                 #print(points.shape, occupancies.shape, occupancies.sum())
                 point_cloud = points
                 print(point_cloud.shape, sdf_values.shape)
-                point_cloud = np.hstack((point_cloud, sdf_values))
+                point_cloud = np.hstack((point_cloud, sdf_values[..., None]))
                 #print(point_cloud.shape, points.shape, occupancies.shape)
 
         else:
