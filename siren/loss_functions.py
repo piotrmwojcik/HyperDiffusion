@@ -323,7 +323,7 @@ def occ_sigmoid(model_output, gt, model, cfg=None, first_state_dict=None):
         return {"occupancy": loss.sum(-1).mean()}
 
 
-def occ_tanh(model_output, gt, model):
+def occ_tanh(model_output, gt, model, cfg=None):
     gt_sdf = gt["sdf"]
     pred_sdf = model_output["model_out"]
     print(gt_sdf, pred_sdf)
