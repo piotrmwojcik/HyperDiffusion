@@ -554,8 +554,8 @@ class PointCloud(Dataset):
                 # Compute the signed distance values
                 sdf_values, _, _, normals = igl.signed_distance(
                     points,
-                    obj.vertices,
-                    obj.faces,
+                    self.obj.vertices,
+                    self.obj.faces,
                     return_normals=True  # Set to True if normals are needed
                 )
 
