@@ -620,6 +620,17 @@ class PointCloud(Dataset):
                 inside_surface_values = igl.fast_winding_number_for_meshes(
                     obj.vertices, obj.faces, coords
                 )
+
+                query_points = np.random.uniform(-0.5, 0.5, size=(1000, 3))  # Replace with desired points
+
+                # Compute the signed distance values
+                sdf_values, closest_points, closest_faces = igl.signed_distance(
+                    query_points,
+                    obj.vertices,
+                    obj.faces,
+                    return_normals=False  # Set to True if normals are needed
+                )
+
                 thresh = 0.5
                 occupancies = np.piecewise(
                     inside_surface_values,
