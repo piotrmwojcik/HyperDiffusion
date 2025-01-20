@@ -273,7 +273,7 @@ class MLP3D(nn.Module):
 
         if self.output_type == "occ":
             #pass
-            x = torch.tanh(x)
+            #x = torch.tanh(x)
             #x = torch.sigmoid(x)
             pass
         elif self.output_type == "sdf":
@@ -282,7 +282,7 @@ class MLP3D(nn.Module):
             x = x
         else:
             raise f"This self.output_type ({self.output_type}) not implemented"
-        x = dist.Bernoulli(logits=x).logits
+        #x = dist.Bernoulli(logits=x).logits
         #print('!!! ', x.shape, x)
 
         return {"model_in": coords_org, "model_out": x}
