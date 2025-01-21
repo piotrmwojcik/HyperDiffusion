@@ -46,7 +46,7 @@ inverse_amplify_schedule:
 inverse_steps_schedule:
   - 20: 3
   - 3000: 1
-model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_small_parallel_big_3_nn_final/checkpoint/model_epoch_279.pth
+model_resume_path: /data/pwojcik/HyperDiffusion/work_dirs/celebhq5k_small_parallel_big_3_nn_final/checkpoint/model_epoch_1039.pth
 sampling: ddimr
 val_fid_calculation_period: 1
 lr: 0.0002
